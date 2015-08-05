@@ -11,7 +11,7 @@ import scalaz.OptionT._
 import AptPrograms._
 
 object AptOperations {
-  lazy val aptSourcePattern  = "(deb|deb-src)[ \t]+(\\w+)([ \t]+\\w+)".r
+  lazy val aptSourcePattern  = "(deb|deb-src)\\s+(\\[arch=(\\S+)\\]\\s+)?(\\S+)\\s+(\\S+)((\\s+\\S+)*)".r
   lazy val etcAptSourcesMain = "/etc/apt/sources.list"
   lazy val etcAptSourcesDir  = "/etc/apt/sources.list.d/*"
   lazy val installedPattern  = "^ii\\s+(\\S+)\\s+(\\S+)".r

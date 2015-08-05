@@ -32,9 +32,11 @@ object AptPrograms {
   implicit val ListAptRepos2AptRepositories: ListAptReposInterpreter[List[AptRepository]] = result => for {
     line      <- result.stdout
     lineMatch <- aptSourcePattern findFirstMatchIn line
-  } yield AptRepository(lineMatch.group(1) == "deb-src", // todo: [architecture, architecture]
-                        lineMatch group 2,
-                        lineMatch group 3 split ("\\s+") toList)
+  } yield AptRepository(isSrc         = lineMatch group 1 equalsIgnoreCase "deb-src",
+                        url           = lineMatch group 4,
+                        branch        = lineMatch group 5,
+                        areas         = lineMatch group 6 split "\\s+" toList,
+                        architectures = lineMatch group 3 split "," toList)
 }
 
 case class AptAddRepository(repository: AptRepository) extends Program[AptAddRepository](
