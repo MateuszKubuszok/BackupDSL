@@ -1,34 +1,69 @@
 package pl.combosolutions.backup.dsl.internals.operations
 
-import pl.combosolutions.backup.dsl.internals._
-import pl.combosolutions.backup.dsl.internals.filesystem.FSPath
-import pl.combosolutions.backup.dsl.internals.filesystem.FileType.FileType
-import pl.combosolutions.backup.dsl.internals.operations.Program.AsyncResult
-import pl.combosolutions.backup.dsl.internals.operations.posix.linux.DebianOperations
-import pl.combosolutions.backup.dsl.internals.repositories.{Package, Repository}
+import java.nio.file.Path
+
+import pl.combosolutions.backup.dsl.internals.filesystem.FileType._
+import pl.combosolutions.backup.dsl.internals.operations.Program._
+import pl.combosolutions.backup.dsl.internals.operations.posix.PosixFileSystem
+import pl.combosolutions.backup.dsl.internals.operations.posix.linux.{AptRepositories, KDESudoElevation, GKSudoElevation}
 
 import scala.util.matching.Regex
 
 object PlatformSpecific {
-  lazy val current: PlatformSpecific = OperatingSystem.current match {
-    case DebianSystem => DebianOperations // TODO: implement for the rest of the world when needed
-  }
+  lazy val current: PlatformSpecific = new CalculatedPlatformSpecific(
+    currentElevation,
+    currentFileSystem,
+    currentRepositories
+  )
+
+  private lazy val currentElevation = List(
+    GKSudoElevation,
+    KDESudoElevation
+  ) find (_.elevationAvailable) getOrElse (throw new IllegalStateException("No elevation found"))
+
+  private lazy val currentFileSystem = List(
+    PosixFileSystem
+  ) find (_.fileSystemAvailable) getOrElse (throw new IllegalStateException("No file system found"))
+
+  private lazy val currentRepositories = List(
+    AptRepositories
+  ) find (_.repositoriesAvailable) getOrElse (throw new IllegalStateException("No repositories found"))
 }
 
-abstract trait PlatformSpecific {
-  abstract def elevate[T <: Program](program: Program[T]): Program[T]
+trait PlatformSpecific
+  extends PlatformSpecificElevation
+  with PlatformSpecificFileSystem
+  with PlatformSpecificRepositories
 
-  val fileIsFile: Regex
-  val fileIsDirectory: Regex
-  val fileIsSymlinkPattern: Regex
-  abstract def getFileType(fSPath: FSPath): AsyncResult[FileType]
+class CalculatedPlatformSpecific(
+    elevationPS: PlatformSpecificElevation,
+    fileSystemPS: PlatformSpecificFileSystem,
+    repositoriesPS: PlatformSpecificRepositories)
+    extends PlatformSpecific {
 
-  type Repositories <: Traversable[Repository]
-  abstract def obtainRepositories: AsyncResult[Repositories]
-  abstract def addRepositories(repositories: Repositories): AsyncResult[Boolean]
-  abstract def removeRepositories(repositories: Repositories): AsyncResult[Boolean]
+  // elevation
 
-  type Packages <: Traversable[Package]
-  abstract def areAllInstalled(packages: Packages): AsyncResult[Boolean]
-  abstract def installAll(packages: Packages): AsyncResult[Boolean]
+  override val elevationAvailable = elevationPS.elevationAvailable
+
+  override def elevate[T <: Program[T]](program: Program[T]): Program[T] = elevationPS.elevate(program)
+
+  // file system
+
+  override val fileSystemAvailable: Boolean = fileSystemPS.fileSystemAvailable
+
+  override val fileIsFile: Regex = fileSystemPS.fileIsFile
+  override val fileIsDirectory: Regex = fileSystemPS.fileIsDirectory
+  override val fileIsSymlinkPattern: Regex = fileSystemPS.fileIsSymlinkPattern
+  override def getFileType(path: Path): AsyncResult[FileType] = fileSystemPS.getFileType(path)
+
+  // repositories
+
+  override val repositoriesAvailable: Boolean = repositoriesPS.repositoriesAvailable
+
+  override def obtainRepositories: AsyncResult[Repositories] = repositoriesPS.obtainRepositories
+  override def addRepositories(repositories: Repositories): AsyncResult[Boolean] = repositoriesPS.addRepositories(repositories)
+  override def removeRepositories(repositories: Repositories): AsyncResult[Boolean]= repositoriesPS.removeRepositories(repositories)
+
+  override def areAllInstalled(packages: Packages): AsyncResult[Boolean] = repositoriesPS.areAllInstalled(packages)
+  override def installAll(packages: Packages): AsyncResult[Boolean] = repositoriesPS.installAll(packages)
 }

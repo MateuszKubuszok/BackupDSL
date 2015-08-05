@@ -2,9 +2,9 @@ package pl.combosolutions.backup.dsl.internals
 
 import org.apache.commons.lang3.SystemUtils._
 
-import scala.reflect.io.File
-
 import OperatingSystem._
+
+import java.nio.file.{Files,Paths}
 
 object OperatingSystem {
   val all = Seq(
@@ -25,22 +25,22 @@ object OperatingSystem {
   lazy val current = all filter (_.isCurrent) head
 
   // from http://linuxmafia.com/faq/Admin/release-files.html
-  def IS_OS_ARCH   = File("/etc/arch-release").exists
-  def IS_OS_DEBIAN = File("/etc/debian_version").exists
-  def IS_OS_FEDORA = File("/etc/fedora-release").exists
-  def IS_OS_GENTOO = File("/etc/gentoo-release").exists
-  def IS_OS_REDHAT = File("/etc/redhat-release").exists
+  def IS_OS_ARCH   = Files.exists(Paths.get("/etc/arch-release"))
+  def IS_OS_DEBIAN = Files.exists(Paths.get("/etc/debian_version"))
+  def IS_OS_FEDORA = Files.exists(Paths.get("/etc/fedora-release"))
+  def IS_OS_GENTOO = Files.exists(Paths.get("/etc/gentoo-release"))
+  def IS_OS_REDHAT = Files.exists(Paths.get("/etc/redhat-release"))
 }
 
 // Operating systems families
 
-sealed abstract case class OperatingSystem(name: String, isCurrent: Boolean, isPosix: Boolean, isWindows: Boolean)
-abstract case class WindowsSystem(override val name: String, override val isCurrent: Boolean) extends OperatingSystem(name, isCurrent, false, true)
-abstract case class PosixSystem(override val name: String, override val isCurrent: Boolean) extends OperatingSystem(name, isCurrent, true, false)
+sealed abstract class OperatingSystem(val name: String, val isCurrent: Boolean, val isPosix: Boolean, val isWindows: Boolean)
+abstract class WindowsSystem(name: String, isCurrent: Boolean) extends OperatingSystem(name, isCurrent, false, true)
+abstract class PosixSystem(name: String, isCurrent: Boolean) extends OperatingSystem(name, isCurrent, true, false)
 
 // Linux family
 
-abstract case class LinuxSystem(override val name: String, override val isCurrent: Boolean) extends PosixSystem(name, isCurrent)
+abstract class LinuxSystem(name: String, isCurrent: Boolean) extends PosixSystem(name, isCurrent)
 case object ArchSystem extends LinuxSystem("Arch", IS_OS_LINUX && IS_OS_ARCH)
 case object DebianSystem extends LinuxSystem("Debian", IS_OS_LINUX && IS_OS_DEBIAN)
 case object FedoraSystem extends LinuxSystem("Fedora", IS_OS_LINUX && IS_OS_FEDORA)

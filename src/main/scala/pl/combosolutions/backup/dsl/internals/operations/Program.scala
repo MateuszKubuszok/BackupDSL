@@ -1,8 +1,11 @@
 package pl.combosolutions.backup.dsl.internals.operations
 
+import scalaz._
 import scalaz.OptionT._
+import scalaz.std.scalaFuture._
 
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.sys.process.{Process, ProcessLogger}
 import scala.util.{Failure, Success, Try}
@@ -11,10 +14,10 @@ import Program._
 
 object Program {
 
-  def apply(name: String, arguments: String*) = new Program[Program](name, arguments.toList)
+  def apply(name: String, arguments: String*) = GenericProgram(name, arguments.toList)
 
   type AsyncResult[U] = Future[Option[U]]
-  def execute[T <: Program](program: Program[T]): AsyncResult[Result[T]] = Future {
+  def execute[T <: Program[T]](program: Program[T]): AsyncResult[Result[T]] = Future {
     Try {
       var stdout = mutable.MutableList[String]()
       var stderr = mutable.MutableList[String]()
@@ -25,13 +28,13 @@ object Program {
       Result[T](exitValue, stdout toList, stderr toList)
     } match {
       case Success(result) => Some(result)
-      case Failure         => None
+      case Failure(_)      => None
     }
   }
 }
 
 
-case class Program[T <: Program[T]](name:String, arguments: List[String]) {
+class Program[T <: Program[T]](val name:String, val arguments: List[String]) {
 
   def run         = execute(this)
 
@@ -39,8 +42,25 @@ case class Program[T <: Program[T]](name:String, arguments: List[String]) {
 
   def digest[U](implicit interpreter: Result[T]#Interpreter[U]) = (for {
     result <- optionT[Future](run)
-  } yield result.interpret).run
+  } yield result.interpret(interpreter)).run
 
   def digestElevated[U](implicit interpreter: Result[T]#Interpreter[U]) =
-    PlatformSpecific.current.elevate(this).digest[U]
+    PlatformSpecific.current.elevate(this).digest[U](interpreter)
 }
+
+class ProgramAlias[T <: Program[T], U <: Program[U]](
+    aliased: Program[U]
+  ) extends Program[T](
+    aliased.name,
+    aliased.arguments
+  ) {
+
+  override def run = (for {
+    originalResult <- optionT[Future](execute(aliased))
+  } yield Result[T](originalResult.exitValue, originalResult.stdout, originalResult.stderr)).run
+}
+
+case class GenericProgram(
+  override val name: String,
+  override val arguments: List[String]
+) extends Program[GenericProgram](name, arguments)
