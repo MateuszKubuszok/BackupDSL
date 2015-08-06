@@ -10,7 +10,6 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import scalaz._
 import scalaz.OptionT._
 import scalaz.std.scalaFuture._
 

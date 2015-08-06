@@ -1,9 +1,8 @@
 package pl.combosolutions.backup.dsl
 
-import org.apache.commons.lang3.SystemUtils
+import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts._
 
 import java.nio.file.{CopyOption, Path}
-import java.nio.file.StandardCopyOption._
 
 case class Settings(
   var backupDir: Path,
@@ -11,6 +10,6 @@ case class Settings(
 )
 
 object Settings extends Settings(
-  backupDir = java.nio.file.Paths.get(SystemUtils.getUserHome.getPath, "backup_dsl"),
-  copyOptions = Array(REPLACE_EXISTING, COPY_ATTRIBUTES)
+  backupDir   = BackupDirPath,
+  copyOptions = CopyOptions
 )

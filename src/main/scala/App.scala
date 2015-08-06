@@ -1,7 +1,7 @@
 package example
 
-object App {
-  def main(args: Array[String]) {
-    print("Hello basic-project!")
-  }
+import pl.combosolutions.backup.dsl.Script
+
+object App extends Script("test script") {
+  this addTask backupFiles(List("README.md"))
 }

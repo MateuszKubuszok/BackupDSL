@@ -14,22 +14,35 @@ object OperatingSystem {
     FedoraSystem,
     GentooSystem,
     RedHatSystem,
+    GenericLinuxSystem,
+
     // MacOS family
-    MacOSXOperatingSystem,
+    GenericMacOSXOperatingSystem,
+    GenericMacOperatingSystem,
+
     // Windows family
+    Windows95System,
+    Windows98System,
+    WindowsMESystem,
+    WindowsNTSystem,
+    WindowsXPSystem,
+    WindowsVistaSystem,
     Windows7System,
     Windows8System,
-    Windows10System
+    GenericWindowsSystem,
+
+    // Unknown system
+    UnknownSystem
   )
 
-  lazy val current = all filter (_.isCurrent) head
+  lazy val current = all find (_.isCurrent) get
 
   // from http://linuxmafia.com/faq/Admin/release-files.html
-  def IS_OS_ARCH   = Files.exists(Paths.get("/etc/arch-release"))
-  def IS_OS_DEBIAN = Files.exists(Paths.get("/etc/debian_version"))
-  def IS_OS_FEDORA = Files.exists(Paths.get("/etc/fedora-release"))
-  def IS_OS_GENTOO = Files.exists(Paths.get("/etc/gentoo-release"))
-  def IS_OS_REDHAT = Files.exists(Paths.get("/etc/redhat-release"))
+  private[internals] def IS_OS_ARCH   = Files.exists(Paths.get("/etc/arch-release"))
+  private[internals] def IS_OS_DEBIAN = Files.exists(Paths.get("/etc/debian_version"))
+  private[internals] def IS_OS_FEDORA = Files.exists(Paths.get("/etc/fedora-release"))
+  private[internals] def IS_OS_GENTOO = Files.exists(Paths.get("/etc/gentoo-release"))
+  private[internals] def IS_OS_REDHAT = Files.exists(Paths.get("/etc/redhat-release"))
 }
 
 // Operating systems families
@@ -46,15 +59,27 @@ case object DebianSystem extends LinuxSystem("Debian", IS_OS_LINUX && IS_OS_DEBI
 case object FedoraSystem extends LinuxSystem("Fedora", IS_OS_LINUX && IS_OS_FEDORA)
 case object GentooSystem extends LinuxSystem("Gentoo", IS_OS_LINUX && IS_OS_GENTOO)
 case object RedHatSystem extends LinuxSystem("Red Hat", IS_OS_LINUX && IS_OS_REDHAT)
+case object GenericLinuxSystem extends LinuxSystem("Generic Linux", IS_OS_LINUX)
 
 // MacOS family
 
-case object MacOSXOperatingSystem extends PosixSystem("MacOS", IS_OS_MAC_OSX)
+case object GenericMacOSXOperatingSystem extends PosixSystem("MacOS", IS_OS_MAC_OSX)
+case object GenericMacOperatingSystem extends PosixSystem("MacOS", IS_OS_MAC)
 
 // Windows family
 
+case object Windows95System extends WindowsSystem("Windows 7", IS_OS_WINDOWS_95)
+case object Windows98System extends WindowsSystem("Windows 7", IS_OS_WINDOWS_98)
+case object WindowsMESystem extends WindowsSystem("Windows 7", IS_OS_WINDOWS_ME)
+case object WindowsNTSystem extends WindowsSystem("Windows 7", IS_OS_WINDOWS_NT)
+case object WindowsXPSystem extends WindowsSystem("Windows 7", IS_OS_WINDOWS_XP)
+case object WindowsVistaSystem extends WindowsSystem("Windows 7", IS_OS_WINDOWS_VISTA)
 case object Windows7System extends WindowsSystem("Windows 7", IS_OS_WINDOWS_7)
 case object Windows8System extends WindowsSystem("Windows 8", IS_OS_WINDOWS_8)
-case object Windows10System extends WindowsSystem("Windows 10", IS_OS_WINDOWS)
+case object GenericWindowsSystem extends WindowsSystem("Windows 10", IS_OS_WINDOWS)
 
-// TODO rest of the systems
+// Unknown system
+
+case object UnknownSystem extends OperatingSystem("Unknown", true, false, false)
+
+// TODO add the rest of systems

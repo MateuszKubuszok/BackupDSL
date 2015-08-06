@@ -4,13 +4,13 @@ import pl.combosolutions.backup.dsl.{Task, Settings}
 
 import scala.concurrent.Future
 
-object RootTask extends Task[Unit,Unit,Unit,Unit] {
+class RootTask extends Task[Unit,Unit,Unit,Unit] {
 
-  def performBackup(implicit settings: Settings): Unit = performBackupWithResult(Unit)
+  def performBackup(implicit withSettings: Settings): Unit = performBackupWithResult(Unit)
 
-  def performRestore(implicit settings: Settings): Unit = performBackupWithResult(Unit)
+  def performRestore(implicit withSettings: Settings): Unit = performRestoreWithResult(Unit)
 
-  override protected def backup(parentResult: Unit)(implicit settings: Settings) = Future successful Some(Unit)
+  override protected def backup(parentResult: Unit)(implicit withSettings: Settings) = Future successful Some(Unit)
 
-  override protected def restore(parentResult: Unit)(implicit settings: Settings) = Future successful Some(Unit)
+  override protected def restore(parentResult: Unit)(implicit withSettings: Settings) = Future successful Some(Unit)
 }

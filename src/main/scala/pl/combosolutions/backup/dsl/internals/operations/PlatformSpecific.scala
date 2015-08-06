@@ -2,6 +2,7 @@ package pl.combosolutions.backup.dsl.internals.operations
 
 import java.nio.file.Path
 
+import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts._
 import pl.combosolutions.backup.dsl.internals.filesystem.FileType._
 import pl.combosolutions.backup.dsl.internals.operations.Program._
 import pl.combosolutions.backup.dsl.internals.operations.posix.PosixFileSystem
@@ -19,15 +20,15 @@ object PlatformSpecific {
   private lazy val currentElevation = List(
     GKSudoElevation,
     KDESudoElevation
-  ) find (_.elevationAvailable) getOrElse (throw new IllegalStateException("No elevation found"))
+  ) find (_.elevationAvailable) getOrElse (throw new IllegalStateException(exceptionNoElevation))
 
   private lazy val currentFileSystem = List(
     PosixFileSystem
-  ) find (_.fileSystemAvailable) getOrElse (throw new IllegalStateException("No file system found"))
+  ) find (_.fileSystemAvailable) getOrElse (throw new IllegalStateException(exceptionNoFileSystem))
 
   private lazy val currentRepositories = List(
     AptRepositories
-  ) find (_.repositoriesAvailable) getOrElse (throw new IllegalStateException("No repositories found"))
+  ) find (_.repositoriesAvailable) getOrElse (throw new IllegalStateException(exceptionNoRepositories))
 }
 
 trait PlatformSpecific

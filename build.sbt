@@ -6,7 +6,16 @@ version := "0.1.0-SNAPSHOT"
 
 scalaVersion := "2.11.2"
 
-crossScalaVersions := Seq("2.10.4", "2.11.2")
+scalacOptions in ThisBuild ++= Seq(
+  "-unchecked",
+  "-deprecation",
+  "-feature",
+  "-language:postfixOps"
+)
+
+crossScalaVersions := Seq("2.11.2")
+
+resolvers += Resolver.sonatypeRepo("public")
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "2.2.1" % "test",
@@ -14,7 +23,8 @@ libraryDependencies ++= Seq(
   "org.scalaz" %% "scalaz-core" % "7.1.3",
   "org.typelevel" % "scalaz-contrib-210_2.11" % "0.2",
   "commons-io" % "commons-io" % "2.4",
-  "org.apache.commons" % "commons-lang3" % "3.4"
+  "org.apache.commons" % "commons-lang3" % "3.4",
+  "com.github.scopt" %% "scopt" % "3.3.0"
 )
 
-initialCommands := "import pl.combosoutions._"
+initialCommands := "import pl.combosoutions.backup.dsl._"

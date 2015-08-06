@@ -19,15 +19,15 @@ abstract class Task[PBR,PRR,BR,RR] {
     child
   }
 
-  protected def backup(parentResult: PBR)(implicit settings: Settings): AsyncResult[BR]
+  protected def backup(parentResult: PBR)(implicit withSettings: Settings): AsyncResult[BR]
 
-  protected def restore(parentResult: PRR)(implicit settings: Settings): AsyncResult[RR]
+  protected def restore(parentResult: PRR)(implicit withSettings: Settings): AsyncResult[RR]
 
-  private[dsl] def performBackupWithResult(parentResult: PBR)(implicit settings: Settings): Unit = (for {
-    result <- optionT[Future](backup(parentResult)(settings))
-  } yield tasks.foreach(_.performBackupWithResult(result)(settings))).run
+  private[dsl] def performBackupWithResult(parentResult: PBR)(implicit withSettings: Settings): Unit = (for {
+    result <- optionT[Future](backup(parentResult)(withSettings))
+  } yield tasks.foreach(_.performBackupWithResult(result)(withSettings))).run
 
-  private[dsl] def performRestoreWithResult(parentResult: PRR)(implicit settings: Settings): Unit = (for {
-    result <- optionT[Future](restore(parentResult)(settings))
-  } yield tasks.foreach(_.performRestoreWithResult(result)(settings))).run
+  private[dsl] def performRestoreWithResult(parentResult: PRR)(implicit withSettings: Settings): Unit = (for {
+    result <- optionT[Future](restore(parentResult)(withSettings))
+  } yield tasks.foreach(_.performRestoreWithResult(result)(withSettings))).run
 }
