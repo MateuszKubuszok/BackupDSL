@@ -9,12 +9,21 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Success,Try}
 
-class BackupFiles[ParentResult](files: List[Path]) extends Task[ParentResult,List[Path]] {
+import BackupFiles._
 
-  override protected def backup(parentResult: ParentResult)(implicit settings: Settings): AsyncResult[List[Path]] =
+object BackupFiles {
+  type BackupResult  = List[Path]
+  type RestoreResult = List[Path]
+}
+
+class BackupFiles[PBR,PRR](files: List[Path]) extends Task[PBR,PRR,BackupResult,RestoreResult] {
+
+  override protected def backup(parentResult: PBR)
+                               (implicit settings: Settings): AsyncResult[BackupResult] =
     combineSubResults ( paths => Files.copy(paths._2, paths._3, settings.copyOptions:_*) )
 
-  override protected def restore(parentResult: ParentResult)(implicit settings: Settings): AsyncResult[List[Path]] =
+  override protected def restore(parentResult: PRR)
+                                (implicit settings: Settings): AsyncResult[RestoreResult] =
     combineSubResults ( paths => Files.copy(paths._3, paths._2, settings.copyOptions:_*) )
 
   private def combineSubResults(copyAction: ((Path, Path, Path)) => Path)
