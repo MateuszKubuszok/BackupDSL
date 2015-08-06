@@ -34,5 +34,5 @@ abstract class Script(name: String) {
 
   def main(args: Array[String]): Unit = parser.parse(args, ScriptConfig()) foreach execute
 
-  def backupFiles[PBR,PRR](files: List[String]) = BackupFiles[PBR,PRR](files)
+  def backupFiles[PBR,PRR](files: String*) = BackupFiles[PBR,PRR](files toList)
 }
