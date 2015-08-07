@@ -64,8 +64,8 @@ class ElevationIPCSocket(socket: Socket) {
     case result: Result[_] => Some(result.asInstanceOf[Result[GenericProgram]])
     case CloseConnection   => close
                               None
-    case ExecutionFailed      => None
-    case _                    => None
+    case ExecutionFailed   => None
+    case _                 => None
   }
 
   def receiveProgram: Option[GenericProgram] = in.readObject match {
