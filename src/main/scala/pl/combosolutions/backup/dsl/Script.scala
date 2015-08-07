@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.dsl
 
-import pl.combosolutions.backup.dsl.tasks.{BackupFiles, RootTask}
+import pl.combosolutions.backup.dsl.tasks.{Task, BackupFiles, RootTask}
 import pl.combosolutions.backup.dsl.Action._
 
 abstract class Script(name: String) {

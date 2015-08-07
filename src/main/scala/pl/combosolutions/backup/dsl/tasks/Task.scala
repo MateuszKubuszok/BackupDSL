@@ -1,12 +1,11 @@
-package pl.combosolutions.backup.dsl
+package pl.combosolutions.backup.dsl.tasks
 
+import pl.combosolutions.backup.dsl.Settings
 import pl.combosolutions.backup.dsl.internals.operations.Program.AsyncResult
 
 import scala.collection.mutable.MutableList
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
-import scalaz._
 import scalaz.OptionT._
 import scalaz.std.scalaFuture._
 
