@@ -15,6 +15,8 @@ abstract class Script(name: String) {
 
     (help("help")
       text "displays help")
+
+    // pass variables into the Script: var=val
   }
 
   private val rootTask = new RootTask
