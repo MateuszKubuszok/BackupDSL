@@ -14,4 +14,14 @@ trait PlatformSpecificFileSystem {
   val fileIsDirectory: Regex
   val fileIsSymlinkPattern: Regex
   def getFileType(path: Path): AsyncResult[FileType]
+
+  /* // TODO
+  def createSymlink(from: Path, to: Path, withElevation: Boolean) = throw new NotImplementedError("TODO")
+
+  def copyFiles(files: List[Path], withElevation: Boolean) = throw new NotImplementedError("TODO")
+
+  def deleteFiles(files: List[Path], withElevation: Boolean) = throw new NotImplementedError("TODO")
+
+  def moveFiles(files: List[Path], withElevation: Boolean) = throw new NotImplementedError("TODO")
+  */
 }

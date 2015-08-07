@@ -5,8 +5,9 @@ import java.nio.file.Path
 import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts._
 import pl.combosolutions.backup.dsl.internals.filesystem.FileType._
 import pl.combosolutions.backup.dsl.internals.operations.Program._
-import pl.combosolutions.backup.dsl.internals.operations.posix.PosixFileSystem
+import pl.combosolutions.backup.dsl.internals.operations.posix.{SudoElevation, PosixFileSystem}
 import pl.combosolutions.backup.dsl.internals.operations.posix.linux.{AptRepositories, KDESudoElevation, GKSudoElevation}
+import pl.combosolutions.backup.dsl.internals.operations.windows.{UACElevation, EmptyElevation}
 
 import scala.util.matching.Regex
 
@@ -18,15 +19,25 @@ object PlatformSpecific {
   )
 
   private lazy val currentElevation = List(
+    // Windows elevation
+    EmptyElevation,
+    UACElevation,
+
+    // Linux elevation
     GKSudoElevation,
-    KDESudoElevation
+    KDESudoElevation,
+
+    // POSIX elevation
+    SudoElevation
   ) find (_.elevationAvailable) getOrElse (throw new IllegalStateException(exceptionNoElevation))
 
   private lazy val currentFileSystem = List(
+    // POSIX file system
     PosixFileSystem
   ) find (_.fileSystemAvailable) getOrElse (throw new IllegalStateException(exceptionNoFileSystem))
 
   private lazy val currentRepositories = List(
+    // Linux repositories
     AptRepositories
   ) find (_.repositoriesAvailable) getOrElse (throw new IllegalStateException(exceptionNoRepositories))
 }

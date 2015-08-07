@@ -14,4 +14,6 @@ trait PlatformSpecificRepositories {
   type Packages = List[Package]
   def areAllInstalled(packages: Packages): AsyncResult[Boolean]
   def installAll(packages: Packages): AsyncResult[Boolean]
+
+  // TODO: withElevation: Boolean
 }

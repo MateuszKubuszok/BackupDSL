@@ -5,3 +5,7 @@ trait PlatformSpecificElevation {
 
   def elevate[T <: Program[T]](program: Program[T]): Program[T]
 }
+
+/*
+ * RUN elevated child process, pass into it commands to execute
+ */

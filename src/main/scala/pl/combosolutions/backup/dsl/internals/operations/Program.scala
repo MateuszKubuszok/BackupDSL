@@ -34,7 +34,7 @@ object Program {
 }
 
 
-class Program[T <: Program[T]](val name:String, val arguments: List[String]) {
+class Program[T <: Program[T]](val name:String, val arguments: List[String]) extends Serializable {
 
   def run         = execute(this)
 
@@ -46,6 +46,8 @@ class Program[T <: Program[T]](val name:String, val arguments: List[String]) {
 
   def digestElevated[U](implicit interpreter: Result[T]#Interpreter[U]) =
     PlatformSpecific.current.elevate(this).digest[U](interpreter)
+
+  def asGeneric: GenericProgram = GenericProgram(name, arguments)
 }
 
 class ProgramAlias[T <: Program[T], U <: Program[U]](
