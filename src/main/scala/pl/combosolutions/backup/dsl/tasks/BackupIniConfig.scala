@@ -8,7 +8,8 @@ object BackupIniConfig {
   type RestoreResult = IniConfigs
 }
 
-abstract case class BackupIniConfig[PBR,PRR](configs: IniConfigs) extends Task[PBR,PRR,BackupResult,RestoreResult] {
+abstract case class BackupIniConfig[PBR,PRR](configs: IniConfigs)
+    extends Task[PBR,PRR,BackupResult,RestoreResult]("backup ini file") {
   // TODO implementation
 }
 

@@ -44,7 +44,7 @@ class ElevationIPCSocket(socket: Socket) {
 
   lazy val port = socket.getLocalPort
 
-  private val in = new ObjectInputStream(socket.getInputStream)
+  private val in  = new ObjectInputStream(socket.getInputStream)
   private val out = new ObjectOutputStream(socket.getOutputStream)
 
   def isListening = !socket.isClosed
@@ -75,6 +75,17 @@ class ElevationIPCSocket(socket: Socket) {
     case ExecutionFailed         => None
     case _                       => None
   }
+}
+
+class ElevationIPCServerSocket(serverSocket: ServerSocket) {
+
+  lazy val port   = serverSocket.getLocalPort
+
+  lazy val socket = new ElevationIPCSocket(serverSocket.accept)
+
+  def close  = socket.close
+
+  def listen = socket
 }
 
 case object CloseConnection

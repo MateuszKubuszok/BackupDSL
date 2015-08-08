@@ -1,11 +1,15 @@
 package pl.combosolutions.backup.dsl.internals.operations
 
+import java.io.File
+import java.lang.management.ManagementFactory
+
 import pl.combosolutions.backup.dsl.internals.jvm.JVMUtils._
 
 import scalaz._
 import scalaz.OptionT._
 import scalaz.std.scalaFuture._
 
+import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -28,13 +32,24 @@ case class GenericProgram(
   override val arguments: List[String]
 ) extends Program[GenericProgram](name, arguments)
 
+object JVMProgram {
+  def argumentsFor[T <: App](mainClass: Class[T], mainClassArguments: List[String]): List[String] = {
+    val realMainClassName = mainClass.getName
+
+    val mainName  = if (realMainClassName endsWith "$") realMainClassName.substring(0, realMainClassName.length-1)
+                    else realMainClassName
+    val jvmArgs   = ManagementFactory.getRuntimeMXBean.getInputArguments.toList
+    val classPath = classPathFor(mainClass).reduce(_ + File.pathSeparator + _)
+    jvmArgs ++ List("-cp", classPath, mainName) ++ mainClassArguments
+  }
+}
+
+import JVMProgram._
+
 case class JVMProgram[T <: App](
   mainClass: Class[T],
-  override val arguments: List[String]
+  mainClassArguments: List[String]
 ) extends Program[JVMProgram[T]](
   javaExe.toString,
-  List(
-    "-cp", classPathFor(mainClass),
-    mainClass.getName
-  ) ++ arguments
+  argumentsFor(mainClass, mainClassArguments)
 )

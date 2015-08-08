@@ -3,7 +3,7 @@ package pl.combosolutions.backup.dsl
 import pl.combosolutions.backup.dsl.tasks.{Task, BackupFiles, RootTask}
 import pl.combosolutions.backup.dsl.Action._
 
-abstract class Script(name: String) {
+abstract class Script(name: String) extends Logging {
 
   private val parser = new scopt.OptionParser[ScriptConfig](name) {
     head("backup/restore script made with BackupDSL")
@@ -26,8 +26,12 @@ abstract class Script(name: String) {
   final def addTask[BR,RR](task: Task[Unit,Unit,BR,RR]): Task[Unit,Unit,BR,RR] = rootTask andThen task
 
   private final def execute(config: ScriptConfig): Unit = config.action match {
-    case Action.Backup  => backup
-    case Action.Restore => restore
+    case Action.Backup  => logger info  s"Running BACKUP: ${name}"
+                           logger trace s"        with configuration ${config}"
+                           backup
+    case Action.Restore => logger info  s"Running RESTORE: ${name}"
+                           logger trace s"        with configuration ${config}"
+                           restore
   }
   
   private final def backup = rootTask performBackup

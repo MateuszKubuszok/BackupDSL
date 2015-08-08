@@ -2,7 +2,9 @@ package pl.combosolutions.backup.dsl.internals.operations
 
 import java.nio.file.Path
 
+import pl.combosolutions.backup.dsl.Logging
 import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts._
+import pl.combosolutions.backup.dsl.internals.OperatingSystem
 import pl.combosolutions.backup.dsl.internals.filesystem.FileType._
 import pl.combosolutions.backup.dsl.internals.operations.Program._
 import pl.combosolutions.backup.dsl.internals.operations.posix.{SudoElevation, PosixFileSystem}
@@ -51,7 +53,12 @@ class CalculatedPlatformSpecific(
     elevationPS: PlatformSpecificElevation,
     fileSystemPS: PlatformSpecificFileSystem,
     repositoriesPS: PlatformSpecificRepositories)
-    extends PlatformSpecific {
+    extends PlatformSpecific with Logging {
+
+  logger trace s"        Operating System -> ${OperatingSystem.current.name}"
+  logger trace s"        Elevation        -> ${elevationPS.getClass.getSimpleName}"
+  logger trace s"        File System      -> ${fileSystemPS.getClass.getSimpleName}"
+  logger trace s"        Repositories     -> ${repositoriesPS.getClass.getSimpleName}"
 
   // elevation
 

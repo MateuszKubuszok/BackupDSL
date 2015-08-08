@@ -1,11 +1,15 @@
 package pl.combosolutions.backup.dsl.internals.jvm
 
-import java.net.URLDecoder
-import java.nio.file.{Path, Files, Paths}
+import java.io.File
+import java.net.{URLClassLoader, URLDecoder}
+import java.nio.file.{Files, Paths}
 
+import pl.combosolutions.backup.dsl.Logging
+
+import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
-object JVMUtils {
+object JVMUtils extends Logging {
   lazy val javaHome = System getProperty "java.home"
 
   lazy val javaExe = Seq(
@@ -24,21 +28,32 @@ object JVMUtils {
 
   lazy val classPath = System getProperty "java.class.path"
 
-  private lazy val classPathPattern = "jar:(file:/)?([^!]+)!.+".r
-  def classPathFor[T](clazz: Class[T]) = {
+  private lazy val jarClassPathPattern  = "jar:(file:)?([^!]+)!.+".r
+  private lazy val fileClassPathPattern = "file:(.+).class".r
+  def classPathFor[T](clazz: Class[T]): List[String] = {
     val pathToClass = getPathToClassFor(clazz)
-    classPathPattern.findFirstMatchIn(pathToClass.toString) match {
-      case Some(matched) => matched group 2
-      case None          => classPath
-    }
+
+    val propClassPath   = classPath.split(File.pathSeparator).toSet
+
+    val loaderClassPath = clazz.getClassLoader.asInstanceOf[URLClassLoader].getURLs.map(_.toString).toSet
+
+    val jarClassPath    = jarClassPathPattern.findFirstMatchIn(pathToClass) map { matcher =>
+      val jarDir = Paths get (matcher group 2) getParent()
+      s"${jarDir}/*"
+    } toSet
+
+    val fileClassPath   = fileClassPathPattern.findFirstMatchIn(pathToClass) map { matcher =>
+      val suffix   = "/" + clazz.getName
+      val fullPath = matcher group 1
+      fullPath substring (0, fullPath.length - suffix.length)
+    } toList
+
+    (propClassPath ++ loaderClassPath ++ jarClassPath ++ fileClassPath ++ Set(".")).toList
   }
 
   private def getPathToClassFor[T](clazz: Class[T]) = {
     val url = clazz getResource s"${clazz.getSimpleName}.class"
-    Try {
-      val decoded = URLDecoder.decode(url.toString, "UTF-8")
-      Paths get decoded toAbsolutePath
-    } match {
+    Try { URLDecoder.decode(url.toString, "UTF-8") } match {
       case Success(classFilePath) => classFilePath
       case Failure(_)             => throw new IllegalStateException("") // TODO
     }

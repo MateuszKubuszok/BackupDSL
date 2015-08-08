@@ -16,6 +16,6 @@ abstract case class BackupPackages[PBR,PRR](
   excludeRepositories: Packages = List(),
   includePackages: Packages = List(),
   excludePackages: Packages = List()
-) extends Task[PBR,PRR,BackupResult,RestoreResult] {
+) extends Task[PBR,PRR,BackupResult,RestoreResult]("backup packages") {
   // TODO implementation
 }

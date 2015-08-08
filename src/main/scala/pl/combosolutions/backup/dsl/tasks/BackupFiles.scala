@@ -16,7 +16,7 @@ object BackupFiles {
   type RestoreResult = List[String]
 }
 
-case class BackupFiles[PBR,PRR](files: List[String]) extends Task[PBR,PRR,BackupResult,RestoreResult] {
+case class BackupFiles[PBR,PRR](files: List[String]) extends Task[PBR,PRR,BackupResult,RestoreResult]("backup files") {
 
   override protected def backup(parentResult: PBR)
                                (implicit withSettings: Settings): AsyncResult[BackupResult] =

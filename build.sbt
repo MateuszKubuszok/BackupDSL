@@ -10,12 +10,15 @@ scalacOptions in ThisBuild ++= Seq(
   "-unchecked",
   "-deprecation",
   "-feature",
+  "-language:existentials",
   "-language:postfixOps"
 )
 
 crossScalaVersions := Seq("2.11.2")
 
 resolvers += Resolver.sonatypeRepo("public")
+
+resolvers += Resolver.typesafeRepo("releases")
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "2.2.1" % "test",
@@ -24,7 +27,9 @@ libraryDependencies ++= Seq(
   "org.typelevel" % "scalaz-contrib-210_2.11" % "0.2",
   "commons-io" % "commons-io" % "2.4",
   "org.apache.commons" % "commons-lang3" % "3.4",
-  "com.github.scopt" %% "scopt" % "3.3.0"
+  "com.github.scopt" %% "scopt" % "3.3.0",
+  "ch.qos.logback" % "logback-classic" % "1.1.3"
 )
 
 initialCommands := "import pl.combosoutions.backup.dsl._"
+
