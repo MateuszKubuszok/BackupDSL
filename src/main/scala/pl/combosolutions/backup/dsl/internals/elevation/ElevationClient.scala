@@ -20,7 +20,7 @@ class ElevationClient(var name: String, val port: Integer) extends Logging {
   } match {
     case Success(result) => logger trace s"Received remote result ${program} for command ${program}"
                             Future successful result
-    case Failure(ex)    =>  logger error s"Remote execution failed: ${ex}"
+    case Failure(ex)     => logger error s"Remote execution failed: ${ex}"
                             Future failed ex
   }
 

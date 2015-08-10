@@ -30,7 +30,7 @@ class ElevationFacade extends Logging {
   val remotePort = 6802 // TODO: Change to something better
 
   val server = createServer(remoteName, remotePort)
-  Thread sleep 1000
+  Thread sleep 1000 // TODO: find better solution
   val client = createClient(remoteName, remotePort)
 
   def runRemotely(program: GenericProgram): AsyncResult[Result[GenericProgram]] = client executeRemote program
