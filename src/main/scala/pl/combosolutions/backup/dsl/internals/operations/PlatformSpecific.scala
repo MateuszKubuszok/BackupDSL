@@ -5,6 +5,7 @@ import java.nio.file.Path
 import pl.combosolutions.backup.dsl.Logging
 import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts._
 import pl.combosolutions.backup.dsl.internals.OperatingSystem
+import pl.combosolutions.backup.dsl.internals.elevation.ElevationFacade
 import pl.combosolutions.backup.dsl.internals.filesystem.FileType._
 import pl.combosolutions.backup.dsl.internals.operations.Program._
 import pl.combosolutions.backup.dsl.internals.operations.posix.{SudoElevation, PosixFileSystem}
@@ -63,8 +64,10 @@ class CalculatedPlatformSpecific(
   // elevation
 
   override val elevationAvailable = elevationPS.elevationAvailable
-
-  override def elevate[T <: Program[T]](program: Program[T]): Program[T] = elevationPS.elevate(program)
+  override val elevationCMD: String = elevationPS.elevationCMD
+  override def elevateDirect[T <: Program[T]](program: Program[T]): Program[T] = elevationPS.elevateDirect(program)
+  override def elevateRemote[T <: Program[T]](program: Program[T], cleaner: Cleaner): Program[T] =
+    elevationPS.elevateRemote(program, cleaner)
 
   // file system
 
@@ -85,4 +88,5 @@ class CalculatedPlatformSpecific(
 
   override def areAllInstalled(packages: Packages): AsyncResult[Boolean] = repositoriesPS.areAllInstalled(packages)
   override def installAll(packages: Packages): AsyncResult[Boolean] = repositoriesPS.installAll(packages)
+
 }

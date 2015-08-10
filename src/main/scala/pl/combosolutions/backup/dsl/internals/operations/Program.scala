@@ -47,8 +47,6 @@ import Program._
 
 class Program[T <: Program[T]](val name:String, val arguments: List[String]) extends Serializable {
 
-  def elevate  = PlatformSpecific.current.elevate(this)
-
   def run      = execute(this)
 
   def run2Kill = execute2Kill(this)

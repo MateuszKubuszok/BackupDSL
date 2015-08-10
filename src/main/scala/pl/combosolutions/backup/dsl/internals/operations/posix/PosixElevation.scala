@@ -1,11 +1,15 @@
 package pl.combosolutions.backup.dsl.internals.operations.posix
 
 import pl.combosolutions.backup.dsl.internals.OperatingSystem
-import pl.combosolutions.backup.dsl.internals.operations.{Program, PlatformSpecificElevation}
+import pl.combosolutions.backup.dsl.internals.elevation.{ElevationFacade, DirectElevatorProgram}
+import pl.combosolutions.backup.dsl.internals.operations.{CommonElevation, Cleaner, Program, PlatformSpecificElevation}
 
-object SudoElevation extends PlatformSpecificElevation {
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
-  override val elevationAvailable: Boolean = OperatingSystem.current.isPosix
+object SudoElevation extends CommonElevation {
 
-  override def elevate[T <: Program[T]](program: Program[T]): Program[T] = throw new NotImplementedError("TODO")
+  override lazy val elevationAvailable: Boolean = OperatingSystem.current.isPosix
+
+  override val elevationCMD: String = "sudo"
 }

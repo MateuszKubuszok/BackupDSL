@@ -3,9 +3,9 @@ package pl.combosolutions.backup.dsl.internals.operations
 trait PlatformSpecificElevation {
   val elevationAvailable: Boolean
 
-  def elevate[T <: Program[T]](program: Program[T]): Program[T]
-}
+  val elevationCMD: String
 
-/*
- * RUN elevated child process, pass into it commands to execute
- */
+  def elevateDirect[T <: Program[T]](program: Program[T]): Program[T]
+
+  def elevateRemote[T <: Program[T]](program: Program[T], cleaner: Cleaner): Program[T]
+}

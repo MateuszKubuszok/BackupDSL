@@ -1,6 +1,6 @@
 package example
 
-import pl.combosolutions.backup.dsl.Logging
+import pl.combosolutions.backup.dsl.Script
 import pl.combosolutions.backup.dsl.internals.elevation.ElevationFacade
 import pl.combosolutions.backup.dsl.internals.operations.GenericProgram
 
@@ -8,22 +8,18 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object ExampleApp extends App with Logging {
+object ExampleApp extends Script("elevation test") {
   logger info "create programs"
 
   val program1 = GenericProgram("ps", List("aux"))
   val program2 = GenericProgram("ls", List("-la"))
 
-  logger info "create elevation"
-
-  val elevation = new ElevationFacade
-
   logger info "run programs"
 
-  var result1 = elevation runRemotely program1
-  var result2 = elevation runRemotely program2
+  var result1 = elevate(program1).run
+  var result2 = elevate(program2).run
 
-
+//  var results = Future sequence Seq(result1)
   var results = Future sequence Seq(result1, result2)
 
   logger info "await results"
@@ -36,8 +32,6 @@ object ExampleApp extends App with Logging {
     case None =>
       println("something failed")
   } }
-
-  elevation close
 }
 
 /*
