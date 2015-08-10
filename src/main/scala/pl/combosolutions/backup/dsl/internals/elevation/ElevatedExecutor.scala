@@ -1,20 +1,35 @@
 package pl.combosolutions.backup.dsl.internals.elevation
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import scala.util.Try
+import java.io.File
+import java.rmi.registry.LocateRegistry
+import java.rmi.server.UnicastRemoteObject
 
-object ElevatedExecutor extends App {
+import pl.combosolutions.backup.dsl.Logging
+import pl.combosolutions.backup.dsl.internals.jvm.JVMUtils._
 
-  println(getClass)
+import scala.util.{Failure, Success, Try}
 
-  def arg2Int(arg: String) = Try(Integer.valueOf(arg)).toOption
+object ElevatedExecutor extends App with Logging {
 
-  def ports(args: Array[String]) = args.indices.map(i => arg2Int(args(i))).flatten
+  logger debug s"Starting remote ${getClass getSimpleName} with args: ${args toList}"
 
-  def listenToPort(port: Integer) = ElevationServer(port).listen
+  val remoteHost = "127.0.0.1"
+  val remoteName = args(0)
+  val remotePort = Integer valueOf args(1)
+  val pathForRMI = jriPathFor(classOf[ElevationServer])
 
-  def socketsFutures(args: Array[String]) = (ports(args) map listenToPort)
+  logger trace s"Set RMU server path to ${pathForRMI}"
+//  System.setProperty("java.rmi.server.codebase", pathForRMI)
 
-  Future sequence socketsFutures(args)
+  Try {
+    val server   = ElevationServer()
+    val stub     = UnicastRemoteObject.exportObject(server, 0).asInstanceOf[ElevationServer]
+    val registry = LocateRegistry.createRegistry(remotePort)
+
+    registry.bind(remoteName, stub)
+  } match {
+    case Success(_)  => logger debug "Remote ready"
+    case Failure(ex) => logger error s"Remote failed: ${ex}"
+                        System exit -1
+  }
 }

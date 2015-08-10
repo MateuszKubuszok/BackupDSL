@@ -1,30 +1,33 @@
 package pl.combosolutions.backup.dsl.internals.elevation
 
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future, Await}
-import scala.concurrent.duration.Duration
-import scala.util.Try
+import java.rmi.{RemoteException, Remote}
 
-object ElevationServer {
-  def apply(port: Integer) = new ElevationServer(socket = new ElevationIPCSocket(ElevationIPC.ipcClient(port)))
+import pl.combosolutions.backup.dsl.Logging
+import pl.combosolutions.backup.dsl.internals.operations.{Result, GenericProgram}
+
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+
+trait ElevationServer extends Remote {
+
+  @throws(classOf[RemoteException])
+  def runRemote(program: GenericProgram): Option[Result[GenericProgram]]
+
+  @throws(classOf[RemoteException])
+  def terminate: Unit
 }
 
-class ElevationServer(socket: ElevationIPCSocket) {
-  def executeLocally: Unit = {
-    socket.receiveProgram match {
-      case Some(program) => Await.result(program.run, Duration.Inf) match {
-          case Some(result) => socket send result
-          case None         => socket error
-        }
+object ElevationServer {
+  def apply(): ElevationServer = new ElevationServerImpl
+}
 
-      case None => socket error
-    }
+class ElevationServerImpl extends ElevationServer with Logging {
+
+  def runRemote(program: GenericProgram): Option[Result[GenericProgram]] = {
+    logger debug s"Run ${program} remotely"
+    Await.result(program.run, Duration.Inf)
   }
 
-  def listen = Future {
-    while (socket.isListening)
-      Try (executeLocally)
-    socket.close
-  }
+  def terminate: Unit = System exit 0
 }

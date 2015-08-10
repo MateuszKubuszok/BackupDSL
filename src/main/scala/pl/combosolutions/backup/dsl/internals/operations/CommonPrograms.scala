@@ -50,6 +50,6 @@ case class JVMProgram[T <: App](
   mainClass: Class[T],
   mainClassArguments: List[String]
 ) extends Program[JVMProgram[T]](
-  javaExe.toString,
+  javaExec.toString,
   argumentsFor(mainClass, mainClassArguments)
 )

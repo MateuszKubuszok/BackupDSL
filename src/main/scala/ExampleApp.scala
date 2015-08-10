@@ -1,6 +1,6 @@
 package example
 
-import pl.combosolutions.backup.dsl.{Logging, ScriptConfig}
+import pl.combosolutions.backup.dsl.Logging
 import pl.combosolutions.backup.dsl.internals.elevation.ElevationFacade
 import pl.combosolutions.backup.dsl.internals.operations.GenericProgram
 
@@ -12,11 +12,11 @@ object ExampleApp extends App with Logging {
   logger info "create programs"
 
   val program1 = GenericProgram("ps", List("aux"))
-  val program2 = GenericProgram("ls", List("ls"))
+  val program2 = GenericProgram("ls", List("-la"))
 
   logger info "create elevation"
 
-  val elevation = new ElevationFacade(ScriptConfig())
+  val elevation = new ElevationFacade
 
   logger info "run programs"
 
@@ -36,6 +36,8 @@ object ExampleApp extends App with Logging {
     case None =>
       println("something failed")
   } }
+
+  elevation close
 }
 
 /*

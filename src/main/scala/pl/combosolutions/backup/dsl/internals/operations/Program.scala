@@ -20,7 +20,7 @@ object Program extends Logging {
   type AsyncResult[U] = Future[Option[U]]
   def execute[T <: Program[T]](program: Program[T]): AsyncResult[Result[T]] = Future {
     Try {
-      Program.logger trace s"        running  ${program.asGeneric.toString} and awaiting results"
+      Program.logger trace s"        running  ${program.asGeneric.showCMD} and awaiting results"
 
       var stdout = mutable.MutableList[String]()
       var stderr = mutable.MutableList[String]()
@@ -38,7 +38,7 @@ object Program extends Logging {
   }
 
   def execute2Kill[T <: Program[T]](program: Program[T]) = {
-    logger trace s"        running  ${program.asGeneric.toString}"
+    logger trace s"        running  ${program.asGeneric.showCMD}"
     Process(program.name, program.arguments).run
   }
 }
@@ -58,4 +58,6 @@ class Program[T <: Program[T]](val name:String, val arguments: List[String]) ext
   } yield result.interpret(interpreter)).run
 
   def asGeneric: GenericProgram = GenericProgram(name, arguments)
+
+  def showCMD: String = s"'$name' ${arguments map ("'" + _ + "'") reduce (_ + " " + _)}"
 }
