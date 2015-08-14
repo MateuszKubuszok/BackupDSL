@@ -17,7 +17,7 @@ object ElevatedExecutor extends App with Logging {
   Try {
     val server   = ElevationServer()
     val stub     = UnicastRemoteObject.exportObject(server, 0).asInstanceOf[ElevationServer]
-    val registry = LocateRegistry createRegistry remotePort
+    val registry = LocateRegistry getRegistry remotePort
 
     registry.bind(remoteName, stub)
   } match {
