@@ -31,10 +31,10 @@ abstract class Script(name: String) extends Logging with Cleaner {
 
   private final def execute(config: ScriptConfig): Unit = config.action match {
     case Action.Backup  => logger info  s"Running BACKUP: ${name}"
-                           logger trace s"        with configuration ${config}"
+                           logger trace s"with configuration ${config}"
                            backup
     case Action.Restore => logger info  s"Running RESTORE: ${name}"
-                           logger trace s"        with configuration ${config}"
+                           logger trace s"with configuration ${config}"
                            restore
   }
   
