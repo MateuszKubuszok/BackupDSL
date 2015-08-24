@@ -1,7 +1,6 @@
 package example
 
 import pl.combosolutions.backup.dsl.Script
-import pl.combosolutions.backup.dsl.internals.elevation.ElevationFacade
 import pl.combosolutions.backup.dsl.internals.operations.GenericProgram
 
 import scala.concurrent.duration.Duration
@@ -18,8 +17,6 @@ object ExampleApp extends Script("elevation test") {
 
   var result1 = elevate(program1).run
   var result2 = elevate(program2).run
-
-//  var results = Future sequence Seq(result1)
   var results = Future sequence Seq(result1, result2)
 
   logger info "await results"
@@ -27,8 +24,8 @@ object ExampleApp extends Script("elevation test") {
   Await.result(results, Duration.Inf) map { _ match {
     case Some(result) =>
       println(s"exit code = ${result.exitValue}" )
-      println(s"stdout    = ${result.stdout}" )
-      println(s"stderr    = ${result.stderr}" )
+      println(s"stdout    = ${if (result.stdout.isEmpty) "empty" else result.stdout.reduce(_ + "\n" + _)}" )
+      println(s"stderr    = ${if (result.stderr.isEmpty) "empty" else result.stderr.reduce(_ + "\n" + _)}" )
     case None =>
       println("something failed")
   } }

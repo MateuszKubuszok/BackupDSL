@@ -19,10 +19,11 @@ object ElevationFacade extends Logging {
   def createClient(name: String, port: Integer) = new ElevationClient(name, port)
 
   def createServer(name: String, port: Integer): Process = {
-    val program = JVMProgram(executorClass, List(name, port.toString))
+    val program  = new JVMProgram(executorClass, List(name, port.toString))
+    val elevated = DirectElevatorProgram(program)
     logger debug s"Preparing elevated remote JVM executor (${executorClass.getSimpleName})"
-    logger debug program
-    program.run2Kill
+    logger debug elevated
+    elevated.run2Kill
   }
 
   def getFor(cleaner: Cleaner) = synchronized {
@@ -64,7 +65,7 @@ class ElevationFacade private () extends Logging {
   @tailrec
   private def getName(registry: Registry): String = {
     val name = Random.nextLong.toString
-    if (!registry.list().contains(name)) name
+    if (!registry.list.contains(name)) name
     else getName(registry)
   }
 }

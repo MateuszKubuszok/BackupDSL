@@ -14,7 +14,7 @@ case class DirectElevatorProgram[T <: Program[T]](
   program: Program[T]
 ) extends Program[T](
   PlatformSpecific.current.elevationCMD,
-  program.name :: program.arguments
+  PlatformSpecific.current.elevationArgs ++ (program.name :: program.arguments)
 )
 
 case class RemoteElevatorProgram[T <: Program[T]](

@@ -56,15 +56,16 @@ class CalculatedPlatformSpecific(
     repositoriesPS: PlatformSpecificRepositories)
     extends PlatformSpecific with Logging {
 
-  logger trace s"        Operating System -> ${OperatingSystem.current.name}"
-  logger trace s"        Elevation        -> ${elevationPS.getClass.getSimpleName}"
-  logger trace s"        File System      -> ${fileSystemPS.getClass.getSimpleName}"
-  logger trace s"        Repositories     -> ${repositoriesPS.getClass.getSimpleName}"
+  logger trace s"Operating System -> ${OperatingSystem.current.name}"
+  logger trace s"Elevation        -> ${elevationPS.getClass.getSimpleName}"
+  logger trace s"File System      -> ${fileSystemPS.getClass.getSimpleName}"
+  logger trace s"Repositories     -> ${repositoriesPS.getClass.getSimpleName}"
 
   // elevation
 
   override val elevationAvailable = elevationPS.elevationAvailable
   override val elevationCMD: String = elevationPS.elevationCMD
+  override val elevationArgs: List[String] = elevationPS.elevationArgs
   override def elevateDirect[T <: Program[T]](program: Program[T]): Program[T] = elevationPS.elevateDirect(program)
   override def elevateRemote[T <: Program[T]](program: Program[T], cleaner: Cleaner): Program[T] =
     elevationPS.elevateRemote(program, cleaner)

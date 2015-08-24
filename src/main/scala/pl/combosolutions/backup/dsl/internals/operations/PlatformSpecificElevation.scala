@@ -5,6 +5,8 @@ trait PlatformSpecificElevation {
 
   val elevationCMD: String
 
+  val elevationArgs: List[String] = List()
+
   def elevateDirect[T <: Program[T]](program: Program[T]): Program[T]
 
   def elevateRemote[T <: Program[T]](program: Program[T], cleaner: Cleaner): Program[T]
