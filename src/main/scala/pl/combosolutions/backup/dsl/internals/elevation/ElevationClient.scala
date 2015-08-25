@@ -9,14 +9,14 @@ import pl.combosolutions.backup.dsl.internals.operations.Program._
 import scala.concurrent.Future
 import scala.util.{Failure, Try, Success}
 
-class ElevationClient(var name: String, val port: Integer) extends Logging {
+class ElevationClient(var name: String, val remotePort: Integer) extends Logging {
 
-  val registry = LocateRegistry getRegistry("127.0.0.1", port)
-  val stub     = (registry lookup name).asInstanceOf[ElevationServer]
+  val registry = LocateRegistry getRegistry remotePort
+  val server   = (registry lookup name).asInstanceOf[ElevationServer]
 
   def executeRemote(program: GenericProgram): AsyncResult[Result[GenericProgram]] = Try {
     logger debug s"Sending remote command: ${program}"
-    stub runRemote program
+    server runRemote program
   } match {
     case Success(result) => logger trace s"Received remote result ${program} for command ${program}"
                             Future successful result
@@ -26,7 +26,7 @@ class ElevationClient(var name: String, val port: Integer) extends Logging {
 
   def terminate: Unit = {
     logger debug "Terminate remote executor"
-    Try (stub terminate)
+    Try (server terminate)
   }
 }
 

@@ -1,6 +1,7 @@
 package pl.combosolutions.backup.dsl.internals.elevation
 
 import java.rmi.registry.{Registry, LocateRegistry}
+import java.rmi.server.UnicastRemoteObject
 
 import pl.combosolutions.backup.dsl.Logging
 import pl.combosolutions.backup.dsl.internals.operations.Program.AsyncResult
@@ -12,42 +13,30 @@ import scala.util.{Failure, Success, Try, Random}
 
 object ElevationFacade extends Logging {
 
-  private val executorClass = ElevatedExecutor.getClass
+  def getFor(cleaner: Cleaner) = synchronized {
+    cleaner addTask elevationCleanUp
+    elevationFacade
+  }
+
+  private      val executorClass    = ElevatedExecutor.getClass
   private lazy val elevationFacade  = new ElevationFacade
   private lazy val elevationCleanUp = () => elevationFacade.close
 
-  def createClient(name: String, port: Integer) = new ElevationClient(name, port)
+  private def createClient(serverName: String, port: Integer) = new ElevationClient(serverName, port)
 
-  def createServer(name: String, port: Integer): Process = {
-    val program  = new JVMProgram(executorClass, List(name, port.toString))
+  private def createServer(notifierName: String, serverName: String, port: Integer): Process = {
+    val program  = new JVMProgram(executorClass, List(notifierName, serverName, port.toString))
     val elevated = DirectElevatorProgram(program)
     logger debug s"Preparing elevated remote JVM executor (${executorClass.getSimpleName})"
     logger debug elevated
     elevated.run2Kill
   }
 
-  def getFor(cleaner: Cleaner) = synchronized {
-    cleaner addTask elevationCleanUp
-    elevationFacade
-  }
-}
-
-import ElevationFacade._
-
-class ElevationFacade private () extends Logging {
-
-  private val (registry, remotePort) = getRegister()
-  private val remoteName             = getName(registry)
-
-  private val server = createServer(remoteName, remotePort)
-  Thread sleep 1000 // TODO: find better solution
-  private val client = createClient(remoteName, remotePort)
-
-  def runRemotely(program: GenericProgram): AsyncResult[Result[GenericProgram]] = client executeRemote program
-
-  def close = {
-    client.terminate
-    server.destroy
+  private def createReadyNotifier(notifierName: String, registry: Registry, mutex: Mutex) = {
+    val notifier = ElevationReadyNotifier(() => mutex.notifyReady)
+    val stub     = UnicastRemoteObject.exportObject(notifier, 0).asInstanceOf[ElevationReadyNotifier]
+    registry bind(notifierName, stub)
+    logger debug s"Preparing notifier informing client about server's readiness"
   }
 
   @tailrec
@@ -58,7 +47,7 @@ class ElevationFacade private () extends Logging {
     Try (LocateRegistry createRegistry randomPort) match {
       case Success(registry) => (registry, randomPort)
       case Failure(ex)       => if (attemptsLeft <= 0) throw ex
-                                else getRegister(attemptsLeft - 1)
+      else getRegister(attemptsLeft - 1)
     }
   }
 
@@ -67,5 +56,33 @@ class ElevationFacade private () extends Logging {
     val name = Random.nextLong.toString
     if (!registry.list.contains(name)) name
     else getName(registry)
+  }
+
+  private[elevation] class Mutex {
+    def waitForReadiness = synchronized(wait)
+
+    def notifyReady = synchronized(notifyAll)
+  }
+}
+
+import ElevationFacade._
+
+class ElevationFacade private () extends Logging {
+
+  private val (registry, remotePort) = getRegister()
+  private val notifierName           = getName(registry)
+  private val serverName             = getName(registry)
+
+  val mutex = new Mutex
+  createReadyNotifier(notifierName, registry, mutex)
+  private val server = createServer(notifierName, serverName, remotePort)
+  mutex.waitForReadiness
+  private val client = createClient(serverName, remotePort)
+
+  def runRemotely(program: GenericProgram): AsyncResult[Result[GenericProgram]] = client executeRemote program
+
+  def close = {
+    client.terminate
+    server.destroy
   }
 }
