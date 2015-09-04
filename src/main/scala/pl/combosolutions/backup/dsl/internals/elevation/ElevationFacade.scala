@@ -25,7 +25,7 @@ object ElevationFacade extends Logging {
   private def createClient(serverName: String, port: Integer) = new ElevationClient(serverName, port)
 
   private def createServer(notifierName: String, serverName: String, port: Integer): Process = {
-    val program  = new JVMProgram(executorClass, List(notifierName, serverName, port.toString))
+    val program  = JVMProgram(executorClass, List(notifierName, serverName, port.toString))
     val elevated = DirectElevatorProgram(program)
     logger debug s"Preparing elevated remote JVM executor (${executorClass.getSimpleName})"
     logger debug elevated
@@ -59,6 +59,7 @@ object ElevationFacade extends Logging {
   }
 
   private[elevation] class Mutex {
+
     def waitForReadiness = synchronized(wait)
 
     def notifyReady = synchronized(notifyAll)
@@ -72,11 +73,11 @@ class ElevationFacade private () extends Logging {
   private val (registry, remotePort) = getRegister()
   private val notifierName           = getName(registry)
   private val serverName             = getName(registry)
+  private val mutex                  = new Mutex
 
-  val mutex = new Mutex
   createReadyNotifier(notifierName, registry, mutex)
   private val server = createServer(notifierName, serverName, remotePort)
-  mutex.waitForReadiness
+  mutex.waitForReadiness // TODO: handle failed elevation
   private val client = createClient(serverName, remotePort)
 
   def runRemotely(program: GenericProgram): AsyncResult[Result[GenericProgram]] = client executeRemote program

@@ -33,7 +33,8 @@ object Program extends Logging {
       Result[T](exitValue, stdout toList, stderr toList)
     } match {
       case Success(result) => Some(result)
-      case Failure(_)      => None
+      case Failure(ex)     => Program.logger error("execution failed", ex)
+                              None
     }
   }
 
@@ -57,5 +58,8 @@ class Program[T <: Program[T]](val name:String, val arguments: List[String]) ext
 
   def asGeneric: GenericProgram = GenericProgram(name, arguments)
 
-  def showCMD: String = s"'$name' ${arguments map ("'" + _ + "'") reduce (_ + " " + _)}"
+  def showCMD: String = s"'$name' ${showArgs(arguments)}"
+
+  private def showArgs(arguments: List[String]) = if (arguments.isEmpty) ""
+                                                  else arguments map ("'" + _ + "'") reduce (_ + " " + _)
 }

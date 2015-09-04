@@ -38,9 +38,14 @@ object JVMProgram {
 
     val mainName  = if (realMainClassName endsWith "$") realMainClassName.substring(0, realMainClassName.length-1)
                     else realMainClassName
-    val jvmArgs   = ManagementFactory.getRuntimeMXBean.getInputArguments.toList
+    val jvmArgs   = stripDebugArgs(ManagementFactory.getRuntimeMXBean.getInputArguments.toList)
     val classPath = classPathFor(mainClass).reduce(_ + File.pathSeparator + _)
     jvmArgs ++ List("-cp", classPath, mainName) ++ mainClassArguments
+  }
+
+  private def stripDebugArgs(list: List[String]) = list.filterNot { arg =>
+    val lcArg = arg.toLowerCase
+    lcArg == "-xdebug" || lcArg == "-xrunjdwp" || lcArg.startsWith("-agentlib:jdwp")
   }
 }
 
