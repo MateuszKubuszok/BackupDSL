@@ -3,8 +3,8 @@ package pl.combosolutions.backup.dsl.internals.elevation
 import java.rmi.registry.LocateRegistry
 
 import pl.combosolutions.backup.dsl.Logging
-import pl.combosolutions.backup.dsl.internals.operations.{GenericProgram, Result}
-import pl.combosolutions.backup.dsl.internals.operations.Program._
+import pl.combosolutions.backup.dsl.internals.programs.{GenericProgram, Program, Result}
+import Program._
 
 import scala.concurrent.Future
 import scala.util.{Failure, Try, Success}

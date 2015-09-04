@@ -3,7 +3,8 @@ package pl.combosolutions.backup.dsl.tasks
 import java.nio.file.{Files, Paths, Path}
 
 import pl.combosolutions.backup.dsl.Settings
-import pl.combosolutions.backup.dsl.internals.operations.Program.AsyncResult
+import pl.combosolutions.backup.dsl.internals.programs.Program
+import Program.AsyncResult
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

@@ -1,6 +1,7 @@
 package pl.combosolutions.backup.dsl.internals.elevation
 
-import pl.combosolutions.backup.dsl.internals.operations.{PlatformSpecific, Program}
+import pl.combosolutions.backup.dsl.internals.operations.PlatformSpecific
+import pl.combosolutions.backup.dsl.internals.programs.Program
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 import scala.concurrent.Future

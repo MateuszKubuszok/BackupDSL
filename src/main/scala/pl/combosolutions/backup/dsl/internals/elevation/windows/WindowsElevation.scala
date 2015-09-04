@@ -1,6 +1,7 @@
-package pl.combosolutions.backup.dsl.internals.operations.windows
+package pl.combosolutions.backup.dsl.internals.elevation.windows
 
-import pl.combosolutions.backup.dsl.internals.operations.{Cleaner, PlatformSpecificElevation, Program}
+import pl.combosolutions.backup.dsl.internals.operations.{Cleaner, PlatformSpecificElevation}
+import pl.combosolutions.backup.dsl.internals.programs.Program
 import pl.combosolutions.backup.dsl.internals.{OperatingSystem, Windows95System, Windows98System, WindowsMESystem}
 
 object EmptyElevation extends PlatformSpecificElevation {

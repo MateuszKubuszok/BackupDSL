@@ -1,6 +1,7 @@
 package pl.combosolutions.backup.dsl
 
-import pl.combosolutions.backup.dsl.internals.operations.{PlatformSpecific, Program, Cleaner}
+import pl.combosolutions.backup.dsl.internals.operations.{PlatformSpecific, Cleaner}
+import pl.combosolutions.backup.dsl.internals.programs.Program
 import pl.combosolutions.backup.dsl.tasks.{Task, BackupFiles, RootTask}
 import pl.combosolutions.backup.dsl.Action._
 

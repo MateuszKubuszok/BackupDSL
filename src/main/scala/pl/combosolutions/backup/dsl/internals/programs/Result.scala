@@ -1,4 +1,4 @@
-package pl.combosolutions.backup.dsl.internals.operations
+package pl.combosolutions.backup.dsl.internals.programs
 
 case class Result[T](exitValue: Int, stdout: List[String], stderr: List[String]) {
   type Interpreter[U] = Result[T] => U

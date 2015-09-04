@@ -2,6 +2,7 @@ package pl.combosolutions.backup.dsl.internals.operations
 
 import org.specs2.mutable.{BeforeAfter, Specification}
 import pl.combosolutions.backup.dsl.internals.OperatingSystem
+import pl.combosolutions.backup.dsl.internals.programs.GenericProgram
 import pl.combosolutions.backup.dsl.test.ProgramResultTestHelper
 import pl.combosolutions.backup.dsl.test.Tags.CurrentPlatformTest
 

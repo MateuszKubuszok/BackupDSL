@@ -1,19 +1,16 @@
-package pl.combosolutions.backup.dsl.internals.operations
+package pl.combosolutions.backup.dsl.internals.programs
 
 import java.io.File
 import java.lang.management.ManagementFactory
 
 import pl.combosolutions.backup.dsl.internals.jvm.JVMUtils._
-
-import scalaz._
-import scalaz.OptionT._
-import scalaz.std.scalaFuture._
+import pl.combosolutions.backup.dsl.internals.programs.Program._
 
 import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
-import Program._
+import scalaz.OptionT._
+import scalaz.std.scalaFuture._
 
 class ProgramAlias[T <: Program[T], U <: Program[U]](
     aliased: Program[U]
@@ -49,7 +46,7 @@ object JVMProgram {
   }
 }
 
-import JVMProgram._
+import pl.combosolutions.backup.dsl.internals.programs.JVMProgram._
 
 case class JVMProgram[T <: App](
   mainClass: Class[T],

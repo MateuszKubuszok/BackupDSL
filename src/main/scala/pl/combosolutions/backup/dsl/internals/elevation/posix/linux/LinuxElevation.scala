@@ -1,6 +1,6 @@
-package pl.combosolutions.backup.dsl.internals.operations.posix.linux
+package pl.combosolutions.backup.dsl.internals.elevation.posix.linux
 
-import pl.combosolutions.backup.dsl.internals.operations.CommonElevation
+import pl.combosolutions.backup.dsl.internals.elevation.CommonElevation
 
 object GKSudoElevation extends CommonElevation {
 

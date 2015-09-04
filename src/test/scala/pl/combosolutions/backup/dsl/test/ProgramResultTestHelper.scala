@@ -1,8 +1,9 @@
 package pl.combosolutions.backup.dsl.test
 
 import org.specs2.matcher._
-import pl.combosolutions.backup.dsl.internals.operations.Program._
-import pl.combosolutions.backup.dsl.internals.operations.Result
+import pl.combosolutions.backup.dsl.internals.programs.{Program, Result}
+import Program._
+import pl.combosolutions.backup.dsl.internals.programs.Result
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration

@@ -1,8 +1,9 @@
 package pl.combosolutions.backup.dsl.tasks
 
 import org.slf4j.LoggerFactory
+import pl.combosolutions.backup.dsl.internals.programs.Program
 import pl.combosolutions.backup.dsl.{Logging, Settings}
-import pl.combosolutions.backup.dsl.internals.operations.Program.AsyncResult
+import Program.AsyncResult
 
 import scala.collection.mutable.MutableList
 import scala.concurrent.ExecutionContext.Implicits.global

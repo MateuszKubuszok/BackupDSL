@@ -1,8 +1,9 @@
-package pl.combosolutions.backup.dsl.internals.operations.posix.linux
+package pl.combosolutions.backup.dsl.internals.programs.posix.linux
 
-import pl.combosolutions.backup.dsl.internals.operations.posix.GrepFiles
-import pl.combosolutions.backup.dsl.internals.operations.{ProgramAlias, Result, Program}
-import pl.combosolutions.backup.dsl.internals.operations.posix.linux.AptRepositories._
+import pl.combosolutions.backup.dsl.internals.programs.{ProgramAlias, Program, Result}
+import pl.combosolutions.backup.dsl.internals.programs.posix.GrepFiles
+import pl.combosolutions.backup.dsl.internals.repositories.posix.linux.AptRepositories
+import AptRepositories._
 import pl.combosolutions.backup.dsl.internals.repositories.{AptRepository, VersionedPackage, Package}
 
 object AptPrograms {

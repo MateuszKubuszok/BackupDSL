@@ -6,11 +6,14 @@ import pl.combosolutions.backup.dsl.Logging
 import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts._
 import pl.combosolutions.backup.dsl.internals.OperatingSystem
 import pl.combosolutions.backup.dsl.internals.elevation.ElevationFacade
+import pl.combosolutions.backup.dsl.internals.elevation.posix.SudoElevation
+import pl.combosolutions.backup.dsl.internals.elevation.posix.linux.{KDESudoElevation, GKSudoElevation}
+import pl.combosolutions.backup.dsl.internals.elevation.windows.{UACElevation, EmptyElevation}
 import pl.combosolutions.backup.dsl.internals.filesystem.FileType._
-import pl.combosolutions.backup.dsl.internals.operations.Program._
-import pl.combosolutions.backup.dsl.internals.operations.posix.{SudoElevation, PosixFileSystem}
-import pl.combosolutions.backup.dsl.internals.operations.posix.linux.{AptRepositories, KDESudoElevation, GKSudoElevation}
-import pl.combosolutions.backup.dsl.internals.operations.windows.{UACElevation, EmptyElevation}
+import pl.combosolutions.backup.dsl.internals.filesystem.posix.PosixFileSystem
+import pl.combosolutions.backup.dsl.internals.programs.Program
+import Program._
+import pl.combosolutions.backup.dsl.internals.repositories.posix.linux.AptRepositories
 
 import scala.util.matching.Regex
 

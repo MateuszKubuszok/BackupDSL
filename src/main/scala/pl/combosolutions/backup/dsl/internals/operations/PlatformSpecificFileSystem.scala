@@ -3,7 +3,8 @@ package pl.combosolutions.backup.dsl.internals.operations
 import java.nio.file.Path
 
 import pl.combosolutions.backup.dsl.internals.filesystem.FileType._
-import pl.combosolutions.backup.dsl.internals.operations.Program._
+import pl.combosolutions.backup.dsl.internals.programs.Program
+import Program._
 
 import scala.util.matching.Regex
 

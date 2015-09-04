@@ -1,19 +1,19 @@
-package pl.combosolutions.backup.dsl.internals.operations.posix.linux
+package pl.combosolutions.backup.dsl.internals.repositories.posix.linux
 
 import pl.combosolutions.backup.dsl.internals.operations.PlatformSpecificRepositories
-import pl.combosolutions.backup.dsl.internals.operations.Program.AsyncResult
-import pl.combosolutions.backup.dsl.internals.operations.posix.PosixPrograms._
-import pl.combosolutions.backup.dsl.internals.operations.posix.WhichProgram
-import pl.combosolutions.backup.dsl.internals.repositories.{Repository, VersionedPackage, AptRepository}
+import pl.combosolutions.backup.dsl.internals.programs.Program
+import Program.AsyncResult
+import pl.combosolutions.backup.dsl.internals.programs.posix.{WhichProgram, PosixPrograms}
+import PosixPrograms._
+import pl.combosolutions.backup.dsl.internals.programs.posix.linux._
+import AptPrograms._
+import pl.combosolutions.backup.dsl.internals.repositories.{AptRepository, Repository, VersionedPackage}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
-
 import scalaz.OptionT._
 import scalaz.std.scalaFuture._
-
-import AptPrograms._
 
 object AptRepositories extends PlatformSpecificRepositories {
 

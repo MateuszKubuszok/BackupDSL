@@ -1,12 +1,17 @@
 package example
 
 import pl.combosolutions.backup.dsl.Script
-import pl.combosolutions.backup.dsl.internals.operations.GenericProgram
+import pl.combosolutions.backup.dsl.internals.programs.GenericProgram
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
+object ExampleApp extends Script("elevation test") {
+  logger info "fetch repos"
+}
+
+/*
 object ExampleApp extends Script("elevation test") {
   logger info "create programs"
 
@@ -30,6 +35,7 @@ object ExampleApp extends Script("elevation test") {
       println("something failed")
   } }
 }
+*/
 
 /*
 import pl.combosolutions.backup.dsl.Script

@@ -4,8 +4,9 @@ import java.rmi.registry.{Registry, LocateRegistry}
 import java.rmi.server.UnicastRemoteObject
 
 import pl.combosolutions.backup.dsl.Logging
-import pl.combosolutions.backup.dsl.internals.operations.Program.AsyncResult
-import pl.combosolutions.backup.dsl.internals.operations.{Cleaner, Result, GenericProgram, JVMProgram}
+import pl.combosolutions.backup.dsl.internals.programs.{JVMProgram, GenericProgram, Program, Result}
+import Program.AsyncResult
+import pl.combosolutions.backup.dsl.internals.operations.Cleaner
 
 import scala.annotation.tailrec
 import scala.sys.process.Process

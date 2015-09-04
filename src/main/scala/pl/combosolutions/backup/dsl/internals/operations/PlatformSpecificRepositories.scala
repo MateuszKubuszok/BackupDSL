@@ -1,6 +1,7 @@
 package pl.combosolutions.backup.dsl.internals.operations
 
-import pl.combosolutions.backup.dsl.internals.operations.Program._
+import pl.combosolutions.backup.dsl.internals.programs.Program
+import Program._
 import pl.combosolutions.backup.dsl.internals.repositories.{Package, Repository}
 
 trait PlatformSpecificRepositories {
@@ -15,5 +16,5 @@ trait PlatformSpecificRepositories {
   def areAllInstalled(packages: Packages): AsyncResult[Boolean]
   def installAll(packages: Packages): AsyncResult[Boolean]
 
-  // TODO: withElevation: Boolean
+  // TODO: withElevation: ElevationMode/ObligatoryElevationMode
 }

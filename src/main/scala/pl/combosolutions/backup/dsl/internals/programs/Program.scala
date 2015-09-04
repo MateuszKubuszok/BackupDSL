@@ -1,17 +1,14 @@
-package pl.combosolutions.backup.dsl.internals.operations
+package pl.combosolutions.backup.dsl.internals.programs
 
-import org.slf4j.LoggerFactory
 import pl.combosolutions.backup.dsl.Logging
-
-import scalaz._
-import scalaz.OptionT._
-import scalaz.std.scalaFuture._
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.sys.process.{Process, ProcessLogger}
 import scala.util.{Failure, Success, Try}
+import scalaz.OptionT._
+import scalaz.std.scalaFuture._
 
 object Program extends Logging {
 
@@ -44,7 +41,7 @@ object Program extends Logging {
   }
 }
 
-import Program._
+import pl.combosolutions.backup.dsl.internals.programs.Program._
 
 class Program[T <: Program[T]](val name:String, val arguments: List[String]) extends Serializable {
 

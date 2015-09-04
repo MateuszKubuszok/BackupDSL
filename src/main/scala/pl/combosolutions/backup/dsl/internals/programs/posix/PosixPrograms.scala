@@ -1,9 +1,10 @@
-package pl.combosolutions.backup.dsl.internals.operations.posix
+package pl.combosolutions.backup.dsl.internals.programs.posix
 
 import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts._
 import pl.combosolutions.backup.dsl.internals.filesystem.FileType
 import pl.combosolutions.backup.dsl.internals.filesystem.FileType.FileType
-import pl.combosolutions.backup.dsl.internals.operations.{PlatformSpecific, Result, Program}
+import pl.combosolutions.backup.dsl.internals.operations.PlatformSpecific
+import pl.combosolutions.backup.dsl.internals.programs.{Program, Result}
 
 object PosixPrograms {
   type CatFileInterpreter[U] = Result[CatFile]#Interpreter[U]
