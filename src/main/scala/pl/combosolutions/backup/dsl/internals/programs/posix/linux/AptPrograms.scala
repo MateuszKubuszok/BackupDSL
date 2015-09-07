@@ -1,10 +1,10 @@
 package pl.combosolutions.backup.dsl.internals.programs.posix.linux
 
-import pl.combosolutions.backup.dsl.internals.programs.{ProgramAlias, Program, Result}
+import pl.combosolutions.backup.dsl.internals.programs.{ ProgramAlias, Program, Result }
 import pl.combosolutions.backup.dsl.internals.programs.posix.GrepFiles
 import pl.combosolutions.backup.dsl.internals.repositories.posix.linux.AptRepositories
 import AptRepositories._
-import pl.combosolutions.backup.dsl.internals.repositories.{AptRepository, VersionedPackage, Package}
+import pl.combosolutions.backup.dsl.internals.repositories.{ AptRepository, VersionedPackage, Package }
 
 object AptPrograms {
   type AptAddRepositoryInterpreter[U] = Result[AptAddRepository]#Interpreter[U]
@@ -24,20 +24,20 @@ object AptPrograms {
 
   type DpkgListInterpreter[U] = Result[DpkgList]#Interpreter[U]
   implicit val DpkgList2VersionedPackages: DpkgListInterpreter[List[VersionedPackage]] = result => for {
-    line      <- result.stdout
+    line <- result.stdout
     lineMatch <- installedPattern findFirstMatchIn line
   } yield VersionedPackage(lineMatch group 1,
-                           lineMatch group 2)
+    lineMatch group 2)
 
   type ListAptReposInterpreter[U] = Result[ListAptRepos]#Interpreter[U]
   implicit val ListAptRepos2AptRepositories: ListAptReposInterpreter[List[AptRepository]] = result => for {
-    line      <- result.stdout
+    line <- result.stdout
     lineMatch <- aptSourcePattern findFirstMatchIn line
-  } yield AptRepository(isSrc         = lineMatch group 1 equalsIgnoreCase "deb-src",
-                        url           = lineMatch group 4,
-                        branch        = lineMatch group 5,
-                        areas         = lineMatch group 6 split "\\s+" toList,
-                        architectures = lineMatch group 3 split "," toList)
+  } yield AptRepository(isSrc = lineMatch group 1 equalsIgnoreCase "deb-src",
+    url = lineMatch group 4,
+    branch = lineMatch group 5,
+    areas = lineMatch group 6 split "\\s+" toList,
+    architectures = lineMatch group 3 split "," toList)
 }
 
 case class AptAddRepository(repository: AptRepository) extends Program[AptAddRepository](
@@ -69,11 +69,11 @@ case object AptGetUpdate extends Program[AptGetUpdate](
 trait DpkgList extends Program[DpkgList]
 case object DpkgList extends Program[DpkgList](
   "dpkg",
-   List("--list")
+  List("--list")
 )
 
 trait ListAptRepos extends Program[ListAptRepos]
-case object ListAptRepos extends ProgramAlias[ListAptRepos,GrepFiles](
+case object ListAptRepos extends ProgramAlias[ListAptRepos, GrepFiles](
   GrepFiles(
     "^deb",
     List(etcAptSourcesMain, etcAptSourcesDir)

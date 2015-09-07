@@ -1,9 +1,9 @@
 package pl.combosolutions.backup.dsl.internals.elevation
 
-import java.rmi.{RemoteException, Remote}
+import java.rmi.{ RemoteException, Remote }
 
 import pl.combosolutions.backup.dsl.Logging
-import pl.combosolutions.backup.dsl.internals.programs.{GenericProgram, Result}
+import pl.combosolutions.backup.dsl.internals.programs.{ GenericProgram, Result }
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration

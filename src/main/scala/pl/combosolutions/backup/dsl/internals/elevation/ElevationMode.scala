@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.dsl.internals.elevation
 
-import pl.combosolutions.backup.dsl.internals.operations.{Cleaner, PlatformSpecific}
+import pl.combosolutions.backup.dsl.internals.operations.{ Cleaner, PlatformSpecific }
 import pl.combosolutions.backup.dsl.internals.programs.Program
 
 sealed trait ElevationMode {
@@ -28,7 +28,6 @@ class ElevateIfNeeded[T <: Program[T]](program: Program[T], withElevation: Eleva
 }
 
 object ElevateIfNeeded {
-  implicit def possiblyElevated[T <: Program[T]](program: Program[T])
-                                                (implicit withElevation: ElevationMode, cleaner: Cleaner) =
+  implicit def possiblyElevated[T <: Program[T]](program: Program[T])(implicit withElevation: ElevationMode, cleaner: Cleaner) =
     new ElevateIfNeeded(program, withElevation, cleaner)
 }

@@ -4,7 +4,7 @@ import org.apache.commons.lang3.SystemUtils._
 
 import OperatingSystem._
 
-import java.nio.file.{Files,Paths}
+import java.nio.file.{ Files, Paths }
 
 object OperatingSystem {
   val all = Seq(
@@ -38,7 +38,7 @@ object OperatingSystem {
   lazy val current = all find (_.isCurrent) get
 
   // from http://linuxmafia.com/faq/Admin/release-files.html
-  private[internals] def IS_OS_ARCH   = Files.exists(Paths.get("/etc/arch-release"))
+  private[internals] def IS_OS_ARCH = Files.exists(Paths.get("/etc/arch-release"))
   private[internals] def IS_OS_DEBIAN = Files.exists(Paths.get("/etc/debian_version"))
   private[internals] def IS_OS_FEDORA = Files.exists(Paths.get("/etc/fedora-release"))
   private[internals] def IS_OS_GENTOO = Files.exists(Paths.get("/etc/gentoo-release"))

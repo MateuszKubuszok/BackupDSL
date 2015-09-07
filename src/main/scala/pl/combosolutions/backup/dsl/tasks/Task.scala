@@ -1,7 +1,7 @@
 package pl.combosolutions.backup.dsl.tasks
 
 import pl.combosolutions.backup.dsl.internals.programs.Program
-import pl.combosolutions.backup.dsl.{Logging, Settings}
+import pl.combosolutions.backup.dsl.{ Logging, Settings }
 import Program.AsyncResult
 
 import scala.collection.mutable.MutableList
@@ -10,11 +10,11 @@ import scala.concurrent.Future
 import scalaz.OptionT._
 import scalaz.std.scalaFuture._
 
-abstract class Task[PBR,PRR,BR,RR](description: String) extends Logging {
+abstract class Task[PBR, PRR, BR, RR](description: String) extends Logging {
 
-  private var tasks: MutableList[Task[BR,RR,_,_]] = MutableList()
+  private var tasks: MutableList[Task[BR, RR, _, _]] = MutableList()
 
-  def andThen[SBR,SRR](child: Task[BR,RR,SBR,SRR]): Task[BR,RR,SBR,SRR] = {
+  def andThen[SBR, SRR](child: Task[BR, RR, SBR, SRR]): Task[BR, RR, SBR, SRR] = {
     tasks += child
     child
   }

@@ -10,7 +10,7 @@ object JVMProgramArgs {
   def argumentsFor[T <: App](mainClass: Class[T], mainClassArguments: List[String]): List[String] = {
     val realMainClassName = mainClass.getName
 
-    val mainName  = if (realMainClassName endsWith "$") realMainClassName.substring(0, realMainClassName.length-1)
+    val mainName = if (realMainClassName endsWith "$") realMainClassName.substring(0, realMainClassName.length - 1)
     else realMainClassName
     val classPath = classPathFor(mainClass).reduce(_ + File.pathSeparator + _)
     JVMUtils.jvmArgsExceptDebug ++ List("-cp", classPath, mainName) ++ mainClassArguments
@@ -19,8 +19,7 @@ object JVMProgramArgs {
 
 case class JVMProgram[T <: App](
   mainClass: Class[T],
-  mainClassArguments: List[String]
-) extends Program[JVMProgram[T]](
+  mainClassArguments: List[String]) extends Program[JVMProgram[T]](
   javaExec.toString,
   argumentsFor(mainClass, mainClassArguments)
 )

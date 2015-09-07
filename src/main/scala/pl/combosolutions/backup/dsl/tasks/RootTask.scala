@@ -4,7 +4,7 @@ import pl.combosolutions.backup.dsl.Settings
 
 import scala.concurrent.Future
 
-class RootTask extends Task[Unit,Unit,Unit,Unit]("root task") {
+class RootTask extends Task[Unit, Unit, Unit, Unit]("root task") {
 
   def performBackup(implicit withSettings: Settings): Unit = performBackupWithResult(Unit)
 

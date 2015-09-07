@@ -2,14 +2,14 @@ package pl.combosolutions.backup.dsl.internals.jvm
 
 import java.io.File
 import java.lang.management.ManagementFactory
-import java.net.{URLClassLoader, URLDecoder}
-import java.nio.file.{Files, Paths}
+import java.net.{ URLClassLoader, URLDecoder }
+import java.nio.file.{ Files, Paths }
 
 import pl.combosolutions.backup.dsl.Logging
 import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts
 
 import scala.collection.JavaConversions._
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
 object JVMUtils extends Logging {
   lazy val javaHome = System getProperty "java.home"
@@ -26,23 +26,23 @@ object JVMUtils extends Logging {
 
   lazy val classPath = System getProperty "java.class.path"
 
-  private lazy val jarClassPathPattern  = "jar:(file:)?([^!]+)!.+".r
+  private lazy val jarClassPathPattern = "jar:(file:)?([^!]+)!.+".r
   private lazy val fileClassPathPattern = "file:(.+).class".r
 
   def classPathFor[T](clazz: Class[T]): List[String] = {
     val pathToClass = getPathToClassFor(clazz)
 
-    val propClassPath   = classPath split File.pathSeparator toSet
+    val propClassPath = classPath split File.pathSeparator toSet
 
     val loaderClassPath = clazz.getClassLoader.asInstanceOf[URLClassLoader].getURLs.map(_.getFile).toSet
 
-    val jarClassPath    = jarClassPathPattern.findFirstMatchIn(pathToClass) map { matcher =>
-      val jarDir = Paths get (matcher group 2) getParent()
+    val jarClassPath = jarClassPathPattern.findFirstMatchIn(pathToClass) map { matcher =>
+      val jarDir = Paths get (matcher group 2) getParent ()
       s"${jarDir}/*"
     } toSet
 
-    val fileClassPath   = fileClassPathPattern.findFirstMatchIn(pathToClass) map { matcher =>
-      val suffix   = "/" + clazz.getName
+    val fileClassPath = fileClassPathPattern.findFirstMatchIn(pathToClass) map { matcher =>
+      val suffix = "/" + clazz.getName
       val fullPath = matcher group 1
       fullPath substring (0, fullPath.length - suffix.length)
     } toSet
@@ -52,8 +52,8 @@ object JVMUtils extends Logging {
 
   def configureRMIFor[T](clazz: Class[T]): Unit = {
     val classPath = classPathFor(clazz)
-    val codebase  = if (classPath isEmpty) ""
-                    else classPath map (new File(_).getAbsoluteFile.toURI.toURL.toString) reduce (_ + " " + _)
+    val codebase = if (classPath isEmpty) ""
+    else classPath map (new File(_).getAbsoluteFile.toURI.toURL.toString) reduce (_ + " " + _)
 
     logger trace s"Set java.rmi.server.codebase to: $codebase"
     System setProperty ("java.rmi.server.codebase", codebase)

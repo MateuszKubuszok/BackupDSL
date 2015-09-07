@@ -5,8 +5,8 @@ import pl.combosolutions.backup.dsl.Logging
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.sys.process.{Process, ProcessLogger}
-import scala.util.{Failure, Success, Try}
+import scala.sys.process.{ Process, ProcessLogger }
+import scala.util.{ Failure, Success, Try }
 import scalaz.OptionT._
 import scalaz.std.scalaFuture._
 
@@ -30,8 +30,9 @@ object Program extends Logging {
       Result[T](exitValue, stdout toList, stderr toList)
     } match {
       case Success(result) => Some(result)
-      case Failure(ex)     => Program.logger error("execution failed", ex)
-                              None
+      case Failure(ex) =>
+        Program.logger error ("execution failed", ex)
+        None
     }
   }
 
@@ -43,9 +44,9 @@ object Program extends Logging {
 
 import pl.combosolutions.backup.dsl.internals.programs.Program._
 
-class Program[T <: Program[T]](val name:String, val arguments: List[String]) extends Serializable {
+class Program[T <: Program[T]](val name: String, val arguments: List[String]) extends Serializable {
 
-  def run      = execute(this)
+  def run = execute(this)
 
   def run2Kill = execute2Kill(this)
 
@@ -58,5 +59,5 @@ class Program[T <: Program[T]](val name:String, val arguments: List[String]) ext
   def showCMD: String = s"'$name' ${showArgs(arguments)}"
 
   private def showArgs(arguments: List[String]) = if (arguments.isEmpty) ""
-                                                  else arguments map ("'" + _ + "'") reduce (_ + " " + _)
+  else arguments map ("'" + _ + "'") reduce (_ + " " + _)
 }

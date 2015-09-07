@@ -8,11 +8,10 @@ import scalaz.OptionT._
 import scalaz.std.scalaFuture._
 
 class ProgramAlias[T <: Program[T], U <: Program[U]](
-    aliased: Program[U]
-  ) extends Program[T](
-    aliased.name,
-    aliased.arguments
-  ) {
+  aliased: Program[U]) extends Program[T](
+  aliased.name,
+  aliased.arguments
+) {
 
   override def run = (for {
     originalResult <- optionT[Future](execute(aliased))
@@ -21,5 +20,4 @@ class ProgramAlias[T <: Program[T], U <: Program[U]](
 
 case class GenericProgram(
   override val name: String,
-  override val arguments: List[String]
-) extends Program[GenericProgram](name, arguments)
+  override val arguments: List[String]) extends Program[GenericProgram](name, arguments)

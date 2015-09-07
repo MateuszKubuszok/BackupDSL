@@ -15,7 +15,7 @@ trait PlatformSpecificFileSystem {
   val fileIsFile: Regex
   val fileIsDirectory: Regex
   val fileIsSymlinkPattern: Regex
-  def getFileType(forPath: Path)(implicit  withElevation: ElevationMode, cleaner: Cleaner): AsyncResult[FileType]
+  def getFileType(forPath: Path)(implicit withElevation: ElevationMode, cleaner: Cleaner): AsyncResult[FileType]
 
   /* // TODO
   def createSymlink(from: Path, to: Path, withElevation: Boolean) = throw new NotImplementedError("TODO")

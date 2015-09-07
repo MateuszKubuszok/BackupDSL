@@ -1,9 +1,9 @@
 package pl.combosolutions.backup.dsl.internals.elevation
 
-import java.rmi.{RemoteException, Remote}
+import java.rmi.{ RemoteException, Remote }
 
 import pl.combosolutions.backup.dsl.Logging
-import pl.combosolutions.backup.dsl.internals.elevation.ElevationReadyNotifier.{FailureListener, ReadyListener}
+import pl.combosolutions.backup.dsl.internals.elevation.ElevationReadyNotifier.{ FailureListener, ReadyListener }
 
 trait ElevationReadyNotifier extends Remote {
 

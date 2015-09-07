@@ -5,10 +5,10 @@ import java.nio.file.Path
 import pl.combosolutions.backup.dsl.Logging
 import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts._
 import pl.combosolutions.backup.dsl.internals.OperatingSystem
-import pl.combosolutions.backup.dsl.internals.elevation.{ObligatoryElevationMode, ElevationMode}
+import pl.combosolutions.backup.dsl.internals.elevation.{ ObligatoryElevationMode, ElevationMode }
 import pl.combosolutions.backup.dsl.internals.elevation.posix.SudoElevation
-import pl.combosolutions.backup.dsl.internals.elevation.posix.linux.{KDESudoElevation, GKSudoElevation}
-import pl.combosolutions.backup.dsl.internals.elevation.windows.{UACElevation, EmptyElevation}
+import pl.combosolutions.backup.dsl.internals.elevation.posix.linux.{ KDESudoElevation, GKSudoElevation }
+import pl.combosolutions.backup.dsl.internals.elevation.windows.{ UACElevation, EmptyElevation }
 import pl.combosolutions.backup.dsl.internals.filesystem.posix.PosixFileSystem
 import pl.combosolutions.backup.dsl.internals.programs.Program
 import Program._
@@ -51,9 +51,9 @@ trait PlatformSpecific
   with PlatformSpecificRepositories
 
 class CalculatedPlatformSpecific(
-    elevationPS: PlatformSpecificElevation,
-    fileSystemPS: PlatformSpecificFileSystem,
-    repositoriesPS: PlatformSpecificRepositories)
+  elevationPS: PlatformSpecificElevation,
+  fileSystemPS: PlatformSpecificFileSystem,
+  repositoriesPS: PlatformSpecificRepositories)
     extends PlatformSpecific with Logging {
 
   logger trace s"Operating System -> ${OperatingSystem.current.name}"
@@ -64,22 +64,21 @@ class CalculatedPlatformSpecific(
   // elevation
 
   override val elevationAvailable = elevationPS.elevationAvailable
-  override val elevationCMD       = elevationPS.elevationCMD
-  override val elevationArgs      = elevationPS.elevationArgs
+  override val elevationCMD = elevationPS.elevationCMD
+  override val elevationArgs = elevationPS.elevationArgs
 
   override def elevateDirect[T <: Program[T]](program: Program[T]) = elevationPS elevateDirect program
   override def elevateRemote[T <: Program[T]](program: Program[T], cleaner: Cleaner) =
-    elevationPS elevateRemote(program, cleaner)
+    elevationPS elevateRemote (program, cleaner)
 
   // file system
 
-  override val fileSystemAvailable  = fileSystemPS.fileSystemAvailable
-  override val fileIsFile           = fileSystemPS.fileIsFile
-  override val fileIsDirectory      = fileSystemPS.fileIsDirectory
+  override val fileSystemAvailable = fileSystemPS.fileSystemAvailable
+  override val fileIsFile = fileSystemPS.fileIsFile
+  override val fileIsDirectory = fileSystemPS.fileIsDirectory
   override val fileIsSymlinkPattern = fileSystemPS.fileIsSymlinkPattern
 
-  override def getFileType(forPath: Path)
-                          (implicit withElevation: ElevationMode, cleaner: Cleaner) = fileSystemPS getFileType forPath
+  override def getFileType(forPath: Path)(implicit withElevation: ElevationMode, cleaner: Cleaner) = fileSystemPS getFileType forPath
 
   // repositories
 
@@ -87,11 +86,9 @@ class CalculatedPlatformSpecific(
 
   override def obtainRepositories(implicit withElevation: ElevationMode, cleaner: Cleaner): AsyncResult[Repositories] =
     repositoriesPS obtainRepositories
-  override def addRepositories(repositories: Repositories)
-                              (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
+  override def addRepositories(repositories: Repositories)(implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
     repositoriesPS addRepositories repositories
-  override def removeRepositories(repositories: Repositories)
-                                 (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
+  override def removeRepositories(repositories: Repositories)(implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
     repositoriesPS removeRepositories repositories
 
   override def areAllInstalled(packages: Packages)(implicit withElevation: ElevationMode, cleaner: Cleaner) =

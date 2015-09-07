@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.dsl.internals.elevation
 
-import pl.combosolutions.backup.dsl.internals.operations.{Cleaner, PlatformSpecificElevation}
+import pl.combosolutions.backup.dsl.internals.operations.{ Cleaner, PlatformSpecificElevation }
 import pl.combosolutions.backup.dsl.internals.programs.Program
 import pl.combosolutions.backup.dsl.internals.programs.posix.PosixPrograms._
 import pl.combosolutions.backup.dsl.internals.programs.posix.WhichProgram

@@ -7,7 +7,7 @@ import pl.combosolutions.backup.dsl.internals.programs.GenericProgram
 
 import scala.collection.JavaConversions._
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ Await, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
 
 // TODO: rewrite tasks in DSL as future-like monads
