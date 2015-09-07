@@ -4,7 +4,8 @@ import java.rmi.registry.{Registry, LocateRegistry}
 import java.rmi.server.UnicastRemoteObject
 
 import pl.combosolutions.backup.dsl.Logging
-import pl.combosolutions.backup.dsl.internals.programs.{JVMProgram, GenericProgram, Program, Result}
+import pl.combosolutions.backup.dsl.internals.jvm.{JVMUtils, JVMProgram}
+import pl.combosolutions.backup.dsl.internals.programs.{GenericProgram, Program, Result}
 import Program.AsyncResult
 import pl.combosolutions.backup.dsl.internals.operations.Cleaner
 
@@ -48,7 +49,7 @@ object ElevationFacade extends Logging {
     Try (LocateRegistry createRegistry randomPort) match {
       case Success(registry) => (registry, randomPort)
       case Failure(ex)       => if (attemptsLeft <= 0) throw ex
-      else getRegister(attemptsLeft - 1)
+                                else getRegister(attemptsLeft - 1)
     }
   }
 
@@ -71,6 +72,8 @@ import ElevationFacade._
 
 class ElevationFacade private () extends Logging {
 
+  JVMUtils configureRMIFor executorClass
+
   private val (registry, remotePort) = getRegister()
   private val notifierName           = getName(registry)
   private val serverName             = getName(registry)
@@ -78,7 +81,7 @@ class ElevationFacade private () extends Logging {
 
   createReadyNotifier(notifierName, registry, mutex)
   private val server = createServer(notifierName, serverName, remotePort)
-  mutex.waitForReadiness // TODO: handle failed elevation
+  mutex.waitForReadiness
   private val client = createClient(serverName, remotePort)
 
   def runRemotely(program: GenericProgram): AsyncResult[Result[GenericProgram]] = client executeRemote program

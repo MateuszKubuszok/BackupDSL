@@ -1,14 +1,21 @@
 package example
 
+import java.io.File
+
 import pl.combosolutions.backup.dsl.Script
 import pl.combosolutions.backup.dsl.internals.programs.GenericProgram
 
+import scala.collection.JavaConversions._
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
+// TODO: rewrite tasks in DSL as future-like monads
+
 object ExampleApp extends Script("elevation test") {
-  logger info "fetch repos"
+  val classpath = System getProperty "java.class.path"
+  val classpathEntries = (classpath split File.pathSeparator).toList
+  logger info classpathEntries
 }
 
 /*

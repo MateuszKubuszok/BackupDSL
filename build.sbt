@@ -4,7 +4,7 @@ organization := "pl.combosolutions"
 
 version := "0.1.0-SNAPSHOT"
 
-scalaVersion := "2.11.2"
+scalaVersion := "2.11.6"
 
 scalacOptions in ThisBuild ++= Seq(
   "-unchecked",
@@ -14,7 +14,7 @@ scalacOptions in ThisBuild ++= Seq(
   "-language:postfixOps"
 )
 
-crossScalaVersions := Seq("2.11.2")
+crossScalaVersions := Seq("2.11.6")
 
 resolvers += Resolver.sonatypeRepo("public")
 

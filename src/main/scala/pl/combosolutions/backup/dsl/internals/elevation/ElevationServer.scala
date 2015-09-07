@@ -1,6 +1,5 @@
 package pl.combosolutions.backup.dsl.internals.elevation
 
-
 import java.rmi.{RemoteException, Remote}
 
 import pl.combosolutions.backup.dsl.Logging

@@ -4,6 +4,7 @@ import java.rmi.registry.LocateRegistry
 import java.rmi.server.UnicastRemoteObject
 
 import pl.combosolutions.backup.dsl.Logging
+import pl.combosolutions.backup.dsl.internals.jvm.JVMUtils
 
 import scala.util.{Failure, Success, Try}
 
@@ -16,6 +17,8 @@ object ElevatedExecutor extends App with Logging {
   val remotePort   = Integer valueOf args(2)
 
   Try {
+    JVMUtils configureRMIFor getClass
+
     val server   = ElevationServer()
     val stub     = UnicastRemoteObject.exportObject(server, 0).asInstanceOf[ElevationServer]
     val registry = LocateRegistry getRegistry remotePort
@@ -27,6 +30,7 @@ object ElevatedExecutor extends App with Logging {
   } match {
     case Success(_)  => logger debug "Remote ready"
     case Failure(ex) => logger error("Remote failed", ex)
+                        // TODO: notify error
                         System exit -1
   }
 }
