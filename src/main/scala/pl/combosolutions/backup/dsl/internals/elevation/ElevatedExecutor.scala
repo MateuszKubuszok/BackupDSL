@@ -18,19 +18,21 @@ object ElevatedExecutor extends App with Logging {
 
   Try {
     JVMUtils configureRMIFor getClass
-
-    val server   = ElevationServer()
-    val stub     = UnicastRemoteObject.exportObject(server, 0).asInstanceOf[ElevationServer]
     val registry = LocateRegistry getRegistry remotePort
     val notifier = (registry lookup notifierName).asInstanceOf[ElevationReadyNotifier]
 
-    registry.bind(serverName, stub)
-
-    notifier.notifyReady
+    Try {
+      val server   = ElevationServer()
+      val stub     = UnicastRemoteObject.exportObject(server, 0).asInstanceOf[ElevationServer]
+      registry.bind(serverName, stub)
+    } match {
+      case Success(_)  => notifier.notifyReady
+      case Failure(ex) => notifier.notifyFailure
+                          throw ex
+    }
   } match {
     case Success(_)  => logger debug "Remote ready"
     case Failure(ex) => logger error("Remote failed", ex)
-                        // TODO: notify error
                         System exit -1
   }
 }

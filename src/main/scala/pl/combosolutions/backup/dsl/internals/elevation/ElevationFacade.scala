@@ -4,6 +4,7 @@ import java.rmi.registry.{Registry, LocateRegistry}
 import java.rmi.server.UnicastRemoteObject
 
 import pl.combosolutions.backup.dsl.Logging
+import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts
 import pl.combosolutions.backup.dsl.internals.jvm.{JVMUtils, JVMProgram}
 import pl.combosolutions.backup.dsl.internals.programs.{GenericProgram, Program, Result}
 import Program.AsyncResult
@@ -35,7 +36,7 @@ object ElevationFacade extends Logging {
   }
 
   private def createReadyNotifier(notifierName: String, registry: Registry, mutex: Mutex) = {
-    val notifier = ElevationReadyNotifier(() => mutex.notifyReady)
+    val notifier = ElevationReadyNotifier(() => mutex.notifyReady, () => mutex.notifyFailure)
     val stub     = UnicastRemoteObject.exportObject(notifier, 0).asInstanceOf[ElevationReadyNotifier]
     registry bind(notifierName, stub)
     logger debug s"Preparing notifier informing client about server's readiness"
@@ -62,9 +63,20 @@ object ElevationFacade extends Logging {
 
   private[elevation] class Mutex {
 
-    def waitForReadiness = synchronized(wait)
+    private var failureOccurred = false
+
+    def waitForReadiness = synchronized {
+      wait
+      if (failureOccurred)
+        throw new IllegalStateException(DefaultsAndConsts.exceptionRemoteFailed)
+    }
 
     def notifyReady = synchronized(notifyAll)
+
+    def notifyFailure = synchronized {
+      failureOccurred = true
+      notifyAll
+    }
   }
 }
 

@@ -1,13 +1,15 @@
 package pl.combosolutions.backup.dsl.internals.repositories.posix.linux
 
-import pl.combosolutions.backup.dsl.internals.operations.PlatformSpecificRepositories
+import pl.combosolutions.backup.dsl.internals.elevation.{ObligatoryElevationMode, ElevationMode}
+import pl.combosolutions.backup.dsl.internals.elevation.ElevateIfNeeded._
+import pl.combosolutions.backup.dsl.internals.operations.{Cleaner, PlatformSpecificRepositories}
 import pl.combosolutions.backup.dsl.internals.programs.Program
 import Program.AsyncResult
 import pl.combosolutions.backup.dsl.internals.programs.posix.{WhichProgram, PosixPrograms}
 import PosixPrograms._
 import pl.combosolutions.backup.dsl.internals.programs.posix.linux._
 import AptPrograms._
-import pl.combosolutions.backup.dsl.internals.repositories.{AptRepository, Repository, VersionedPackage}
+import pl.combosolutions.backup.dsl.internals.repositories.{AptRepository, VersionedPackage}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
@@ -25,18 +27,20 @@ object AptRepositories extends PlatformSpecificRepositories {
   override lazy val repositoriesAvailable: Boolean =
     Await.result(WhichProgram("apt-get").digest[Boolean], Duration.Inf) getOrElse false
 
-  override def obtainRepositories: AsyncResult[List[Repository]] = ListAptRepos.digest[List[AptRepository]]
+  override def obtainRepositories(implicit withElevation: ElevationMode, cleaner: Cleaner) =
+    ListAptRepos.handleElevation.digest[List[AptRepository]]
 
-  override def addRepositories(repositories: Repositories): AsyncResult[Boolean] =
-    areAllTrueWithinAsyncResults(asApt(repositories) map (AptAddRepository(_).digest[Boolean]))
+  override def addRepositories(repositories: Repositories)(implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
+    areAllTrueWithinAsyncResults(asApt(repositories) map (AptAddRepository(_).handleElevation.digest[Boolean]))
 
-  override def removeRepositories(repositories: Repositories): AsyncResult[Boolean] =
-    areAllTrueWithinAsyncResults(asApt(repositories) map (AptRemoveRepository(_).digest[Boolean]))
+  override def removeRepositories(repositories: Repositories)(implicit  withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
+    areAllTrueWithinAsyncResults(asApt(repositories) map (AptRemoveRepository(_).handleElevation.digest[Boolean]))
 
-  override def installAll(packages: Packages): AsyncResult[Boolean] = AptGetInstall(packages toList).digest[Boolean]
+  override def installAll(packages: Packages)(implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
+    AptGetInstall(packages toList).handleElevation.digest[Boolean]
 
-  override def areAllInstalled(packages: Packages): AsyncResult[Boolean] = (for {
-    installedPackages <- optionT[Future](DpkgList.digest[List[VersionedPackage]])
+  override def areAllInstalled(packages: Packages)(implicit withElevation: ElevationMode, cleaner: Cleaner) = (for {
+    installedPackages <- optionT[Future](DpkgList.handleElevation.digest[List[VersionedPackage]])
   } yield packages.forall(package_ => installedPackages.exists(iPackage => iPackage.name == package_.name))).run
 
   private def asApt(list: Repositories) = list collect { case ar: AptRepository => ar }

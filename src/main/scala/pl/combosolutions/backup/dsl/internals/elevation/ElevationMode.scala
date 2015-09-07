@@ -22,3 +22,13 @@ object RemoteElevation extends ObligatoryElevationMode {
   override def apply[T <: Program[T]](program: Program[T], cleaner: Cleaner) =
     PlatformSpecific.current.elevateRemote(program, cleaner)
 }
+
+class ElevateIfNeeded[T <: Program[T]](program: Program[T], withElevation: ElevationMode, cleaner: Cleaner) {
+  def handleElevation = withElevation(program, cleaner)
+}
+
+object ElevateIfNeeded {
+  implicit def possiblyElevated[T <: Program[T]](program: Program[T])
+                                                (implicit withElevation: ElevationMode, cleaner: Cleaner) =
+    new ElevateIfNeeded(program, withElevation, cleaner)
+}

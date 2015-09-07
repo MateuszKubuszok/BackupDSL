@@ -6,6 +6,7 @@ import java.net.{URLClassLoader, URLDecoder}
 import java.nio.file.{Files, Paths}
 
 import pl.combosolutions.backup.dsl.Logging
+import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts
 
 import scala.collection.JavaConversions._
 import scala.util.{Failure, Success, Try}
@@ -71,7 +72,7 @@ object JVMUtils extends Logging {
     val url = clazz getResource s"${clazz.getSimpleName}.class"
     Try (URLDecoder decode (url.toString, "UTF-8")) match {
       case Success(classFilePath) => classFilePath
-      case Failure(_)             => throw new IllegalStateException("") // TODO
+      case Failure(ex)            => throw new IllegalStateException(DefaultsAndConsts.exceptionBadClassURL, ex)
     }
   }
 
