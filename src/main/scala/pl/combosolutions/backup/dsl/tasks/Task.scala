@@ -1,6 +1,5 @@
 package pl.combosolutions.backup.dsl.tasks
 
-import org.slf4j.LoggerFactory
 import pl.combosolutions.backup.dsl.internals.programs.Program
 import pl.combosolutions.backup.dsl.{Logging, Settings}
 import Program.AsyncResult

@@ -5,7 +5,6 @@ import java.nio.file.Path
 import pl.combosolutions.backup.dsl.Logging
 import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts._
 import pl.combosolutions.backup.dsl.internals.OperatingSystem
-import pl.combosolutions.backup.dsl.internals.elevation.ElevationFacade
 import pl.combosolutions.backup.dsl.internals.elevation.posix.SudoElevation
 import pl.combosolutions.backup.dsl.internals.elevation.posix.linux.{KDESudoElevation, GKSudoElevation}
 import pl.combosolutions.backup.dsl.internals.elevation.windows.{UACElevation, EmptyElevation}

@@ -2,7 +2,7 @@ package pl.combosolutions.backup.dsl.internals.jvm
 
 import java.io.File
 import java.lang.management.ManagementFactory
-import java.net.{URL, URLClassLoader, URLDecoder}
+import java.net.{URLClassLoader, URLDecoder}
 import java.nio.file.{Files, Paths}
 
 import pl.combosolutions.backup.dsl.Logging
