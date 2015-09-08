@@ -10,6 +10,9 @@ object DefaultsAndConsts {
   val BackupDirPath = java.nio.file.Paths.get(SystemUtils.getUserHome.getPath, BackupDirName)
   val CopyOptions = Array[CopyOption](REPLACE_EXISTING, COPY_ATTRIBUTES)
 
+  val ProgramThreadPoolSize = 10
+  val TaskThreadPoolSize = 10
+
   val exceptionBadClassURL = "Invalid class URL"
   val exceptionNoElevation = "No elevation found"
   val exceptionNoFileSystem = "No file system found"

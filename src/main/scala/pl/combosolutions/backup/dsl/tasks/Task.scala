@@ -1,11 +1,11 @@
 package pl.combosolutions.backup.dsl.tasks
 
+import pl.combosolutions.backup.dsl.internals.ExecutionContexts.Task.context
 import pl.combosolutions.backup.dsl.internals.programs.Program
 import pl.combosolutions.backup.dsl.{ Logging, Settings }
 import Program.AsyncResult
 
 import scala.collection.mutable.MutableList
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scalaz.OptionT._
 import scalaz.std.scalaFuture._

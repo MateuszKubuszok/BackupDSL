@@ -1,13 +1,12 @@
 package pl.combosolutions.backup.dsl.internals.elevation
 
+import pl.combosolutions.backup.dsl.internals.ExecutionContexts.Program.context
 import pl.combosolutions.backup.dsl.internals.operations.PlatformSpecific
 import pl.combosolutions.backup.dsl.internals.programs.Program
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
-import scalaz._
 import scalaz.OptionT._
 import scalaz.std.scalaFuture._
 

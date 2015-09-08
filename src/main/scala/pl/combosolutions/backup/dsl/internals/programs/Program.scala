@@ -1,9 +1,9 @@
 package pl.combosolutions.backup.dsl.internals.programs
 
 import pl.combosolutions.backup.dsl.Logging
+import pl.combosolutions.backup.dsl.internals.ExecutionContexts.Program.context
 
 import scala.collection.mutable
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.sys.process.{ Process, ProcessLogger }
 import scala.util.{ Failure, Success, Try }

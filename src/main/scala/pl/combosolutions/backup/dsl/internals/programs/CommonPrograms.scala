@@ -1,8 +1,8 @@
 package pl.combosolutions.backup.dsl.internals.programs
 
+import pl.combosolutions.backup.dsl.internals.ExecutionContexts.Program.context
 import pl.combosolutions.backup.dsl.internals.programs.Program._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scalaz.OptionT._
 import scalaz.std.scalaFuture._

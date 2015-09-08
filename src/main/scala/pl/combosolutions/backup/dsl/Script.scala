@@ -1,11 +1,16 @@
 package pl.combosolutions.backup.dsl
 
+import pl.combosolutions.backup.dsl.internals.ExecutionContexts
 import pl.combosolutions.backup.dsl.internals.operations.{ PlatformSpecific, Cleaner }
 import pl.combosolutions.backup.dsl.internals.programs.Program
 import pl.combosolutions.backup.dsl.tasks.{ Task, BackupFiles, RootTask }
 import pl.combosolutions.backup.dsl.Action._
 
+import scala.concurrent.ExecutionContext
+
 abstract class Script(name: String) extends Logging with Cleaner {
+
+  implicit val context: ExecutionContext = ExecutionContexts.Task.context
 
   private val parser = new scopt.OptionParser[ScriptConfig](name) {
     head("backup/restore script made with BackupDSL")

@@ -1,5 +1,6 @@
 package pl.combosolutions.backup.dsl.internals.repositories.posix.linux
 
+import pl.combosolutions.backup.dsl.internals.ExecutionContexts.Task.context
 import pl.combosolutions.backup.dsl.internals.elevation.{ ObligatoryElevationMode, ElevationMode }
 import pl.combosolutions.backup.dsl.internals.elevation.ElevateIfNeeded._
 import pl.combosolutions.backup.dsl.internals.operations.{ Cleaner, PlatformSpecificRepositories }
@@ -11,7 +12,6 @@ import pl.combosolutions.backup.dsl.internals.programs.posix.linux._
 import AptPrograms._
 import pl.combosolutions.backup.dsl.internals.repositories.{ AptRepository, VersionedPackage }
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ Await, Future }
 import scalaz.OptionT._
