@@ -28,7 +28,7 @@ final class SubTaskProxy[Result](proxyDependencyType: DependencyType.Value) exte
 
   private var implementation: Option[SubTask[Result]] = None
 
-  def setImplementation(subTask: SubTask[Result]): Unit = {
+  private[beta] def setImplementation(subTask: SubTask[Result]): Unit = {
     assert(implementation.isEmpty, "Implementation is already set")
     assert(dependencyType == subTask.dependencyType, "Declared dependency type must match the actual one")
 
@@ -56,7 +56,7 @@ final class IndependentSubTask[Result](action: () => Future[Result]) extends Sub
   final override def execute = action()
 }
 
-class IndependentSubTaskBuilder[Result, ParentResult, ChildResult](action: () => Future[Result]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.Independent) {
+case class IndependentSubTaskBuilder[Result, ParentResult, ChildResult](action: () => Future[Result]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.Independent) {
 
   injectableProxy.setImplementation(new IndependentSubTask[Result](action))
 
@@ -80,7 +80,7 @@ final class ParentDependentSubTask[Result, ParentResult](action: Function[Parent
   final val executeWithParentResult: Behavior = action
 }
 
-class ParentDependentSubTaskBuilder[Result, ParentResult, ChildResult](action: Function[ParentResult, Future[Result]]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.ParentDependent) {
+case class ParentDependentSubTaskBuilder[Result, ParentResult, ChildResult](action: Function[ParentResult, Future[Result]]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.ParentDependent) {
 
   final override def configureForParent(parentTask: SubTaskBuilder[ParentResult, _, _]): Unit = {
     assert(parentTask.injectableProxy.dependencyType != DependencyType.ChildDependent, "Circular dependency is not allowed")
@@ -110,7 +110,7 @@ final class ChildDependentSubTask[Result, ChildResult](action: Function[Traversa
   final val executeWithChildrenResults: Behavior = action
 }
 
-class ChildDependentSubTaskBuilder[Result, ParentResult, ChildResult](action: Function[Traversable[ChildResult], Future[Result]]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.ChildDependent) {
+case class ChildDependentSubTaskBuilder[Result, ParentResult, ChildResult](action: Function[Traversable[ChildResult], Future[Result]]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.ChildDependent) {
 
   final override def configureForParent(childrenTasks: SubTaskBuilder[ParentResult, _, _]): Unit =
     throw new IllegalStateException("Child dependent task cannot rely on any parent task")
