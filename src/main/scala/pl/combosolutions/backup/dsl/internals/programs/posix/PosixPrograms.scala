@@ -1,6 +1,7 @@
 package pl.combosolutions.backup.dsl.internals.programs.posix
 
-import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts._
+import pl.combosolutions.backup.dsl.ReportException
+import pl.combosolutions.backup.dsl.internals.InternalsExceptionMessages.UnknownFileType
 import pl.combosolutions.backup.dsl.internals.filesystem.FileType
 import pl.combosolutions.backup.dsl.internals.filesystem.FileType.FileType
 import pl.combosolutions.backup.dsl.internals.operations.PlatformSpecific
@@ -15,7 +16,7 @@ object PosixPrograms {
     case PlatformSpecific.current.fileIsDirectory(fileName)      => FileType.Directory
     case PlatformSpecific.current.fileIsSymlinkPattern(fileName) => FileType.SymbolicLink
     case PlatformSpecific.current.fileIsFile(fileName)           => FileType.File
-  } getOrElse (throw new IllegalStateException(exceptionUnknownFileType))
+  } getOrElse (ReportException onIllegalStateOf UnknownFileType)
 
   type GrepFilesInterpreter[U] = Result[GrepFiles]#Interpreter[U]
   implicit val GrepFiles2ListString: ListFileInterpreter[List[String]] = _.stdout

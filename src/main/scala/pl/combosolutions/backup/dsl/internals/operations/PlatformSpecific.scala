@@ -2,8 +2,8 @@ package pl.combosolutions.backup.dsl.internals.operations
 
 import java.nio.file.Path
 
-import pl.combosolutions.backup.dsl.Logging
-import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts._
+import pl.combosolutions.backup.dsl.{ ReportException, Logging }
+import pl.combosolutions.backup.dsl.internals.InternalsExceptionMessages._
 import pl.combosolutions.backup.dsl.internals.OperatingSystem
 import pl.combosolutions.backup.dsl.internals.elevation.{ ObligatoryElevationMode, ElevationMode }
 import pl.combosolutions.backup.dsl.internals.elevation.posix.SudoElevation
@@ -33,17 +33,17 @@ object PlatformSpecific {
 
     // POSIX elevation
     SudoElevation
-  ) find (_.elevationAvailable) getOrElse (throw new IllegalStateException(exceptionNoElevation))
+  ) find (_.elevationAvailable) getOrElse (ReportException onIllegalStateOf NoElevationAvailable)
 
   private lazy val currentFileSystem = List(
     // POSIX file system
     PosixFileSystem
-  ) find (_.fileSystemAvailable) getOrElse (throw new IllegalStateException(exceptionNoFileSystem))
+  ) find (_.fileSystemAvailable) getOrElse (ReportException onIllegalStateOf NoFileSystemAvailable)
 
   private lazy val currentRepositories = List(
     // Linux repositories
     AptRepositories
-  ) find (_.repositoriesAvailable) getOrElse (throw new IllegalStateException(exceptionNoRepositories))
+  ) find (_.repositoriesAvailable) getOrElse (ReportException onIllegalStateOf NoRepositoriesAvailable)
 }
 
 trait PlatformSpecific

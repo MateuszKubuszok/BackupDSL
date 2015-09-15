@@ -3,7 +3,7 @@ package pl.combosolutions.backup.dsl.internals
 import java.util.concurrent.Executors
 
 import pl.combosolutions.backup.dsl.Logging
-import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts.{ ProgramThreadPoolSize, TaskThreadPoolSize }
+import pl.combosolutions.backup.dsl.internals.DefaultsAndConstants.{ ProgramThreadPoolSize, TaskThreadPoolSize }
 
 import scala.concurrent.ExecutionContext
 

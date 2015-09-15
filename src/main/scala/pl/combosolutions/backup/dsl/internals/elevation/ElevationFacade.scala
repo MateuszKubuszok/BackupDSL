@@ -3,8 +3,8 @@ package pl.combosolutions.backup.dsl.internals.elevation
 import java.rmi.registry.{ Registry, LocateRegistry }
 import java.rmi.server.UnicastRemoteObject
 
-import pl.combosolutions.backup.dsl.Logging
-import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts.exceptionRemoteFailed
+import pl.combosolutions.backup.dsl.{ ReportException, Logging }
+import pl.combosolutions.backup.dsl.internals.InternalsExceptionMessages.RemoteFailure
 import pl.combosolutions.backup.dsl.internals.jvm.{ JVMUtils, JVMProgram }
 import pl.combosolutions.backup.dsl.internals.programs.{ GenericProgram, Program, Result }
 import Program.AsyncResult
@@ -70,7 +70,7 @@ object ElevationFacade extends Logging {
     def waitForReadiness = synchronized {
       wait
       if (failureOccurred)
-        throw new IllegalStateException(exceptionRemoteFailed)
+        ReportException onIllegalStateOf RemoteFailure
     }
 
     def notifyReady = synchronized(notifyAll)

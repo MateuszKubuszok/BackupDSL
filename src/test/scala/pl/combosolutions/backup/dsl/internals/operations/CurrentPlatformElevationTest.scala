@@ -1,6 +1,7 @@
 package pl.combosolutions.backup.dsl.internals.operations
 
 import org.specs2.mutable.{BeforeAfter, Specification}
+import pl.combosolutions.backup.dsl.ReportException
 import pl.combosolutions.backup.dsl.internals.OperatingSystem
 import pl.combosolutions.backup.dsl.internals.programs.GenericProgram
 import pl.combosolutions.backup.dsl.test.ProgramResultTestHelper
@@ -19,7 +20,7 @@ class CurrentPlatformElevationTest extends Specification with ProgramResultTestH
 
   val testProgram     = if      (currentSystem.isWindows) GenericProgram("cmd", List())
                         else if (currentSystem.isPosix)   GenericProgram("ls", List())
-                        else                              throw new NotImplementedError("Unknown platform")
+                        else                              ReportException onNotImplemented "Unknown platform"
 
   "Current platform's elevator" should {
 

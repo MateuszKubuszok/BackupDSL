@@ -5,15 +5,16 @@ import java.lang.management.ManagementFactory
 import java.net.{ URLClassLoader, URLDecoder }
 import java.nio.file.{ Files, Paths }
 
-import pl.combosolutions.backup.dsl.Logging
-import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts.exceptionBadClassURL
+import pl.combosolutions.backup.dsl.{ ReportException, Logging }
+import pl.combosolutions.backup.dsl.internals.DefaultsAndConstants.{ JavaHomeProperty, ClassPathProperty, RMICodebaseProperty, RMIDisableHttpProperty }
+import pl.combosolutions.backup.dsl.internals.InternalsExceptionMessages.BadClassURL
 
 import scala.collection.JavaConversions._
 import scala.util.{ Failure, Success, Try }
 
 object JVMUtils extends Logging {
 
-  lazy val javaHome = System getProperty "java.home"
+  lazy val javaHome = System getProperty JavaHomeProperty
 
   lazy val javaExec = Seq(
     Paths get (javaHome, "bin", "java"),
@@ -25,7 +26,7 @@ object JVMUtils extends Logging {
     Paths get (javaHome, "bin", "javaw.exe")
   ) filter (Files exists _) head
 
-  lazy val classPath = System getProperty "java.class.path"
+  lazy val classPath = System getProperty ClassPathProperty
 
   private lazy val jarClassPathPattern = "jar:(file:)?([^!]+)!.+".r
   private lazy val fileClassPathPattern = "file:(.+).class".r
@@ -56,11 +57,11 @@ object JVMUtils extends Logging {
     val codebase = if (classPath isEmpty) ""
     else classPath map (new File(_).getAbsoluteFile.toURI.toURL.toString) reduce (_ + " " + _)
 
-    logger trace s"Set java.rmi.server.codebase to: $codebase"
-    System setProperty ("java.rmi.server.codebase", codebase)
+    logger trace s"Set $RMICodebaseProperty to: $codebase"
+    System setProperty (RMICodebaseProperty, codebase)
 
-    logger trace s"Set java.rmi.server.disableHttp to: true"
-    System setProperty ("java.rmi.server.disableHttp", "true")
+    logger trace s"Set $RMIDisableHttpProperty to: true"
+    System setProperty (RMIDisableHttpProperty, "true")
   }
 
   def jvmArgs: List[String] = ManagementFactory.getRuntimeMXBean.getInputArguments.toList
@@ -73,7 +74,7 @@ object JVMUtils extends Logging {
     val url = clazz getResource s"${clazz.getSimpleName}.class"
     Try (URLDecoder decode (url.toString, "UTF-8")) match {
       case Success(classFilePath) => classFilePath
-      case Failure(ex)            => throw new IllegalStateException(exceptionBadClassURL, ex)
+      case Failure(ex)            => ReportException onIllegalStateOf (BadClassURL, ex)
     }
   }
 
