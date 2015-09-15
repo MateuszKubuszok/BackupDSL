@@ -1,9 +1,9 @@
 package pl.combosolutions.backup.dsl.internals.elevation
 
+import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts.exceptionRemoteKilling
 import pl.combosolutions.backup.dsl.internals.ExecutionContexts.Program.context
 import pl.combosolutions.backup.dsl.internals.operations.PlatformSpecific
 import pl.combosolutions.backup.dsl.internals.programs.Program
-import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 import scala.concurrent.Future
 
@@ -27,5 +27,5 @@ case class RemoteElevatorProgram[T <: Program[T]](
     result <- optionT[Future](elevationFacade runRemotely program.asGeneric)
   } yield result.asSpecific[T]).run
 
-  override def run2Kill = throw new NotImplementedException
+  override def run2Kill = throw new NotImplementedError(exceptionRemoteKilling)
 }

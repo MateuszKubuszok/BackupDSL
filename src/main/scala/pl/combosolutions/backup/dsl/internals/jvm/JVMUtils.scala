@@ -6,22 +6,23 @@ import java.net.{ URLClassLoader, URLDecoder }
 import java.nio.file.{ Files, Paths }
 
 import pl.combosolutions.backup.dsl.Logging
-import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts
+import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts.exceptionBadClassURL
 
 import scala.collection.JavaConversions._
 import scala.util.{ Failure, Success, Try }
 
 object JVMUtils extends Logging {
+
   lazy val javaHome = System getProperty "java.home"
 
   lazy val javaExec = Seq(
-    Paths.get(javaHome, "bin", "java"),
-    Paths.get(javaHome, "bin", "java.exe")
+    Paths get (javaHome, "bin", "java"),
+    Paths get (javaHome, "bin", "java.exe")
   ) filter (Files exists _) head
 
   lazy val javaWExec = Seq(
-    Paths.get(javaHome, "bin", "javaw"),
-    Paths.get(javaHome, "bin", "javaw.exe")
+    Paths get (javaHome, "bin", "javaw"),
+    Paths get (javaHome, "bin", "javaw.exe")
   ) filter (Files exists _) head
 
   lazy val classPath = System getProperty "java.class.path"
@@ -72,7 +73,7 @@ object JVMUtils extends Logging {
     val url = clazz getResource s"${clazz.getSimpleName}.class"
     Try (URLDecoder decode (url.toString, "UTF-8")) match {
       case Success(classFilePath) => classFilePath
-      case Failure(ex)            => throw new IllegalStateException(DefaultsAndConsts.exceptionBadClassURL, ex)
+      case Failure(ex)            => throw new IllegalStateException(exceptionBadClassURL, ex)
     }
   }
 

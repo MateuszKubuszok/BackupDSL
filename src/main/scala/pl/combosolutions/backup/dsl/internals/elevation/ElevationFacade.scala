@@ -4,7 +4,7 @@ import java.rmi.registry.{ Registry, LocateRegistry }
 import java.rmi.server.UnicastRemoteObject
 
 import pl.combosolutions.backup.dsl.Logging
-import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts
+import pl.combosolutions.backup.dsl.internals.DefaultsAndConsts.exceptionRemoteFailed
 import pl.combosolutions.backup.dsl.internals.jvm.{ JVMUtils, JVMProgram }
 import pl.combosolutions.backup.dsl.internals.programs.{ GenericProgram, Program, Result }
 import Program.AsyncResult
@@ -32,7 +32,7 @@ object ElevationFacade extends Logging {
     val elevated = DirectElevatorProgram(program)
     logger debug s"Preparing elevated remote JVM executor (${executorClass.getSimpleName})"
     logger debug elevated
-    elevated.run2Kill
+    elevated run2Kill
   }
 
   private def createReadyNotifier(notifierName: String, registry: Registry, mutex: Mutex) = {
@@ -43,22 +43,24 @@ object ElevationFacade extends Logging {
   }
 
   @tailrec
-  private def getRegister(attemptsLeft: Integer = 10): (Registry, Integer) = {
+  private def createRegister(attemptsLeft: Integer = 10): (Registry, Integer) = {
     val possiblePorts = (1024 to 65536)
-    val randomPort = possiblePorts(scala.util.Random.nextInt(possiblePorts.size))
+    val randomPort = possiblePorts(Random nextInt possiblePorts.size)
 
+    // format: OFF
     Try (LocateRegistry createRegistry randomPort) match {
       case Success(registry) => (registry, randomPort)
-      case Failure(ex) => if (attemptsLeft <= 0) throw ex
-      else getRegister(attemptsLeft - 1)
+      case Failure(ex)       => if (attemptsLeft <= 0) throw ex
+                                else createRegister(attemptsLeft - 1)
     }
+    // format: ON
   }
 
   @tailrec
-  private def getName(registry: Registry): String = {
+  private def findFreeName(registry: Registry): String = {
     val name = Random.nextLong.toString
     if (!registry.list.contains(name)) name
-    else getName(registry)
+    else findFreeName(registry)
   }
 
   private[elevation] class Mutex {
@@ -68,7 +70,7 @@ object ElevationFacade extends Logging {
     def waitForReadiness = synchronized {
       wait
       if (failureOccurred)
-        throw new IllegalStateException(DefaultsAndConsts.exceptionRemoteFailed)
+        throw new IllegalStateException(exceptionRemoteFailed)
     }
 
     def notifyReady = synchronized(notifyAll)
@@ -86,9 +88,9 @@ class ElevationFacade private () extends Logging {
 
   JVMUtils configureRMIFor executorClass
 
-  private val (registry, remotePort) = getRegister()
-  private val notifierName = getName(registry)
-  private val serverName = getName(registry)
+  private val (registry, remotePort) = createRegister()
+  private val notifierName = findFreeName(registry)
+  private val serverName = findFreeName(registry)
   private val mutex = new Mutex
 
   createReadyNotifier(notifierName, registry, mutex)

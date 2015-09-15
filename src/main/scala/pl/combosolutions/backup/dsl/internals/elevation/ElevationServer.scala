@@ -25,7 +25,7 @@ class ElevationServerImpl extends ElevationServer with Logging {
 
   def runRemote(program: GenericProgram): Option[Result[GenericProgram]] = {
     logger debug s"Run ${program} remotely"
-    Await.result(program.run, Duration.Inf)
+    Await result (program.run, Duration.Inf)
   }
 
   def terminate: Unit = System exit 0

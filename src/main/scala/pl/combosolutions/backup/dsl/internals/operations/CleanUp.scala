@@ -3,6 +3,7 @@ package pl.combosolutions.backup.dsl.internals.operations
 import scala.collection.mutable
 
 trait Cleaner {
+
   type CleanUp = () => Unit
 
   private val tasks = mutable.Set[CleanUp]()

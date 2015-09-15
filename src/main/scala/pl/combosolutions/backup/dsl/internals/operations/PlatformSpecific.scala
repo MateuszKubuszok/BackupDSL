@@ -15,6 +15,7 @@ import Program._
 import pl.combosolutions.backup.dsl.internals.repositories.posix.linux.AptRepositories
 
 object PlatformSpecific {
+
   lazy val current: PlatformSpecific = new CalculatedPlatformSpecific(
     currentElevation,
     currentFileSystem,
@@ -84,12 +85,16 @@ class CalculatedPlatformSpecific(
 
   override val repositoriesAvailable = repositoriesPS.repositoriesAvailable
 
+  // format: OFF
   override def obtainRepositories(implicit withElevation: ElevationMode, cleaner: Cleaner): AsyncResult[Repositories] =
     repositoriesPS obtainRepositories
-  override def addRepositories(repositories: Repositories)(implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
+  override def addRepositories(repositories: Repositories)
+                              (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
     repositoriesPS addRepositories repositories
-  override def removeRepositories(repositories: Repositories)(implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
+  override def removeRepositories(repositories: Repositories)
+                                 (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
     repositoriesPS removeRepositories repositories
+  // format: ON
 
   override def areAllInstalled(packages: Packages)(implicit withElevation: ElevationMode, cleaner: Cleaner) =
     repositoriesPS areAllInstalled packages

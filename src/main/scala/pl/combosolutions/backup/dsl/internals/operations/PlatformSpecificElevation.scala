@@ -3,6 +3,7 @@ package pl.combosolutions.backup.dsl.internals.operations
 import pl.combosolutions.backup.dsl.internals.programs.Program
 
 trait PlatformSpecificElevation {
+
   val elevationAvailable: Boolean
 
   val elevationCMD: String

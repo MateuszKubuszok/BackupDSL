@@ -15,12 +15,12 @@ sealed trait ObligatoryElevationMode extends ElevationMode
 
 object DirectElevation extends ObligatoryElevationMode {
   override def apply[T <: Program[T]](program: Program[T], cleaner: Cleaner) =
-    PlatformSpecific.current.elevateDirect(program)
+    PlatformSpecific.current elevateDirect program
 }
 
 object RemoteElevation extends ObligatoryElevationMode {
   override def apply[T <: Program[T]](program: Program[T], cleaner: Cleaner) =
-    PlatformSpecific.current.elevateRemote(program, cleaner)
+    PlatformSpecific.current elevateRemote (program, cleaner)
 }
 
 class ElevateIfNeeded[T <: Program[T]](program: Program[T], withElevation: ElevationMode, cleaner: Cleaner) {
@@ -28,6 +28,9 @@ class ElevateIfNeeded[T <: Program[T]](program: Program[T], withElevation: Eleva
 }
 
 object ElevateIfNeeded {
-  implicit def possiblyElevated[T <: Program[T]](program: Program[T])(implicit withElevation: ElevationMode, cleaner: Cleaner) =
+  // format: OFF
+  implicit def possiblyElevated[T <: Program[T]](program: Program[T])
+                                                (implicit withElevation: ElevationMode, cleaner: Cleaner) =
     new ElevateIfNeeded(program, withElevation, cleaner)
+  // format: ON
 }

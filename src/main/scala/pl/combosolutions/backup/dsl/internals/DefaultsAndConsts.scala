@@ -18,5 +18,6 @@ object DefaultsAndConsts {
   val exceptionNoFileSystem = "No file system found"
   val exceptionNoRepositories = "No repositories found"
   val exceptionRemoteFailed = "Failed to initiate remote executor"
+  val exceptionRemoteKilling = "Remote elevator isn't supposed to die before program finishes"
   val exceptionUnknownFileType = "Unexpected `file` answer"
 }

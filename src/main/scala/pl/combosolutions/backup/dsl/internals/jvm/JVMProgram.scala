@@ -7,13 +7,15 @@ import pl.combosolutions.backup.dsl.internals.jvm.JVMProgramArgs._
 import pl.combosolutions.backup.dsl.internals.programs.Program
 
 object JVMProgramArgs {
-  def argumentsFor[T <: App](mainClass: Class[T], mainClassArguments: List[String]): List[String] = {
-    val realMainClassName = mainClass.getName
 
+  def argumentsFor[T <: App](mainClass: Class[T], mainClassArguments: List[String]): List[String] = {
+    // format: OFF
+    val realMainClassName = mainClass.getName
     val mainName = if (realMainClassName endsWith "$") realMainClassName.substring(0, realMainClassName.length - 1)
-    else realMainClassName
+                   else realMainClassName
     val classPath = classPathFor(mainClass).reduce(_ + File.pathSeparator + _)
-    JVMUtils.jvmArgsExceptDebug ++ List("-cp", classPath, mainName) ++ mainClassArguments
+    // format: ON
+    jvmArgsExceptDebug ++ List("-cp", classPath, mainName) ++ mainClassArguments
   }
 }
 
