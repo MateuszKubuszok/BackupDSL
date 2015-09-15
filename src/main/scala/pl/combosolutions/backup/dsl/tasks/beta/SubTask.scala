@@ -4,7 +4,7 @@ import pl.combosolutions.backup.dsl.internals.ExecutionContexts
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-import SubTask._
+import ChildDependentSubTask._
 
 object DependencyType extends Enumeration {
   type DependencyType = Value
@@ -22,12 +22,6 @@ sealed trait SubTask[Result] {
   protected def execute: Future[Result]
 }
 
-object SubTask {
-
-  def compose[Result](children: Traversable[SubTask[Result]])(implicit executor: ExecutionContext): Future[Traversable[Result]] =
-    Future sequence (children map (_.result))
-}
-
 final class SubTaskProxy[Result](proxyDependencyType: DependencyType.Value) extends SubTask[Result] {
 
   val dependencyType = proxyDependencyType
@@ -35,24 +29,47 @@ final class SubTaskProxy[Result](proxyDependencyType: DependencyType.Value) exte
   private var implementation: Option[SubTask[Result]] = None
 
   def setImplementation(subTask: SubTask[Result]): Unit = {
-    if (implementation.isEmpty) implementation = Some(subTask)
-    else throw new IllegalStateException("Implementation is already set")
+    assert(implementation.isEmpty, "Implementation is already set")
+    assert(dependencyType == subTask.dependencyType, "Declared dependency type must match the actual one")
+
+    implementation = Some(subTask)
   }
 
   def execute = implementation map (_.result) getOrElse (throw new IllegalStateException("Implementation not set"))
 }
 
-class SubTaskBuilder[Result](dependencyType: DependencyType.Value) {
+sealed abstract class SubTaskBuilder[Result, ParentResult, ChildResult](dependencyType: DependencyType.Value) {
 
   val injectableProxy = new SubTaskProxy[Result](dependencyType)
+
+  def configureForParent(parentTask: SubTaskBuilder[ParentResult, _, _]): Unit
+
+  def configureForChildren(childrenTasks: Traversable[SubTaskBuilder[ChildResult, _, _]]): Unit
 }
 
-abstract class IndependentSubTask[Result] extends SubTask[Result] {
+// Independent subtasks
+
+final class IndependentSubTask[Result](action: () => Future[Result]) extends SubTask[Result] {
 
   val dependencyType = DependencyType.Independent
+
+  final override def execute = action()
 }
 
-abstract class ParentDependentSubTask[Result, ParentResult](parent: SubTask[ParentResult]) extends SubTask[Result] {
+class IndependentSubTaskBuilder[Result, ParentResult, ChildResult](action: () => Future[Result]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.Independent) {
+
+  injectableProxy.setImplementation(new IndependentSubTask[Result](action))
+
+  final override def configureForParent(parentTask: SubTaskBuilder[ParentResult, _, _]): Unit =
+    throw new IllegalStateException("Independent task cannot rely on any parent task")
+
+  final override def configureForChildren(childrenTasks: Traversable[SubTaskBuilder[ChildResult, _, _]]): Unit =
+    throw new IllegalStateException("Independent task cannot rely on any children tasks")
+}
+
+// Parent dependent subtasks
+
+final class ParentDependentSubTask[Result, ParentResult](action: Function[ParentResult, Future[Result]], parent: SubTask[ParentResult]) extends SubTask[Result] {
 
   val dependencyType = DependencyType.ParentDependent
 
@@ -60,10 +77,29 @@ abstract class ParentDependentSubTask[Result, ParentResult](parent: SubTask[Pare
 
   final protected def execute = parent.result flatMap (executeWithParentResult(_))
 
-  protected val executeWithParentResult: Behavior
+  final val executeWithParentResult: Behavior = action
 }
 
-abstract class ChildDependentSubTask[Result, ChildResult](children: Traversable[SubTask[ChildResult]]) extends SubTask[Result] {
+class ParentDependentSubTaskBuilder[Result, ParentResult, ChildResult](action: Function[ParentResult, Future[Result]]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.ParentDependent) {
+
+  final override def configureForParent(parentTask: SubTaskBuilder[ParentResult, _, _]): Unit = {
+    assert(parentTask.injectableProxy.dependencyType != DependencyType.ChildDependent, "Circular dependency is not allowed")
+    injectableProxy.setImplementation(new ParentDependentSubTask[Result, ParentResult](action, parentTask.injectableProxy))
+  }
+
+  final override def configureForChildren(childrenTasks: Traversable[SubTaskBuilder[ChildResult, _, _]]): Unit =
+    throw new IllegalStateException("Parent dependent task cannot rely on any children tasks")
+}
+
+// Child dependent subtasks
+
+object ChildDependentSubTask {
+
+  def compose[Result](children: Traversable[SubTask[Result]])(implicit executor: ExecutionContext): Future[Traversable[Result]] =
+    Future sequence (children map (_.result))
+}
+
+final class ChildDependentSubTask[Result, ChildResult](action: Function[Traversable[ChildResult], Future[Result]], children: Traversable[SubTask[ChildResult]]) extends SubTask[Result] {
 
   val dependencyType = DependencyType.ChildDependent
 
@@ -71,6 +107,16 @@ abstract class ChildDependentSubTask[Result, ChildResult](children: Traversable[
 
   final protected def execute = compose(children) flatMap (executeWithChildrenResults(_))
 
-  protected val executeWithChildrenResults: Behavior
+  final val executeWithChildrenResults: Behavior = action
 }
 
+class ChildDependentSubTaskBuilder[Result, ParentResult, ChildResult](action: Function[Traversable[ChildResult], Future[Result]]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.ChildDependent) {
+
+  final override def configureForParent(childrenTasks: SubTaskBuilder[ParentResult, _, _]): Unit =
+    throw new IllegalStateException("Child dependent task cannot rely on any parent task")
+
+  final override def configureForChildren(childrenTasks: Traversable[SubTaskBuilder[ChildResult, _, _]]): Unit = {
+    assert(childrenTasks.forall(_.injectableProxy.dependencyType != DependencyType.ParentDependent), "Circular dependency is not allowed")
+    injectableProxy.setImplementation(new ChildDependentSubTask[Result, ChildResult](action, childrenTasks.map(_.injectableProxy)))
+  }
+}

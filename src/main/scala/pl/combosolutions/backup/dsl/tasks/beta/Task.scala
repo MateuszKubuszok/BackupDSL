@@ -6,4 +6,3 @@ abstract class Task[ParentBackupResult, BackupResult, ParentRestoreResult, Resto
 
 }
 
-
