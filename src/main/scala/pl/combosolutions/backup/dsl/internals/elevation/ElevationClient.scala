@@ -2,11 +2,9 @@ package pl.combosolutions.backup.dsl.internals.elevation
 
 import java.rmi.registry.LocateRegistry
 
-import pl.combosolutions.backup.dsl.Logging
-import pl.combosolutions.backup.dsl.internals.programs.{ GenericProgram, Program, Result }
-import Program._
+import pl.combosolutions.backup.dsl.{ AsyncResult, Logging }
+import pl.combosolutions.backup.dsl.internals.programs.{ GenericProgram, Result }
 
-import scala.concurrent.Future
 import scala.util.{ Failure, Try, Success }
 
 class ElevationClient(var name: String, val remotePort: Integer) extends Logging {
@@ -20,10 +18,10 @@ class ElevationClient(var name: String, val remotePort: Integer) extends Logging
   } match {
     case Success(result) =>
       logger trace s"Received remote result ${program} for command ${program}"
-      Future successful result
+      AsyncResult(result)
     case Failure(ex) =>
       logger error s"Remote execution failed: ${ex}"
-      Future failed ex
+      AsyncResult failed ex
   }
 
   def terminate: Unit = {

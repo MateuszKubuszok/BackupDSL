@@ -1,11 +1,11 @@
 package pl.combosolutions.backup.dsl.internals.repositories.posix.linux
 
+import pl.combosolutions.backup.dsl.AsyncResult
+import pl.combosolutions.backup.dsl.wrapAsyncResultForMapping
 import pl.combosolutions.backup.dsl.internals.ExecutionContexts.Task.context
 import pl.combosolutions.backup.dsl.internals.elevation.{ ObligatoryElevationMode, ElevationMode }
 import pl.combosolutions.backup.dsl.internals.elevation.ElevateIfNeeded._
 import pl.combosolutions.backup.dsl.internals.operations.{ Cleaner, PlatformSpecificRepositories }
-import pl.combosolutions.backup.dsl.internals.programs.Program
-import Program.AsyncResult
 import pl.combosolutions.backup.dsl.internals.programs.posix.{ WhichProgram, PosixPrograms }
 import PosixPrograms._
 import pl.combosolutions.backup.dsl.internals.programs.posix.linux._
@@ -46,8 +46,5 @@ object AptRepositories extends PlatformSpecificRepositories {
   private def asApt(list: Repositories) = list collect { case ar: AptRepository => ar }
 
   private def areAllTrueWithinAsyncResults(futureOptBooleans: List[AsyncResult[Boolean]]): AsyncResult[Boolean] =
-    Future sequence futureOptBooleans map { resultOpts =>
-      if (resultOpts exists (_.isEmpty)) None
-      else Some(resultOpts collect { case Some(boolean) => boolean } forall identity)
-    }
+    (AsyncResult completeSequence futureOptBooleans).asAsync map (_ forall identity)
 }

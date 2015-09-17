@@ -1,8 +1,7 @@
 package pl.combosolutions.backup.dsl.internals.operations
 
+import pl.combosolutions.backup.dsl.AsyncResult
 import pl.combosolutions.backup.dsl.internals.elevation.{ ObligatoryElevationMode, ElevationMode }
-import pl.combosolutions.backup.dsl.internals.programs.Program
-import Program._
 import pl.combosolutions.backup.dsl.internals.repositories.{ Package, Repository }
 
 trait PlatformSpecificRepositories {

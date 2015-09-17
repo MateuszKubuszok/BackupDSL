@@ -2,12 +2,10 @@ package pl.combosolutions.backup.dsl.tasks
 
 import java.nio.file.{ Files, Paths, Path }
 
-import pl.combosolutions.backup.dsl.Settings
+import pl.combosolutions.backup.dsl.{ AsyncResult, Settings }
+import pl.combosolutions.backup.dsl.wrapAsyncResultForMapping
 import pl.combosolutions.backup.dsl.internals.ExecutionContexts.Task.context
-import pl.combosolutions.backup.dsl.internals.programs.Program
-import Program.AsyncResult
 
-import scala.concurrent.Future
 import scala.util.{ Success, Try }
 
 import BackupFiles._
@@ -33,19 +31,23 @@ case class BackupFiles[PBR, PRR](files: List[String]) extends Task[PBR, PRR, Bac
       Files.copy(paths._3, paths._2, withSettings.copyOptions: _*)
     }
 
-  private def combineSubResults(copyAction: ((String, Path, Path)) => Path)(implicit withSettings: Settings) =
-    Future sequence (hashPaths map { paths =>
-      Future {
-        Try { copyAction(paths) } match {
-          case Success(path) =>
-            println("success")
-            Some(path)
-          case _ =>
-            println("failure")
-            None
+  private def combineSubResults(copyAction: ((String, Path, Path)) => Path)(implicit withSettings: Settings): AsyncResult[List[String]] =
+    (AsyncResult incompleteSequence {
+      hashPaths map { paths =>
+        AsyncResult {
+          Try {
+            copyAction(paths)
+          } match {
+            case Success(path) =>
+              println("success")
+              Some(path)
+            case _ =>
+              println("failure")
+              None
+          }
         }
       }
-    }) map (list => Some(list collect { case Some(path) => path.toString }))
+    }).asAsync map (_ map (_.toString))
 
   private def hashPaths(implicit withSettings: Settings) = files map { file =>
     val backup = Paths get file toAbsolutePath

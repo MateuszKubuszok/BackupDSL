@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.dsl.tasks.beta
 
-import pl.combosolutions.backup.dsl.tasks.beta.TasksExceptionMessages.{InvalidScriptAction, ParentDependentWithoutParent}
+import pl.combosolutions.backup.dsl.tasks.beta.TasksExceptionMessages.{ InvalidScriptAction, ParentDependentWithoutParent }
 import pl.combosolutions.backup.dsl.{ ReportException, Action }
 
 final class Task[BackupResult, ParentBackupResult, ChildBackupResult, RestoreResult, ParentRestoreResult, ChildRestoreResult](

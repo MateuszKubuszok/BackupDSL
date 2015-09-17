@@ -3,11 +3,10 @@ package pl.combosolutions.backup.dsl.internals.elevation
 import java.rmi.registry.{ Registry, LocateRegistry }
 import java.rmi.server.UnicastRemoteObject
 
-import pl.combosolutions.backup.dsl.{ ReportException, Logging }
+import pl.combosolutions.backup.dsl.{ AsyncResult, ReportException, Logging }
 import pl.combosolutions.backup.dsl.internals.InternalsExceptionMessages.RemoteFailure
 import pl.combosolutions.backup.dsl.internals.jvm.{ JVMUtils, JVMProgram }
-import pl.combosolutions.backup.dsl.internals.programs.{ GenericProgram, Program, Result }
-import Program.AsyncResult
+import pl.combosolutions.backup.dsl.internals.programs.{ GenericProgram, Result }
 import pl.combosolutions.backup.dsl.internals.operations.Cleaner
 
 import scala.annotation.tailrec

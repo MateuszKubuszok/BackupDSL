@@ -1,10 +1,11 @@
 package pl.combosolutions.backup.dsl.tasks.beta
 
-import pl.combosolutions.backup.dsl.ReportException
+import pl.combosolutions.backup.dsl.{ AsyncResult, ReportException }
+import pl.combosolutions.backup.dsl.wrapAsyncResultForMapping
 import pl.combosolutions.backup.dsl.internals.ExecutionContexts
 import pl.combosolutions.backup.dsl.tasks.beta.TasksExceptionMessages._
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.ExecutionContext
 
 // Dependency types
 
@@ -21,9 +22,9 @@ sealed trait SubTask[Result] {
 
   val dependencyType: DependencyType.Value
 
-  lazy val result: Future[Result] = execute
+  lazy val result: AsyncResult[Result] = execute
 
-  protected def execute: Future[Result]
+  protected def execute: AsyncResult[Result]
 
   private lazy val fakeSelfBuilder = new FakeSubTaskBuilder[Result, Nothing, Nothing](this, dependencyType)
 
@@ -33,17 +34,17 @@ sealed trait SubTask[Result] {
   }
 
   def map[MappedResult](mapping: Result => MappedResult): SubTask[MappedResult] = {
-    val futureMapping = (result: Result) => Future { mapping(result) }
+    val futureMapping = (result: Result) => AsyncResult { mapping(result) }
     SubTask(futureMapping, this)
   }
 }
 
 object SubTask {
 
-  def apply[Result](action: () => Future[Result]): SubTask[Result] =
+  def apply[Result](action: () => AsyncResult[Result]): SubTask[Result] =
     new IndependentSubTaskBuilder(action).injectableProxy
 
-  def apply[Result, ParentResult](action: ParentResult => Future[Result], parent: SubTask[ParentResult]): SubTask[Result] = {
+  def apply[Result, ParentResult](action: ParentResult => AsyncResult[Result], parent: SubTask[ParentResult]): SubTask[Result] = {
     val builder = new ParentDependentSubTaskBuilder[Result, ParentResult, Nothing](action)
     builder configureForParent parent.fakeSelfBuilder
     builder.injectableProxy
@@ -92,14 +93,14 @@ final class FakeSubTaskBuilder[Result, ParentResult, ChildResult](subTask: SubTa
 
 // Independent subtasks
 
-final class IndependentSubTask[Result](action: () => Future[Result]) extends SubTask[Result] {
+final class IndependentSubTask[Result](action: () => AsyncResult[Result]) extends SubTask[Result] {
 
   val dependencyType = DependencyType.Independent
 
   final override def execute = action()
 }
 
-case class IndependentSubTaskBuilder[Result, ParentResult, ChildResult](action: () => Future[Result]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.Independent) {
+case class IndependentSubTaskBuilder[Result, ParentResult, ChildResult](action: () => AsyncResult[Result]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.Independent) {
 
   injectableProxy.setImplementation(new IndependentSubTask[Result](action))
 
@@ -112,18 +113,18 @@ case class IndependentSubTaskBuilder[Result, ParentResult, ChildResult](action: 
 
 // Parent dependent subtasks
 
-final class ParentDependentSubTask[Result, ParentResult](action: Function[ParentResult, Future[Result]], parent: SubTask[ParentResult]) extends SubTask[Result] {
+final class ParentDependentSubTask[Result, ParentResult](action: Function[ParentResult, AsyncResult[Result]], parent: SubTask[ParentResult]) extends SubTask[Result] {
 
   val dependencyType = DependencyType.ParentDependent
 
-  type Behavior = Function[ParentResult, Future[Result]]
+  type Behavior = Function[ParentResult, AsyncResult[Result]]
 
-  final protected def execute = parent.result flatMap (executeWithParentResult(_))
+  final protected def execute = parent.result.asAsync flatMap (executeWithParentResult(_))
 
   final val executeWithParentResult: Behavior = action
 }
 
-case class ParentDependentSubTaskBuilder[Result, ParentResult, ChildResult](action: Function[ParentResult, Future[Result]]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.ParentDependent) {
+case class ParentDependentSubTaskBuilder[Result, ParentResult, ChildResult](action: Function[ParentResult, AsyncResult[Result]]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.ParentDependent) {
 
   final override def configureForParent(parentTask: SubTaskBuilder[ParentResult, _, _]): Unit = {
     assert(parentTask.injectableProxy.dependencyType != DependencyType.ChildDependent, CircularDependency)
@@ -138,24 +139,24 @@ case class ParentDependentSubTaskBuilder[Result, ParentResult, ChildResult](acti
 
 object ChildDependentSubTask {
 
-  def compose[Result](children: Traversable[SubTask[Result]])(implicit executor: ExecutionContext): Future[Traversable[Result]] =
-    Future sequence (children map (_.result))
+  def compose[Result](children: Traversable[SubTask[Result]])(implicit executor: ExecutionContext): AsyncResult[Traversable[Result]] =
+    AsyncResult completeSequence (children map (_.result))
 }
 
-final class ChildDependentSubTask[Result, ChildResult](action: Function[Traversable[ChildResult], Future[Result]], children: Traversable[SubTask[ChildResult]]) extends SubTask[Result] {
+final class ChildDependentSubTask[Result, ChildResult](action: Function[Traversable[ChildResult], AsyncResult[Result]], children: Traversable[SubTask[ChildResult]]) extends SubTask[Result] {
 
   import ChildDependentSubTask._
 
   val dependencyType = DependencyType.ChildDependent
 
-  type Behavior = Function[Traversable[ChildResult], Future[Result]]
+  type Behavior = Function[Traversable[ChildResult], AsyncResult[Result]]
 
-  final protected def execute = compose(children) flatMap (executeWithChildrenResults(_))
+  final protected def execute = compose(children).asAsync flatMap (executeWithChildrenResults(_))
 
   final val executeWithChildrenResults: Behavior = action
 }
 
-case class ChildDependentSubTaskBuilder[Result, ParentResult, ChildResult](action: Function[Traversable[ChildResult], Future[Result]]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.ChildDependent) {
+case class ChildDependentSubTaskBuilder[Result, ParentResult, ChildResult](action: Function[Traversable[ChildResult], AsyncResult[Result]]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.ChildDependent) {
 
   final override def configureForParent(childrenTasks: SubTaskBuilder[ParentResult, _, _]): Unit =
     ReportException onIllegalStateOf ChildrenDependentWithParentConfig

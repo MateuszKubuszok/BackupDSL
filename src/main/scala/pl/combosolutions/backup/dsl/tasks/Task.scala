@@ -1,9 +1,7 @@
 package pl.combosolutions.backup.dsl.tasks
 
 import pl.combosolutions.backup.dsl.internals.ExecutionContexts.Task.context
-import pl.combosolutions.backup.dsl.internals.programs.Program
-import pl.combosolutions.backup.dsl.{ Logging, Settings }
-import Program.AsyncResult
+import pl.combosolutions.backup.dsl.{ AsyncResult, Logging, Settings }
 
 import scala.collection.mutable.MutableList
 import scala.concurrent.Future

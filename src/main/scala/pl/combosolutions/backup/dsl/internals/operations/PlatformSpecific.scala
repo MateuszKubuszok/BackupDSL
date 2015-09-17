@@ -2,7 +2,7 @@ package pl.combosolutions.backup.dsl.internals.operations
 
 import java.nio.file.Path
 
-import pl.combosolutions.backup.dsl.{ ReportException, Logging }
+import pl.combosolutions.backup.dsl.{ AsyncResult, ReportException, Logging }
 import pl.combosolutions.backup.dsl.internals.InternalsExceptionMessages._
 import pl.combosolutions.backup.dsl.internals.OperatingSystem
 import pl.combosolutions.backup.dsl.internals.elevation.{ ObligatoryElevationMode, ElevationMode }
@@ -11,7 +11,6 @@ import pl.combosolutions.backup.dsl.internals.elevation.posix.linux.{ KDESudoEle
 import pl.combosolutions.backup.dsl.internals.elevation.windows.{ UACElevation, EmptyElevation }
 import pl.combosolutions.backup.dsl.internals.filesystem.posix.PosixFileSystem
 import pl.combosolutions.backup.dsl.internals.programs.Program
-import Program._
 import pl.combosolutions.backup.dsl.internals.repositories.posix.linux.AptRepositories
 
 object PlatformSpecific {

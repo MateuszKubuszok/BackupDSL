@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.dsl.internals.programs
 
-import pl.combosolutions.backup.dsl.Logging
+import pl.combosolutions.backup.dsl.{ AsyncResult, Logging }
 import pl.combosolutions.backup.dsl.internals.ExecutionContexts.Program.context
 
 import scala.collection.mutable
@@ -14,8 +14,7 @@ object Program extends Logging {
 
   def apply(name: String, arguments: String*) = GenericProgram(name, arguments.toList)
 
-  type AsyncResult[U] = Future[Option[U]]
-  def execute[T <: Program[T]](program: Program[T]): AsyncResult[Result[T]] = Future {
+  def execute[T <: Program[T]](program: Program[T]): AsyncResult[Result[T]] = AsyncResult {
     Try {
       Program.logger trace s"running  ${program.asGeneric.showCMD} and awaiting results"
 
@@ -58,6 +57,9 @@ class Program[T <: Program[T]](val name: String, val arguments: List[String]) ex
 
   def showCMD: String = s"'$name' ${showArgs(arguments)}"
 
-  private def showArgs(arguments: List[String]) = if (arguments.isEmpty) ""
-  else arguments map ("'" + _ + "'") reduce (_ + " " + _)
+  // format: OFF
+  private def showArgs(arguments: List[String]) =
+    if (arguments.isEmpty) ""
+    else arguments map ("'" + _ + "'") reduce (_ + " " + _)
+  // format: ON
 }

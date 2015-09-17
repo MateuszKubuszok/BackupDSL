@@ -11,6 +11,7 @@ scalacOptions in ThisBuild ++= Seq(
   "-deprecation",
   "-feature",
   "-language:existentials",
+  "-language:higherKinds",
   "-language:implicitConversions",
   "-language:postfixOps"
 )
