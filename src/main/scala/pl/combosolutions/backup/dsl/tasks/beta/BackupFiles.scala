@@ -3,27 +3,27 @@ package pl.combosolutions.backup.dsl.tasks.beta
 import java.nio.file.{ Files, Paths, Path }
 
 import pl.combosolutions.backup.dsl.tasks.beta.BackupFiles.{ RestoreSubTaskBuilder, BackupSubTaskBuilder }
-import pl.combosolutions.backup.dsl.{ AsyncResult, Settings }
+import pl.combosolutions.backup.dsl.{ Reporting, AsyncResult, Settings }
 import pl.combosolutions.backup.dsl.internals.ExecutionContexts.Task.context
 
-import scala.util.{ Success, Try }
+import scala.util.{ Failure, Success, Try }
 
-object BackupFiles {
+object BackupFiles extends Reporting {
 
   private def backupPassedFilesAction(implicit withSettings: Settings): (List[Path]) => AsyncResult[List[Path]] =
     (files: List[Path]) =>
       combineSubResults(files) { paths =>
-        print(s"Backing up ${paths._2} into ${paths._3}... ")
+        reporter details s"Backing up ${paths._2} into ${paths._3}... "
         paths._3.toFile.mkdirs
-        Files.copy(paths._2, paths._3, withSettings.copyOptions: _*)
+        Files.copy(paths._2, paths._3, withSettings.copyOptions: _*) // TODO: compress into TAR archive and allow elevation
       }
 
   private def restorePassedFilesAction(implicit withSettings: Settings): (List[Path]) => AsyncResult[List[Path]] =
     (files: List[Path]) =>
       combineSubResults(files) { paths =>
-        print(s"Restoring ${paths._3} into ${paths._2}... ")
+        reporter details s"Restoring ${paths._3} into ${paths._2}... "
         paths._2.toFile.mkdirs
-        Files.copy(paths._3, paths._2, withSettings.copyOptions: _*)
+        Files.copy(paths._3, paths._2, withSettings.copyOptions: _*) // TODO: compress into TAR archive and allow elevation
       }
 
   private def combineSubResults(files: List[Path])(copyAction: ((Path, Path, Path)) => Path)(implicit withSettings: Settings): AsyncResult[List[Path]] =
@@ -34,10 +34,10 @@ object BackupFiles {
             copyAction(paths)
           } match {
             case Success(path) =>
-              println("success")
+              reporter inform s"Copied up $path successfully"
               Some(path)
-            case _ =>
-              println("failure")
+            case Failure(ex) =>
+              reporter error (s"Failed to copy file", ex)
               None
           }
         }
