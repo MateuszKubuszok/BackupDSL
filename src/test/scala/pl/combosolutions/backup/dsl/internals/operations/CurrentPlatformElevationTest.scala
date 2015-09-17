@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.dsl.internals.operations
 
-import org.specs2.mutable.{BeforeAfter, Specification}
+import org.specs2.mutable.{ BeforeAfter, Specification }
 import pl.combosolutions.backup.dsl.ReportException
 import pl.combosolutions.backup.dsl.internals.OperatingSystem
 import pl.combosolutions.backup.dsl.internals.programs.GenericProgram
@@ -16,11 +16,11 @@ class CurrentPlatformElevationTest extends Specification with ProgramResultTestH
 
   val currentPlatform = PlatformSpecific.current
 
-  val currentSystem   = OperatingSystem.current
+  val currentSystem = OperatingSystem.current
 
-  val testProgram     = if      (currentSystem.isWindows) GenericProgram("cmd", List())
-                        else if (currentSystem.isPosix)   GenericProgram("ls", List())
-                        else                              ReportException onNotImplemented "Unknown platform"
+  val testProgram = if (currentSystem.isWindows) GenericProgram("cmd", List())
+  else if (currentSystem.isPosix) GenericProgram("ls", List())
+  else ReportException onNotImplemented "Unknown platform"
 
   "Current platform's elevator" should {
 
@@ -33,7 +33,7 @@ class CurrentPlatformElevationTest extends Specification with ProgramResultTestH
     } tag (CurrentPlatformTest)
 
     "allows remote elevation" in CleanedContext {
-      val program = currentPlatform elevateRemote(testProgram, ElevationTestCleaner)
+      val program = currentPlatform elevateRemote (testProgram, ElevationTestCleaner)
 
       val result = program.run
 
@@ -45,7 +45,7 @@ class CurrentPlatformElevationTest extends Specification with ProgramResultTestH
 
   object CleanedContext extends BeforeAfter {
     def before: Any = {}
-    def after:  Any = ElevationTestCleaner.cleanup
+    def after: Any = ElevationTestCleaner.cleanup
   }
 
   object ElevationTestCleaner extends Cleaner {

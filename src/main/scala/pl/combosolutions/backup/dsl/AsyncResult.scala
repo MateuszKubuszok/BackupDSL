@@ -34,13 +34,4 @@ object AsyncResult {
 
   def map[Result, NewResult](result: AsyncResult[Result], function: Result => NewResult)(implicit executor: ExecutionContext): AsyncResult[NewResult] =
     result map (_ map function)
-
-  implicit class AsyncResultTransformer[Result](result: AsyncResult[Result]) {
-
-    def asAsync = this
-
-    def flatMap[NewResult](function: Result => AsyncResult[NewResult])(implicit executor: ExecutionContext) = AsyncResult.flatMap(result, function)
-
-    def map[NewResult](function: Result => NewResult)(implicit executor: ExecutionContext) = AsyncResult.map(result, function)
-  }
 }
