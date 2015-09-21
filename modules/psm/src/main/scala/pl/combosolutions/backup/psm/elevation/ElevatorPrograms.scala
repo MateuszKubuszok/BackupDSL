@@ -1,9 +1,8 @@
 package pl.combosolutions.backup.psm.elevation
 
 import pl.combosolutions.backup.ReportException
-import pl.combosolutions.backup.psm.{ExecutionContexts, PsmExceptionMessages}
-import PsmExceptionMessages.RemoteKilling
-import ExecutionContexts.Program.context
+import pl.combosolutions.backup.psm.ExecutionContexts.Program.context
+import pl.combosolutions.backup.psm.PsmExceptionMessages.RemoteKilling
 import pl.combosolutions.backup.psm.operations.PlatformSpecific
 import pl.combosolutions.backup.psm.programs.Program
 

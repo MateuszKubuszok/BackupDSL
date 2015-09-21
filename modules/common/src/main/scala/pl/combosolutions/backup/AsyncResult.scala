@@ -1,7 +1,7 @@
 package pl.combosolutions.backup
 
 import scala.collection.generic.CanBuildFrom
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 object AsyncResult {
 

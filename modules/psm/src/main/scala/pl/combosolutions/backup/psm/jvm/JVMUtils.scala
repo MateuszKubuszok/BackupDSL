@@ -5,11 +5,9 @@ import java.lang.management.ManagementFactory
 import java.net.{ URLClassLoader, URLDecoder }
 import java.nio.file.{ Files, Paths }
 
-import pl.combosolutions.backup.{ ReportException, Logging }
-import pl.combosolutions.backup.psm.{DefaultsAndConstants, PsmExceptionMessages}
-import DefaultsAndConstants.{ JavaHomeProperty, ClassPathProperty, RMICodebaseProperty, RMIDisableHttpProperty }
-import pl.combosolutions.backup.psm.PsmExceptionMessages
-import PsmExceptionMessages.BadClassURL
+import pl.combosolutions.backup.{ Logging, ReportException }
+import pl.combosolutions.backup.psm.DefaultsAndConstants.{ JavaHomeProperty, ClassPathProperty, RMICodebaseProperty, RMIDisableHttpProperty }
+import pl.combosolutions.backup.psm.PsmExceptionMessages.BadClassURL
 
 import scala.collection.JavaConversions._
 import scala.util.{ Failure, Success, Try }
@@ -74,9 +72,9 @@ object JVMUtils extends Logging {
 
   private def getPathToClassFor[T](clazz: Class[T]) = {
     val url = clazz getResource s"${clazz.getSimpleName}.class"
-    Try (URLDecoder decode (url.toString, "UTF-8")) match {
+    Try(URLDecoder decode (url.toString, "UTF-8")) match {
       case Success(classFilePath) => classFilePath
-      case Failure(ex)            => ReportException onIllegalStateOf (BadClassURL, ex)
+      case Failure(ex) => ReportException onIllegalStateOf (BadClassURL, ex)
     }
   }
 

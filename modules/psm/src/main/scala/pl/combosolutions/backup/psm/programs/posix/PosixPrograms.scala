@@ -1,22 +1,22 @@
 package pl.combosolutions.backup.psm.programs.posix
 
 import pl.combosolutions.backup.ReportException
-import pl.combosolutions.backup.psm.PsmExceptionMessages
-import PsmExceptionMessages.UnknownFileType
+import pl.combosolutions.backup.psm.PsmExceptionMessages.UnknownFileType
 import pl.combosolutions.backup.psm.filesystem.FileType
 import FileType.FileType
 import pl.combosolutions.backup.psm.operations.PlatformSpecific
-import pl.combosolutions.backup.psm.programs.{Program, Result}
+import pl.combosolutions.backup.psm.programs.{ Program, Result }
 
 object PosixPrograms {
+
   type CatFileInterpreter[U] = Result[CatFile]#Interpreter[U]
   implicit val CatFile2Content: CatFileInterpreter[List[String]] = _.stdout
 
   type ListFileInterpreter[U] = Result[FileInfo]#Interpreter[U]
   implicit val FileInfo2FileType: ListFileInterpreter[FileType] = _.stdout.headOption map {
-    case PlatformSpecific.current.fileIsDirectory(fileName)      => FileType.Directory
+    case PlatformSpecific.current.fileIsDirectory(fileName) => FileType.Directory
     case PlatformSpecific.current.fileIsSymlinkPattern(fileName) => FileType.SymbolicLink
-    case PlatformSpecific.current.fileIsFile(fileName)           => FileType.File
+    case PlatformSpecific.current.fileIsFile(fileName) => FileType.File
   } getOrElse (ReportException onIllegalStateOf UnknownFileType)
 
   type GrepFilesInterpreter[U] = Result[GrepFiles]#Interpreter[U]

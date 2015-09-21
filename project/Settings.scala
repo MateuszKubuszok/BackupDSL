@@ -1,3 +1,4 @@
+import com.typesafe.sbt.SbtScalariform._
 import sbt._
 import sbt.Keys._
 
@@ -19,11 +20,11 @@ trait Settings extends Dependencies {
     ),
 
     resolvers ++= Seq(
-    	Resolver.sonatypeRepo("public"),
-			Resolver.typesafeRepo("releases")
+      Resolver.sonatypeRepo("public"),
+      Resolver.typesafeRepo("releases")
     ),
 
     libraryDependencies ++= mainDeps,
     libraryDependencies ++= testDeps map (_ % "test")
-  )
+  ) ++ scalariformSettings
 }

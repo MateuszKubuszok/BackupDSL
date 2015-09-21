@@ -1,8 +1,8 @@
 package pl.combosolutions.backup.psm.elevation.windows
 
 import pl.combosolutions.backup.ReportException
-import pl.combosolutions.backup.psm.{OperatingSystem, Windows95System, Windows98System, WindowsMESystem}
-import pl.combosolutions.backup.psm.operations.{Cleaner, PlatformSpecificElevation}
+import pl.combosolutions.backup.psm.{ OperatingSystem, Windows95System, Windows98System, WindowsMESystem }
+import pl.combosolutions.backup.psm.operations.{ Cleaner, PlatformSpecificElevation }
 import pl.combosolutions.backup.psm.programs.Program
 
 object EmptyElevation extends PlatformSpecificElevation {

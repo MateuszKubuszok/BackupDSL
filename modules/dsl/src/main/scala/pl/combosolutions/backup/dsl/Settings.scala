@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.dsl
 
-import pl.combosolutions.backup.psm.DefaultsAndConstants.{BackupDirPath, CopyOptions}
+import pl.combosolutions.backup.psm.DefaultsAndConstants.{ BackupDirPath, CopyOptions }
 
 import java.nio.file.{ CopyOption, Path }
 

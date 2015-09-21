@@ -33,14 +33,16 @@ object ExampleApp extends Script("elevation test") {
 
   logger info "await results"
 
-  Await.result(results, Duration.Inf) map { _ match {
-    case Some(result) =>
-      println(s"exit code = ${result.exitValue}" )
-      println(s"stdout    = ${if (result.stdout.isEmpty) "empty" else result.stdout.reduce(_ + "\n" + _)}" )
-      println(s"stderr    = ${if (result.stderr.isEmpty) "empty" else result.stderr.reduce(_ + "\n" + _)}" )
-    case None =>
-      println("something failed")
-  } }
+  Await.result(results, Duration.Inf) map {
+    _ match {
+      case Some(result) =>
+        println(s"exit code = ${result.exitValue}")
+        println(s"stdout    = ${if (result.stdout.isEmpty) "empty" else result.stdout.reduce(_ + "\n" + _)}")
+        println(s"stderr    = ${if (result.stderr.isEmpty) "empty" else result.stderr.reduce(_ + "\n" + _)}")
+      case None =>
+        println("something failed")
+    }
+  }
 }
 
 /*

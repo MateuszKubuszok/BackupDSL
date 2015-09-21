@@ -1,10 +1,10 @@
 package pl.combosolutions.backup.dsl
 
 import pl.combosolutions.backup.Logging
-import pl.combosolutions.backup.dsl.tasks.{ Task, BackupFiles, RootTask }
+import pl.combosolutions.backup.dsl.tasks.{ BackupFiles, RootTask, Task }
 import pl.combosolutions.backup.dsl.Action._
 import pl.combosolutions.backup.psm.ExecutionContexts
-import pl.combosolutions.backup.psm.operations.{Cleaner, PlatformSpecific}
+import pl.combosolutions.backup.psm.operations.{ Cleaner, PlatformSpecific }
 import pl.combosolutions.backup.psm.programs.Program
 
 import scala.concurrent.ExecutionContext

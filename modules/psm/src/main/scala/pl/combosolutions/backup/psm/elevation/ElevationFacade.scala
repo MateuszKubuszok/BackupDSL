@@ -3,12 +3,11 @@ package pl.combosolutions.backup.psm.elevation
 import java.rmi.registry.{ LocateRegistry, Registry }
 import java.rmi.server.UnicastRemoteObject
 
-import pl.combosolutions.backup.{ AsyncResult, ReportException, Logging }
-import pl.combosolutions.backup.psm.PsmExceptionMessages
-import PsmExceptionMessages.RemoteFailure
-import pl.combosolutions.backup.psm.jvm.{JVMProgram, JVMUtils}
+import pl.combosolutions.backup.{ AsyncResult, Logging, ReportException }
+import pl.combosolutions.backup.psm.PsmExceptionMessages.RemoteFailure
+import pl.combosolutions.backup.psm.jvm.{ JVMProgram, JVMUtils }
 import pl.combosolutions.backup.psm.operations.Cleaner
-import pl.combosolutions.backup.psm.programs.{Result, GenericProgram}
+import pl.combosolutions.backup.psm.programs.{ GenericProgram, Result }
 
 import scala.annotation.tailrec
 import scala.sys.process.Process

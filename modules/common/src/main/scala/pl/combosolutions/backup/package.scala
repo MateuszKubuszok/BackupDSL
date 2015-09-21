@@ -1,6 +1,6 @@
 package pl.combosolutions
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 package object backup {
 

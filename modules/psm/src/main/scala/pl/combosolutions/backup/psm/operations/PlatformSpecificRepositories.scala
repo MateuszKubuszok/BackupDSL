@@ -1,8 +1,8 @@
 package pl.combosolutions.backup.psm.operations
 
 import pl.combosolutions.backup.AsyncResult
-import pl.combosolutions.backup.psm.elevation.{ObligatoryElevationMode, ElevationMode}
-import pl.combosolutions.backup.psm.repositories.{Repository, Package}
+import pl.combosolutions.backup.psm.elevation.{ ElevationMode, ObligatoryElevationMode }
+import pl.combosolutions.backup.psm.repositories.{ Package, Repository }
 
 trait PlatformSpecificRepositories {
 

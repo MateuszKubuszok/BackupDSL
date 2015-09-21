@@ -1,9 +1,7 @@
 package pl.combosolutions.backup.psm.programs
 
 import pl.combosolutions.backup.{ AsyncResult, Logging }
-import pl.combosolutions.backup.psm.ExecutionContexts
-import ExecutionContexts.Program.context
-import pl.combosolutions.backup.psm.ExecutionContexts
+import pl.combosolutions.backup.psm.ExecutionContexts.Program.context
 
 import scala.collection.mutable
 import scala.concurrent.Future

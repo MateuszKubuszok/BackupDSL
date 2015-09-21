@@ -12,6 +12,7 @@ import scala.util.{ Success, Try }
 import BackupFiles._
 
 object BackupFiles {
+
   type BackupResult = List[String]
   type RestoreResult = List[String]
 }

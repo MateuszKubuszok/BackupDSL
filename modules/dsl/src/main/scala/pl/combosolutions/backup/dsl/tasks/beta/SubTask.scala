@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.dsl.tasks.beta
 
-import pl.combosolutions.backup.{ReportException, AsyncResult}
+import pl.combosolutions.backup.{ AsyncResult, ReportException }
 import pl.combosolutions.backup.wrapAsyncResultForMapping
 import pl.combosolutions.backup.dsl.tasks.beta.TasksExceptionMessages._
 import pl.combosolutions.backup.psm.ExecutionContexts

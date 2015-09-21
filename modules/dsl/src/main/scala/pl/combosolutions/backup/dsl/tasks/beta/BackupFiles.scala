@@ -1,9 +1,9 @@
 package pl.combosolutions.backup.dsl.tasks.beta
 
-import java.nio.file.{ Files, Paths, Path }
+import java.nio.file.{ Files, Path, Paths }
 
-import pl.combosolutions.backup.{Reporting, AsyncResult}
-import pl.combosolutions.backup.dsl.tasks.beta.BackupFiles.{ RestoreSubTaskBuilder, BackupSubTaskBuilder }
+import pl.combosolutions.backup.{ AsyncResult, Reporting }
+import pl.combosolutions.backup.dsl.tasks.beta.BackupFiles.{ BackupSubTaskBuilder, RestoreSubTaskBuilder }
 import pl.combosolutions.backup.dsl.Settings
 import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
 

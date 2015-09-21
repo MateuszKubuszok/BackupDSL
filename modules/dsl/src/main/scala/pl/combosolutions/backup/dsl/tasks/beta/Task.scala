@@ -1,8 +1,8 @@
 package pl.combosolutions.backup.dsl.tasks.beta
 
 import pl.combosolutions.backup.ReportException
-import pl.combosolutions.backup.dsl.tasks.beta.TasksExceptionMessages.{ InvalidScriptAction, ParentDependentWithoutParent }
 import pl.combosolutions.backup.dsl.Action
+import pl.combosolutions.backup.dsl.tasks.beta.TasksExceptionMessages.{ InvalidScriptAction, ParentDependentWithoutParent }
 
 final class Task[BackupResult, ParentBackupResult, ChildBackupResult, RestoreResult, ParentRestoreResult, ChildRestoreResult](
     private[beta] val backupSubTask: SubTask[BackupResult],
@@ -16,9 +16,9 @@ final class Task[BackupResult, ParentBackupResult, ChildBackupResult, RestoreRes
   def restore = restoreSubTask.result
 
   def eitherSubTask(action: Action.Value) = action match {
-    case Action.Backup  => Right(() => backupResult)
+    case Action.Backup => Right(() => backupResult)
     case Action.Restore => Left(() => restoreResult)
-    case _              => ReportException onIllegalStateOf InvalidScriptAction
+    case _ => ReportException onIllegalStateOf InvalidScriptAction
   }
 }
 

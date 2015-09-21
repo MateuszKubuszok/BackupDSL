@@ -3,7 +3,7 @@ package pl.combosolutions.backup.psm.elevation
 import java.rmi.{ Remote, RemoteException }
 
 import pl.combosolutions.backup.Logging
-import pl.combosolutions.backup.psm.programs.{Result, GenericProgram}
+import pl.combosolutions.backup.psm.programs.{ GenericProgram, Result }
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -18,6 +18,7 @@ trait ElevationServer extends Remote {
 }
 
 object ElevationServer {
+
   def apply(): ElevationServer = new ElevationServerImpl
 }
 

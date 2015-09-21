@@ -1,8 +1,8 @@
 package pl.combosolutions.backup.psm.elevation
 
-import pl.combosolutions.backup.psm.operations.{Cleaner, PlatformSpecificElevation}
+import pl.combosolutions.backup.psm.operations.{ Cleaner, PlatformSpecificElevation }
 import pl.combosolutions.backup.psm.programs.Program
-import pl.combosolutions.backup.psm.programs.posix.{PosixPrograms, WhichProgram}
+import pl.combosolutions.backup.psm.programs.posix.{ PosixPrograms, WhichProgram }
 import PosixPrograms._
 
 import scala.concurrent.Await

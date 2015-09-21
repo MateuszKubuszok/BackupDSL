@@ -1,9 +1,7 @@
 package pl.combosolutions.backup.psm.programs
 
-import pl.combosolutions.backup.psm.ExecutionContexts
-import ExecutionContexts.Program.context
+import pl.combosolutions.backup.psm.ExecutionContexts.Program.context
 import Program._
-import pl.combosolutions.backup.psm.ExecutionContexts
 
 import scala.concurrent.Future
 import scalaz.OptionT._

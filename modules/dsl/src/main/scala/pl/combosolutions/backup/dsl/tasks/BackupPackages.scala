@@ -1,9 +1,11 @@
 package pl.combosolutions.backup.dsl.tasks
 
-import BackupPackages._
 import pl.combosolutions.backup.psm.operations.PlatformSpecific
 
+import BackupPackages._
+
 object BackupPackages {
+
   type Packages = PlatformSpecific.current.Packages
   type Repositories = PlatformSpecific.current.Repositories
   type BackupResult = (Repositories, Packages)

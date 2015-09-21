@@ -1,11 +1,12 @@
 package pl.combosolutions.backup.psm
 
-import java.nio.file.{Files, Paths}
+import java.nio.file.{ Files, Paths }
 
 import org.apache.commons.lang3.SystemUtils._
 import pl.combosolutions.backup.psm.OperatingSystem._
 
 object OperatingSystem {
+
   val all = Seq(
     // Linux family
     ArchSystem,
@@ -47,12 +48,12 @@ object OperatingSystem {
 // Operating systems families
 
 sealed abstract class OperatingSystem(val name: String, val isCurrent: Boolean, val isPosix: Boolean, val isWindows: Boolean)
-abstract class WindowsSystem(name: String, isCurrent: Boolean) extends OperatingSystem(name, isCurrent, false, true)
-abstract class PosixSystem(name: String, isCurrent: Boolean) extends OperatingSystem(name, isCurrent, true, false)
+sealed abstract class WindowsSystem(name: String, isCurrent: Boolean) extends OperatingSystem(name, isCurrent, false, true)
+sealed abstract class PosixSystem(name: String, isCurrent: Boolean) extends OperatingSystem(name, isCurrent, true, false)
 
 // Linux family
 
-abstract class LinuxSystem(name: String, isCurrent: Boolean) extends PosixSystem(name, isCurrent)
+sealed abstract class LinuxSystem(name: String, isCurrent: Boolean) extends PosixSystem(name, isCurrent)
 case object ArchSystem extends LinuxSystem("Arch", IS_OS_LINUX && IS_OS_ARCH)
 case object DebianSystem extends LinuxSystem("Debian", IS_OS_LINUX && IS_OS_DEBIAN)
 case object FedoraSystem extends LinuxSystem("Fedora", IS_OS_LINUX && IS_OS_FEDORA)

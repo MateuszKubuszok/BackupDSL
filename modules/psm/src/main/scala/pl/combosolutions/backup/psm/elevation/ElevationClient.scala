@@ -3,7 +3,7 @@ package pl.combosolutions.backup.psm.elevation
 import java.rmi.registry.LocateRegistry
 
 import pl.combosolutions.backup.{ AsyncResult, Logging }
-import pl.combosolutions.backup.psm.programs.{GenericProgram, Result }
+import pl.combosolutions.backup.psm.programs.{ GenericProgram, Result }
 
 import scala.util.{ Failure, Try, Success }
 
@@ -26,7 +26,7 @@ class ElevationClient(var name: String, val remotePort: Integer) extends Logging
 
   def terminate: Unit = {
     logger debug "Terminate remote executor"
-    Try (server terminate)
+    Try(server terminate)
   }
 }
 

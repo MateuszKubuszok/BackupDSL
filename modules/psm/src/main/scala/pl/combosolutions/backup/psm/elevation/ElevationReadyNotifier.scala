@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.psm.elevation
 
-import java.rmi.{ RemoteException, Remote }
+import java.rmi.{ Remote, RemoteException }
 
 import pl.combosolutions.backup.Logging
 import ElevationReadyNotifier.{ FailureListener, ReadyListener }

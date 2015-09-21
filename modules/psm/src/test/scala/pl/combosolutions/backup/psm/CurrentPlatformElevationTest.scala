@@ -2,7 +2,7 @@ package pl.combosolutions.backup.psm
 
 import org.specs2.mutable.{ BeforeAfter, Specification }
 import pl.combosolutions.backup.ReportException
-import pl.combosolutions.backup.psm.operations.{Cleaner, PlatformSpecific}
+import pl.combosolutions.backup.psm.operations.{ Cleaner, PlatformSpecific }
 import pl.combosolutions.backup.psm.programs.GenericProgram
 import pl.combosolutions.backup.test.ProgramResultTestHelper
 import pl.combosolutions.backup.test.Tags.CurrentPlatformTest

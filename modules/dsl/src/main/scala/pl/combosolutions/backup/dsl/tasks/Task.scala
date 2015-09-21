@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.dsl.tasks
 
-import pl.combosolutions.backup.{AsyncResult, Logging}
+import pl.combosolutions.backup.{ AsyncResult, Logging }
 import pl.combosolutions.backup.dsl.Settings
 import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
 

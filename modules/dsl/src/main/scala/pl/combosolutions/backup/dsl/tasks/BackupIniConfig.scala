@@ -3,6 +3,7 @@ package pl.combosolutions.backup.dsl.tasks
 import BackupIniConfig._
 
 object BackupIniConfig {
+
   type IniConfigs = Map[String, List[String]]
   type BackupResult = IniConfigs
   type RestoreResult = IniConfigs

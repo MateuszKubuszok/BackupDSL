@@ -2,13 +2,13 @@ package pl.combosolutions.backup.psm.operations
 
 import java.nio.file.Path
 
-import pl.combosolutions.backup.{AsyncResult, Logging, ReportException}
-import pl.combosolutions.backup.psm.{OperatingSystem, PsmExceptionMessages}
-import PsmExceptionMessages._
-import pl.combosolutions.backup.psm.elevation.{ElevationMode, ObligatoryElevationMode}
+import pl.combosolutions.backup.{ AsyncResult, Logging, ReportException }
+import pl.combosolutions.backup.psm.OperatingSystem
+import pl.combosolutions.backup.psm.PsmExceptionMessages._
+import pl.combosolutions.backup.psm.elevation.{ ElevationMode, ObligatoryElevationMode }
 import pl.combosolutions.backup.psm.elevation.posix.SudoElevation
-import pl.combosolutions.backup.psm.elevation.posix.linux.{KDESudoElevation, GKSudoElevation}
-import pl.combosolutions.backup.psm.elevation.windows.{UACElevation, EmptyElevation}
+import pl.combosolutions.backup.psm.elevation.posix.linux.{ KDESudoElevation, GKSudoElevation }
+import pl.combosolutions.backup.psm.elevation.windows.{ EmptyElevation, UACElevation }
 import pl.combosolutions.backup.psm.filesystem.posix.PosixFileSystem
 import pl.combosolutions.backup.psm.programs.Program
 import pl.combosolutions.backup.psm.repositories.posix.linux.AptRepositories

@@ -2,15 +2,15 @@ package pl.combosolutions.backup.psm.repositories.posix.linux
 
 import pl.combosolutions.backup.AsyncResult
 import pl.combosolutions.backup.wrapAsyncResultForMapping
-import pl.combosolutions.backup.psm.elevation.{ObligatoryElevationMode, ElevationMode, ElevateIfNeeded}
-import ElevateIfNeeded._
 import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
-import pl.combosolutions.backup.psm.programs.posix.linux._
-import pl.combosolutions.backup.psm.programs.posix.{PosixPrograms, WhichProgram}
+import pl.combosolutions.backup.psm.elevation.{ ElevateIfNeeded, ElevationMode, ObligatoryElevationMode }
+import ElevateIfNeeded._
+import pl.combosolutions.backup.psm.operations.{ Cleaner, PlatformSpecificRepositories }
+import pl.combosolutions.backup.psm.programs.posix.{ PosixPrograms, WhichProgram }
 import PosixPrograms._
+import pl.combosolutions.backup.psm.programs.posix.linux._
 import AptPrograms._
-import pl.combosolutions.backup.psm.operations.{Cleaner, PlatformSpecificRepositories}
-import pl.combosolutions.backup.psm.repositories.{VersionedPackage, AptRepository}
+import pl.combosolutions.backup.psm.repositories.{ AptRepository, VersionedPackage }
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ Await, Future }
