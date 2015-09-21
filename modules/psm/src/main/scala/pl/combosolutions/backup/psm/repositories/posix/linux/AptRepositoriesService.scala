@@ -5,19 +5,19 @@ import pl.combosolutions.backup.wrapAsyncResultForMapping
 import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
 import pl.combosolutions.backup.psm.elevation.{ ElevateIfNeeded, ElevationMode, ObligatoryElevationMode }
 import ElevateIfNeeded._
-import pl.combosolutions.backup.psm.operations.{ Cleaner, PlatformSpecificRepositories }
+import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.posix.{ PosixPrograms, WhichProgram }
 import PosixPrograms._
 import pl.combosolutions.backup.psm.programs.posix.linux._
 import AptPrograms._
-import pl.combosolutions.backup.psm.repositories.{ AptRepository, VersionedPackage }
+import pl.combosolutions.backup.psm.repositories.{ RepositoriesService, AptRepository, VersionedPackage }
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ Await, Future }
 import scalaz.OptionT._
 import scalaz.std.scalaFuture._
 
-object AptRepositories extends PlatformSpecificRepositories {
+object AptRepositoriesService extends RepositoriesService {
 
   lazy val aptSourcePattern = "(deb|deb-src)\\s+(\\[arch=(\\S+)\\]\\s+)?(\\S+)\\s+(\\S+)((\\s+\\S+)*)".r
   lazy val etcAptSourcesMain = "/etc/apt/sources.list"

@@ -1,15 +1,15 @@
 package pl.combosolutions.backup.psm.elevation.posix.linux
 
-import pl.combosolutions.backup.psm.elevation.CommonElevation
+import pl.combosolutions.backup.psm.elevation.CommonElevationService
 
-object GKSudoElevation extends CommonElevation {
+object GKSudoElevationService extends CommonElevationService {
 
   override val elevationCMD = "gksudo"
 
   override val elevationArgs = List("-m", "BackupDSL elevation runner", "--")
 }
 
-object KDESudoElevation extends CommonElevation {
+object KDESudoElevationService extends CommonElevationService {
 
   override val elevationCMD = "kdesudo"
 

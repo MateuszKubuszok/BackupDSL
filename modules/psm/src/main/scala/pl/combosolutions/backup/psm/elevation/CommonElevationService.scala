@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.psm.elevation
 
-import pl.combosolutions.backup.psm.operations.{ Cleaner, PlatformSpecificElevation }
+import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.Program
 import pl.combosolutions.backup.psm.programs.posix.{ PosixPrograms, WhichProgram }
 import PosixPrograms._
@@ -8,7 +8,7 @@ import PosixPrograms._
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-trait CommonElevation extends PlatformSpecificElevation {
+trait CommonElevationService extends ElevationService {
 
   override lazy val elevationAvailable: Boolean =
     Await.result(WhichProgram(elevationCMD).digest[Boolean], Duration.Inf) getOrElse false

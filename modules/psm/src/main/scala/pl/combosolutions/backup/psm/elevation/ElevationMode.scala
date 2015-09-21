@@ -1,6 +1,7 @@
 package pl.combosolutions.backup.psm.elevation
 
-import pl.combosolutions.backup.psm.operations.{ Cleaner, PlatformSpecific }
+import pl.combosolutions.backup.psm.ComponentsHelper
+import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.Program
 
 sealed trait ElevationMode {
@@ -15,16 +16,18 @@ object NotElevated extends ElevationMode {
 
 sealed trait ObligatoryElevationMode extends ElevationMode
 
-object DirectElevation extends ObligatoryElevationMode {
+object DirectElevation extends ObligatoryElevationMode with ComponentsHelper {
+  this: ObligatoryElevationMode with ElevationServiceComponent =>
 
   override def apply[T <: Program[T]](program: Program[T], cleaner: Cleaner) =
-    PlatformSpecific.current elevateDirect program
+    elevationService elevateDirect program
 }
 
-object RemoteElevation extends ObligatoryElevationMode {
+object RemoteElevation extends ObligatoryElevationMode with ComponentsHelper {
+  this: ObligatoryElevationMode with ElevationServiceComponent =>
 
   override def apply[T <: Program[T]](program: Program[T], cleaner: Cleaner) =
-    PlatformSpecific.current elevateRemote (program, cleaner)
+    elevationService elevateRemote (program, cleaner)
 }
 
 class ElevateIfNeeded[T <: Program[T]](program: Program[T], withElevation: ElevationMode, cleaner: Cleaner) {

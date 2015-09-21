@@ -2,30 +2,27 @@ package pl.combosolutions.backup.psm
 
 import org.specs2.mutable.{ BeforeAfter, Specification }
 import pl.combosolutions.backup.ReportException
-import pl.combosolutions.backup.psm.operations.{ Cleaner, PlatformSpecific }
+import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.GenericProgram
+import pl.combosolutions.backup.psm.systems.OperatingSystem
 import pl.combosolutions.backup.test.ProgramResultTestHelper
 import pl.combosolutions.backup.test.Tags.CurrentPlatformTest
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-class CurrentPlatformElevationTest extends Specification with ProgramResultTestHelper {
+class CurrentPlatformElevationTest extends Specification with ProgramResultTestHelper with ComponentsHelper {
 
   sequential // gksudo lock causes failure when some process already grabbed it
 
-  val currentPlatform = PlatformSpecific.current
-
-  val currentSystem = OperatingSystem.current
-
-  val testProgram = if (currentSystem.isWindows) GenericProgram("cmd", List())
-  else if (currentSystem.isPosix) GenericProgram("ls", List())
+  val testProgram = if (operatingSystem.isWindows) GenericProgram("cmd", List())
+  else if (operatingSystem.isPosix) GenericProgram("ls", List())
   else ReportException onNotImplemented "Unknown platform"
 
   "Current platform's elevator" should {
 
     "allows direct elevation" in {
-      val program = currentPlatform elevateDirect testProgram
+      val program = elevationService elevateDirect testProgram
 
       val result = program.run
 
@@ -33,7 +30,7 @@ class CurrentPlatformElevationTest extends Specification with ProgramResultTestH
     } tag (CurrentPlatformTest)
 
     "allows remote elevation" in CleanedContext {
-      val program = currentPlatform elevateRemote (testProgram, ElevationTestCleaner)
+      val program = elevationService elevateRemote (testProgram, ElevationTestCleaner)
 
       val result = program.run
 

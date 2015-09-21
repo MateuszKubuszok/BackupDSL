@@ -1,15 +1,18 @@
-package pl.combosolutions.backup.psm.operations
+package pl.combosolutions.backup.psm.filesystem
 
 import java.nio.file.Path
 
-import pl.combosolutions.backup.AsyncResult
+import pl.combosolutions.backup.psm.PsmExceptionMessages.NoFileSystemAvailable
 import pl.combosolutions.backup.psm.elevation.ElevationMode
-import pl.combosolutions.backup.psm.filesystem.FileType
-import FileType._
+import pl.combosolutions.backup.psm.filesystem.FileType._
+import pl.combosolutions.backup.psm.filesystem.posix.PosixFileSystemService
+import pl.combosolutions.backup.psm.operations.Cleaner
+import pl.combosolutions.backup.{ AsyncResult, Logging, ReportException }
 
 import scala.util.matching.Regex
 
-trait PlatformSpecificFileSystem {
+trait FileSystemService {
+
   val fileSystemAvailable: Boolean
 
   val fileIsFile: Regex
@@ -26,4 +29,17 @@ trait PlatformSpecificFileSystem {
 
   def moveFiles(files: List[Path], withElevation: Boolean) = throw new NotImplementedError("TODO")
   */
+}
+
+trait FileSystemServiceComponent {
+
+  def fileSystemService: FileSystemService
+}
+
+trait FileSystemServiceComponentImpl extends FileSystemServiceComponent with Logging {
+
+  override lazy val fileSystemService = Seq(
+    // POSIX file system
+    PosixFileSystemService
+  ) find (_.fileSystemAvailable) getOrElse (ReportException onIllegalStateOf NoFileSystemAvailable)
 }

@@ -3,13 +3,15 @@ package pl.combosolutions.backup.dsl
 import pl.combosolutions.backup.Logging
 import pl.combosolutions.backup.dsl.tasks.{ BackupFiles, RootTask, Task }
 import pl.combosolutions.backup.dsl.Action._
-import pl.combosolutions.backup.psm.ExecutionContexts
-import pl.combosolutions.backup.psm.operations.{ Cleaner, PlatformSpecific }
+import pl.combosolutions.backup.psm.elevation.ElevationServiceComponent
+import pl.combosolutions.backup.psm.{ ComponentsHelper, ExecutionContexts }
+import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.Program
 
 import scala.concurrent.ExecutionContext
 
-abstract class Script(name: String) extends Logging with Cleaner {
+abstract class Script(name: String) extends Cleaner with Logging with ComponentsHelper {
+  self: Cleaner with Logging with ElevationServiceComponent =>
 
   implicit val context: ExecutionContext = ExecutionContexts.Task.context
 
@@ -33,7 +35,7 @@ abstract class Script(name: String) extends Logging with Cleaner {
   final def addTask[BR, RR](task: Task[Unit, Unit, BR, RR]): Task[Unit, Unit, BR, RR] = rootTask andThen task
 
   protected def elevate[T <: Program[T]](program: Program[T]): Program[T] =
-    PlatformSpecific.current.elevateRemote(program, this)
+    elevationService elevateRemote (program, this)
 
   private final def execute(config: ScriptConfig): Unit = config.action match {
     case Action.Backup =>

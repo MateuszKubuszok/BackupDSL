@@ -1,48 +1,19 @@
-package pl.combosolutions.backup.psm
+package pl.combosolutions.backup.psm.systems
 
 import java.nio.file.{ Files, Paths }
 
 import org.apache.commons.lang3.SystemUtils._
-import pl.combosolutions.backup.psm.OperatingSystem._
+
+import OperatingSystem._
 
 object OperatingSystem {
 
-  val all = Seq(
-    // Linux family
-    ArchSystem,
-    DebianSystem,
-    FedoraSystem,
-    GentooSystem,
-    RedHatSystem,
-    GenericLinuxSystem,
-
-    // MacOS family
-    GenericMacOSXOperatingSystem,
-    GenericMacOperatingSystem,
-
-    // Windows family
-    Windows95System,
-    Windows98System,
-    WindowsMESystem,
-    WindowsNTSystem,
-    WindowsXPSystem,
-    WindowsVistaSystem,
-    Windows7System,
-    Windows8System,
-    GenericWindowsSystem,
-
-    // Unknown system
-    UnknownSystem
-  )
-
-  lazy val current = all find (_.isCurrent) get
-
   // from http://linuxmafia.com/faq/Admin/release-files.html
-  private[psm] def IS_OS_ARCH = Files.exists(Paths.get("/etc/arch-release"))
-  private[psm] def IS_OS_DEBIAN = Files.exists(Paths.get("/etc/debian_version"))
-  private[psm] def IS_OS_FEDORA = Files.exists(Paths.get("/etc/fedora-release"))
-  private[psm] def IS_OS_GENTOO = Files.exists(Paths.get("/etc/gentoo-release"))
-  private[psm] def IS_OS_REDHAT = Files.exists(Paths.get("/etc/redhat-release"))
+  private[systems] def IS_OS_ARCH = Files.exists(Paths.get("/etc/arch-release"))
+  private[systems] def IS_OS_DEBIAN = Files.exists(Paths.get("/etc/debian_version"))
+  private[systems] def IS_OS_FEDORA = Files.exists(Paths.get("/etc/fedora-release"))
+  private[systems] def IS_OS_GENTOO = Files.exists(Paths.get("/etc/gentoo-release"))
+  private[systems] def IS_OS_REDHAT = Files.exists(Paths.get("/etc/redhat-release"))
 }
 
 // Operating systems families
@@ -83,3 +54,39 @@ case object GenericWindowsSystem extends WindowsSystem("Windows 10", IS_OS_WINDO
 case object UnknownSystem extends OperatingSystem("Unknown", true, false, false)
 
 // TODO add the rest of systems
+
+trait OperatingSystemComponent {
+
+  def operatingSystem: OperatingSystem
+}
+
+trait OperatingSystemComponentImpl extends OperatingSystemComponent {
+
+  override val operatingSystem = Seq(
+    // Linux family
+    ArchSystem,
+    DebianSystem,
+    FedoraSystem,
+    GentooSystem,
+    RedHatSystem,
+    GenericLinuxSystem,
+
+    // MacOS family
+    GenericMacOSXOperatingSystem,
+    GenericMacOperatingSystem,
+
+    // Windows family
+    Windows95System,
+    Windows98System,
+    WindowsMESystem,
+    WindowsNTSystem,
+    WindowsXPSystem,
+    WindowsVistaSystem,
+    Windows7System,
+    Windows8System,
+    GenericWindowsSystem,
+
+    // Unknown system
+    UnknownSystem
+  ) find (_.isCurrent) get
+}

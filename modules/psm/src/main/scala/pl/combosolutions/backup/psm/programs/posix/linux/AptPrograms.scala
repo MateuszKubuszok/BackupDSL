@@ -4,8 +4,8 @@ import pl.combosolutions.backup.psm.programs.{ ProgramAlias, Program, Result }
 import pl.combosolutions.backup.psm.programs.posix.GrepFiles
 import pl.combosolutions.backup.psm.repositories
 import pl.combosolutions.backup.psm.repositories.{ AptRepository, VersionedPackage }
-import pl.combosolutions.backup.psm.repositories.posix.linux.AptRepositories
-import AptRepositories._
+import pl.combosolutions.backup.psm.repositories.posix.linux.AptRepositoriesService
+import AptRepositoriesService._
 
 object AptPrograms {
 
