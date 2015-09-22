@@ -11,7 +11,7 @@ import scala.concurrent.Future
 import scalaz.OptionT._
 import scalaz.std.scalaFuture._
 
-object ElevatorProgram extends ComponentsHelper {
+private object ElevatorProgram extends ComponentsHelper {
   this: ElevationServiceComponent =>
 
   def elevationCMD = elevationService.elevationCMD
@@ -19,13 +19,13 @@ object ElevatorProgram extends ComponentsHelper {
   def elevationArgs = elevationService.elevationArgs
 }
 
-case class DirectElevatorProgram[T <: Program[T]](
+final case class DirectElevatorProgram[T <: Program[T]](
   program: Program[T]) extends Program[T](
   ElevatorProgram.elevationCMD,
   ElevatorProgram.elevationArgs ++ (program.name :: program.arguments)
 )
 
-case class RemoteElevatorProgram[T <: Program[T]](
+final case class RemoteElevatorProgram[T <: Program[T]](
   program: Program[T],
   elevationFacade: ElevationFacade) extends Program[T](
   program.name,

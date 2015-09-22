@@ -8,7 +8,7 @@ import pl.combosolutions.backup.psm.programs.{ GenericProgram, Result }
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-trait ElevationServer extends Remote {
+sealed trait ElevationServer extends Remote {
 
   @throws(classOf[RemoteException])
   def runRemote(program: GenericProgram): Option[Result[GenericProgram]]
@@ -22,7 +22,7 @@ object ElevationServer {
   def apply(): ElevationServer = new ElevationServerImpl
 }
 
-class ElevationServerImpl extends ElevationServer with Logging {
+private[elevation] final class ElevationServerImpl extends ElevationServer with Logging {
 
   def runRemote(program: GenericProgram): Option[Result[GenericProgram]] = {
     logger debug s"Run ${program} remotely"

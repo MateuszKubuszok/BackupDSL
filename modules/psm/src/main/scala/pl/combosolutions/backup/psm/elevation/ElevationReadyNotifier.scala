@@ -5,7 +5,7 @@ import java.rmi.{ Remote, RemoteException }
 import pl.combosolutions.backup.Logging
 import ElevationReadyNotifier.{ FailureListener, ReadyListener }
 
-trait ElevationReadyNotifier extends Remote {
+sealed trait ElevationReadyNotifier extends Remote {
 
   @throws(classOf[RemoteException])
   def notifyFailure: Unit
@@ -24,7 +24,9 @@ object ElevationReadyNotifier {
     new ElevationReadyNotifierImpl(readyListener, failureListener)
 }
 
-class ElevationReadyNotifierImpl(readyListener: ReadyListener, failureListener: FailureListener)
+private[elevation] final class ElevationReadyNotifierImpl(
+  readyListener: ReadyListener,
+  failureListener: FailureListener)
     extends ElevationReadyNotifier with Logging {
 
   override def notifyFailure: Unit = {

@@ -13,7 +13,7 @@ import scala.annotation.tailrec
 import scala.sys.process.Process
 import scala.util.{ Failure, Success, Try, Random }
 
-object ElevationFacade extends Logging {
+private[elevation] object ElevationFacade extends Logging {
 
   def getFor(cleaner: Cleaner) = synchronized {
     cleaner addTask elevationCleanUp
@@ -83,7 +83,7 @@ object ElevationFacade extends Logging {
 
 import ElevationFacade._
 
-class ElevationFacade private () extends Logging {
+private[elevation] final class ElevationFacade extends Logging {
 
   JVMUtils configureRMIFor executorClass
 

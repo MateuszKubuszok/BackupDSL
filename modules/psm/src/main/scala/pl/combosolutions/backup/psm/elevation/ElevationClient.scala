@@ -7,7 +7,7 @@ import pl.combosolutions.backup.psm.programs.{ GenericProgram, Result }
 
 import scala.util.{ Failure, Try, Success }
 
-class ElevationClient(var name: String, val remotePort: Integer) extends Logging {
+private[elevation] class ElevationClient(var name: String, val remotePort: Integer) extends Logging {
 
   def executeRemote(program: GenericProgram): AsyncResult[Result[GenericProgram]] = Try {
     logger debug s"Sending remote command: ${program}"
