@@ -9,9 +9,6 @@ import scala.util.{ Failure, Try, Success }
 
 class ElevationClient(var name: String, val remotePort: Integer) extends Logging {
 
-  val registry = LocateRegistry getRegistry remotePort
-  val server = (registry lookup name).asInstanceOf[ElevationServer]
-
   def executeRemote(program: GenericProgram): AsyncResult[Result[GenericProgram]] = Try {
     logger debug s"Sending remote command: ${program}"
     server runRemote program
@@ -28,5 +25,8 @@ class ElevationClient(var name: String, val remotePort: Integer) extends Logging
     logger debug "Terminate remote executor"
     Try(server terminate)
   }
+
+  private lazy val serverInstance = (LocateRegistry getRegistry remotePort lookup name).asInstanceOf[ElevationServer]
+  protected def server = serverInstance
 }
 
