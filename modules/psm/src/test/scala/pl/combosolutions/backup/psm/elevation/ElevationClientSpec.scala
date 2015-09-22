@@ -2,11 +2,12 @@ package pl.combosolutions.backup.psm.elevation
 
 import java.rmi.RemoteException
 
+import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import pl.combosolutions.backup.psm.programs.{ Result, GenericProgram }
-import pl.combosolutions.backup.test.AsyncResultSpecification
+import pl.combosolutions.backup.test.AsyncResultSpecificationHelper
 
-class ElevationClientSpec extends Specification with AsyncResultSpecification {
+class ElevationClientSpec extends Specification with Mockito with AsyncResultSpecificationHelper {
 
   private val name = "mock-repository"
   private val remotePort = 6000
@@ -18,28 +19,27 @@ class ElevationClientSpec extends Specification with AsyncResultSpecification {
       // given
       val server = mock[ElevationServer]
       val client = elevationClientFor(server)
-      val expected = Some(Result[GenericProgram](0, List(), List()))
-      (server runRemote program) returns expected
+      val expected = Result[GenericProgram](0, List(), List())
+      (server runRemote program) returns Some(expected)
 
       // when
       val result = await(client executeRemote program)
 
       // then
-      result mustEqual expected
+      result must beSome(expected)
     }
 
     "return None successful AsyncResult for None successful response" in {
       // given
       val server = mock[ElevationServer]
       val client = elevationClientFor(server)
-      val expected = None
-      (server runRemote program) returns expected
+      (server runRemote program) returns None
 
       // when
       val result = await(client executeRemote program)
 
       // then
-      result mustEqual expected
+      result must beNone
     }
 
     "return failed AsyncResult for failed request" in {
