@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.psm.elevation.posix.linux
 
-import pl.combosolutions.backup.psm.elevation.CommonElevationService
+import pl.combosolutions.backup.psm.elevation.posix.CommonElevationService
 
 object GKSudoElevationService extends CommonElevationService {
 
