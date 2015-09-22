@@ -25,6 +25,8 @@ trait Settings extends Dependencies {
     ),
 
     libraryDependencies ++= mainDeps,
-    libraryDependencies ++= testDeps map (_ % "test")
+    libraryDependencies ++= testDeps map (_ % "test"),
+
+    testOptions in Test += Tests.Argument(TestFrameworks.Specs2, "exclude", "current-platform")
   ) ++ scalariformSettings
 }
