@@ -1,4 +1,5 @@
 import com.typesafe.sbt.SbtScalariform._
+import sbt.Defaults.testSettings
 import sbt.TestFrameworks.Specs2
 import sbt.Tests.Argument
 import sbt._
@@ -6,43 +7,66 @@ import sbt.Keys._
 
 trait Settings extends Dependencies {
 
-  lazy val PlatformTestConfig = config("platform") extend(Test)
-  lazy val FunctionalTestConfig = config("functional") extend(Test)
-  lazy val UnitTestConfig = config("unit") extend(Test)
+  val platformTestTag = TestTag.PlatformTest
+  val PlatformTest = config(platformTestTag) extend(Test)
 
-  val commonConfigs = Seq(PlatformTestConfig, FunctionalTestConfig, UnitTestConfig)
+  val functionalTestTag = TestTag.FunctionalTest
+  val FunctionalTest = config(functionalTestTag) extend(Test)
 
-  val commonSettings =
-    inConfig(PlatformTestConfig)(Defaults.testSettings) ++
-    inConfig(FunctionalTestConfig)(Defaults.testSettings) ++
-    inConfig(UnitTestConfig)(Defaults.testSettings) ++
-    scalariformSettings ++
-    Seq(
-      organization := "pl.combosolutions",
-      version := "0.1.0-SNAPSHOT",
+  val unitTestTag = TestTag.UnitTest
+  val UnitTest = config(unitTestTag) extend(Test)
 
-      scalaVersion := "2.11.6",
-      scalacOptions ++= Seq(
-        "-unchecked",
-        "-deprecation",
-        "-feature",
-        "-language:existentials",
-        "-language:higherKinds",
-        "-language:implicitConversions",
-        "-language:postfixOps"
-      ),
+  val projectSettings = Seq(
+    organization := "pl.combosolutions",
+    version := "0.1.0-SNAPSHOT",
 
-      resolvers ++= Seq(
-        Resolver sonatypeRepo "public",
-        Resolver typesafeRepo "releases"
-      ),
+    scalaVersion := "2.11.6",
+    scalacOptions ++= Seq(
+      "-unchecked",
+      "-deprecation",
+      "-feature",
+      "-language:existentials",
+      "-language:higherKinds",
+      "-language:implicitConversions",
+      "-language:postfixOps"
+    ),
 
-      libraryDependencies ++= mainDeps,
-      libraryDependencies ++= testDeps map (_ % "test"),
+    resolvers ++= Seq(
+      Resolver sonatypeRepo "public",
+      Resolver typesafeRepo "releases"
+    ),
 
-      testOptions in Test += Argument(Specs2, "exclude", s"${TestTag.PlatformTest},${TestTag.FunctionalTest}"),
-      testOptions in PlatformTestConfig += Argument(Specs2, "include", TestTag.PlatformTest),
-      testOptions in FunctionalTestConfig += Argument(Specs2, "include", TestTag.FunctionalTest),
-      testOptions in UnitTestConfig += Argument(Specs2, "include", TestTag.UnitTest)
-    )
+    libraryDependencies ++= mainDeps,
+    libraryDependencies ++= testDeps map (_ % "test"),
+
+    testOptions in Test += excludeTags(platformTestTag)
+  )
+
+  val commonSettings = scalariformSettings ++ projectSettings
+
+  private def excludeTags(tags: String*) = Argument(Specs2, "exclude", tags.reduce(_ + "," + _))
+  private def includeTags(tags: String*) = Argument(Specs2, "include", tags.reduce(_ + "," + _))
+
+  abstract class Configurator(project: Project, config: Configuration, tag: String) {
+
+    protected def configure() = project.
+      configs(config).
+      settings(inConfig(config)(testSettings): _*).
+      settings(testOptions := Seq(includeTags(tag)))
+  }
+
+  implicit class PlatformConfigurator(project: Project) extends Configurator(project, PlatformTest, platformTestTag) {
+
+    def configurePlatform() = configure
+  }
+
+  implicit class FunctionalConfigurator(project: Project) extends Configurator(project, FunctionalTest, functionalTestTag) {
+
+    def configureFunctional() = configure
+  }
+
+  implicit class UnitConfigurator(project: Project) extends Configurator(project, UnitTest, unitTestTag) {
+
+    def configureUnit() = configure
+  }
 }

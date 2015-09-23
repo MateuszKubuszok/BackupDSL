@@ -26,4 +26,18 @@ trait Dependencies {
   val mainDeps = Seq(scalaz, scalazContrib, commonsIo, commonsLang, scopt, logback)
 
   val testDeps = Seq(mockito, spec2, spec2Core, spec2JUnit)
+
+  implicit class ProjectFrom(project: Project) {
+
+    private val commonDir = "modules"
+
+    def from(dir: String) = project in file(s"$commonDir/$dir")
+  }
+
+  implicit class DependsOnProject(project: Project) {
+
+    val dependsOnCompileAndTest = "test->test;compile->compile"
+
+    def dependsOnProjects(projects: Project*) = project dependsOn (projects.map(_ % dependsOnCompileAndTest): _*)
+  }
 }
