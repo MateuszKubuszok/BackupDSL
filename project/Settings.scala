@@ -1,22 +1,24 @@
 import com.typesafe.sbt.SbtScalariform._
-import sbt.Defaults.testSettings
+import sbt.Defaults.testTasks
 import sbt.TestFrameworks.Specs2
 import sbt.Tests.Argument
 import sbt._
 import sbt.Keys._
 
-trait Settings extends Dependencies {
+import Settings._
 
-  val platformTestTag = TestTag.PlatformTest
-  val PlatformTest = config(platformTestTag) extend(Test)
+object Settings extends Dependencies {
 
-  val functionalTestTag = TestTag.FunctionalTest
-  val FunctionalTest = config(functionalTestTag) extend(Test)
+  private val platformTestTag = TestTag.PlatformTest
+  val PlatformTest = config(platformTestTag) extend Test describedAs "Runs dangerous (!!!) platform-specific tests"
 
-  val unitTestTag = TestTag.UnitTest
-  val UnitTest = config(unitTestTag) extend(Test)
+  private val functionalTestTag = TestTag.FunctionalTest
+  val FunctionalTest = config(functionalTestTag) extend Test describedAs "Runs only functional tests"
 
-  val projectSettings = Seq(
+  private val unitTestTag = TestTag.UnitTest
+  val UnitTest = config(unitTestTag) extend Test describedAs "Runs only unit tests"
+
+  private val customSettings = Seq(
     organization := "pl.combosolutions",
     version := "0.1.0-SNAPSHOT",
 
@@ -42,7 +44,7 @@ trait Settings extends Dependencies {
     testOptions in Test += excludeTags(platformTestTag)
   )
 
-  val commonSettings = scalariformSettings ++ projectSettings
+  private val commonSettings = scalariformSettings ++ customSettings
 
   private def excludeTags(tags: String*) = Argument(Specs2, "exclude", tags.reduce(_ + "," + _))
   private def includeTags(tags: String*) = Argument(Specs2, "include", tags.reduce(_ + "," + _))
@@ -51,21 +53,33 @@ trait Settings extends Dependencies {
 
     protected def configure() = project.
       configs(config).
-      settings(inConfig(config)(testSettings): _*).
-      settings(testOptions := Seq(includeTags(tag)))
+      settings(inConfig(config)(testTasks): _*).
+      settings(testOptions in config := Seq(includeTags(tag))).
+      settings(libraryDependencies ++= testDeps map (_ % tag))
+  }
+}
+
+trait Settings {
+
+  implicit class CommonConfigurator(project: Project) {
+
+    def configureCommon() = project.settings(commonSettings: _*)
   }
 
-  implicit class PlatformConfigurator(project: Project) extends Configurator(project, PlatformTest, platformTestTag) {
+  implicit class PlatformConfigurator(project: Project)
+    extends Configurator(project, PlatformTest, platformTestTag) {
 
     def configurePlatform() = configure
   }
 
-  implicit class FunctionalConfigurator(project: Project) extends Configurator(project, FunctionalTest, functionalTestTag) {
+  implicit class FunctionalConfigurator(project: Project)
+    extends Configurator(project, FunctionalTest, functionalTestTag) {
 
     def configureFunctional() = configure
   }
 
-  implicit class UnitConfigurator(project: Project) extends Configurator(project, UnitTest, unitTestTag) {
+  implicit class UnitConfigurator(project: Project)
+    extends Configurator(project, UnitTest, unitTestTag) {
 
     def configureUnit() = configure
   }

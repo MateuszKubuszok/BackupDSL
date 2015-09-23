@@ -1,7 +1,8 @@
 import sbt._
-import Keys._
 
-trait Dependencies {
+import Dependencies._
+
+object Dependencies {
 
   // functional utils
   val scalaz        = "org.scalaz" %% "scalaz-core" % "7.1.3"
@@ -22,6 +23,9 @@ trait Dependencies {
   val spec2      = "org.specs2" %% "specs2" % "2.4.1"
   val spec2Core  = "org.specs2" %% "specs2-core" % "2.4.1"
   val spec2JUnit = "org.specs2" %% "specs2-junit" % "2.4.1"
+}
+
+trait Dependencies {
 
   val mainDeps = Seq(scalaz, scalazContrib, commonsIo, commonsLang, scopt, logback)
 
