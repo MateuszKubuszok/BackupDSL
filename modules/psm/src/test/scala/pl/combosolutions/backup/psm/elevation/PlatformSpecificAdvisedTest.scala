@@ -1,16 +1,17 @@
-package pl.combosolutions.backup.psm
+package pl.combosolutions.backup.psm.elevation
 
 import org.specs2.mutable.{ BeforeAfter, Specification }
 import pl.combosolutions.backup.ReportException
+import pl.combosolutions.backup.psm.ComponentsHelper
 import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.GenericProgram
 import pl.combosolutions.backup.test.ProgramResultTestHelper
-import pl.combosolutions.backup.test.Tags.CurrentPlatformTest
+import pl.combosolutions.backup.test.Tags.PlatformTest
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-class CurrentPlatformElevationTest extends Specification with ProgramResultTestHelper with ComponentsHelper {
+class PlatformSpecificAdvisedTest extends Specification with ProgramResultTestHelper with ComponentsHelper {
 
   sequential // gksudo lock causes failure when some process already grabbed it
 
@@ -26,7 +27,7 @@ class CurrentPlatformElevationTest extends Specification with ProgramResultTestH
       val result = program.run
 
       result should beCorrectProgramResult
-    } tag (CurrentPlatformTest)
+    } tag PlatformTest
 
     "allows remote elevation" in CleanedContext {
       val program = elevationService elevateRemote (testProgram, ElevationTestCleaner)
@@ -36,7 +37,7 @@ class CurrentPlatformElevationTest extends Specification with ProgramResultTestH
       val w8 = Await.result(result, Duration.Inf)
 
       result should beCorrectProgramResult
-    } tag (CurrentPlatformTest)
+    } tag PlatformTest
   }
 
   object CleanedContext extends BeforeAfter {

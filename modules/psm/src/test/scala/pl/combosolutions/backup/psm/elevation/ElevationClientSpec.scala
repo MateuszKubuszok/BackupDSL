@@ -5,7 +5,8 @@ import java.rmi.RemoteException
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import pl.combosolutions.backup.psm.programs.{ Result, GenericProgram }
-import pl.combosolutions.backup.test.AsyncResultSpecificationHelper
+import pl.combosolutions.backup.test.Tags.UnitTest
+import pl.combosolutions.backup.test.{ Tags, AsyncResultSpecificationHelper }
 
 class ElevationClientSpec extends Specification with Mockito with AsyncResultSpecificationHelper {
 
@@ -27,7 +28,7 @@ class ElevationClientSpec extends Specification with Mockito with AsyncResultSpe
 
       // then
       result must beSome(expected)
-    }
+    } tag UnitTest
 
     "return None successful AsyncResult for None successful response" in {
       // given
@@ -40,7 +41,7 @@ class ElevationClientSpec extends Specification with Mockito with AsyncResultSpe
 
       // then
       result must beNone
-    }
+    } tag UnitTest
 
     "return failed AsyncResult for failed request" in {
       // given
@@ -53,7 +54,7 @@ class ElevationClientSpec extends Specification with Mockito with AsyncResultSpe
 
       // then
       await(result) must throwA[RemoteException]
-    }
+    } tag UnitTest
 
     "terminate server on termination command" in {
       // given
@@ -65,7 +66,7 @@ class ElevationClientSpec extends Specification with Mockito with AsyncResultSpe
 
       // then
       there was one(server).terminate
-    }
+    } tag UnitTest
   }
 
   private def elevationClientFor(mockServer: ElevationServer) = new ElevationClient(name, remotePort) {

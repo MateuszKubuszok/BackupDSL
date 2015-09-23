@@ -17,7 +17,7 @@ trait CommonElevationService extends ElevationService {
     Await.result(WhichProgram(elevationCMD).digest[Boolean], Duration.Inf) getOrElse false
 
   override def elevateDirect[T <: Program[T]](program: Program[T]) =
-    DirectElevatorProgram[T](program)
+    DirectElevatorProgram[T](program, elevationService)
 
   override def elevateRemote[T <: Program[T]](program: Program[T], cleaner: Cleaner) =
     RemoteElevatorProgram[T](program, ElevationFacade getFor cleaner)

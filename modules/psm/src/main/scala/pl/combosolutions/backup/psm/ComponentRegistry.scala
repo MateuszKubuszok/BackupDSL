@@ -1,10 +1,10 @@
 package pl.combosolutions.backup.psm
 
 import pl.combosolutions.backup.Logging
-import pl.combosolutions.backup.psm.elevation.{ ElevationServiceComponent, ElevationServiceComponentImpl }
-import pl.combosolutions.backup.psm.filesystem.{ FileSystemServiceComponent, FileSystemServiceComponentImpl }
-import pl.combosolutions.backup.psm.repositories.{ RepositoriesServiceComponent, RepositoriesServiceComponentImpl }
-import pl.combosolutions.backup.psm.systems.{ OperatingSystemComponent, OperatingSystemComponentImpl }
+import pl.combosolutions.backup.psm.elevation.{ ElevationService, ElevationServiceComponent, ElevationServiceComponentImpl }
+import pl.combosolutions.backup.psm.filesystem.{ FileSystemService, FileSystemServiceComponent, FileSystemServiceComponentImpl }
+import pl.combosolutions.backup.psm.repositories.{ RepositoriesService, RepositoriesServiceComponent, RepositoriesServiceComponentImpl }
+import pl.combosolutions.backup.psm.systems.{ OperatingSystem, OperatingSystemComponent, OperatingSystemComponentImpl }
 
 trait ComponentRegistry extends AnyRef
   with OperatingSystemComponent
@@ -26,10 +26,10 @@ object ComponentRegistry extends ComponentRegistry
 
   trait ComponentRegistryImpl extends ComponentRegistry {
 
-    override def operatingSystem = ComponentRegistry.operatingSystem
-    override def elevationService = ComponentRegistry.elevationService
-    override def fileSystemService = ComponentRegistry.fileSystemService
-    override def repositoriesService = ComponentRegistry.repositoriesService
+    override def operatingSystem: OperatingSystem = ComponentRegistry.operatingSystem
+    override def elevationService: ElevationService = ComponentRegistry.elevationService
+    override def fileSystemService: FileSystemService = ComponentRegistry.fileSystemService
+    override def repositoriesService: RepositoriesService = ComponentRegistry.repositoriesService
   }
 }
 

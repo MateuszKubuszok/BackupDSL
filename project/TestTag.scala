@@ -1,6 +1,4 @@
-package pl.combosolutions.backup.test
-
-object Tags {
+object TestTag {
   val PlatformTest = "platform"
   val FunctionalTest = "functional"
   val UnitTest = "unit"

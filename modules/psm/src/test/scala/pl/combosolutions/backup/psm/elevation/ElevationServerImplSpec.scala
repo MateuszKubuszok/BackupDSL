@@ -4,7 +4,8 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import pl.combosolutions.backup.AsyncResult
 import pl.combosolutions.backup.psm.programs.{ Result, GenericProgram }
-import pl.combosolutions.backup.test.AsyncResultSpecificationHelper
+import pl.combosolutions.backup.test.Tags.UnitTest
+import pl.combosolutions.backup.test.{ Tags, AsyncResultSpecificationHelper }
 
 class ElevationServerImplSpec extends Specification with Mockito with AsyncResultSpecificationHelper {
 
@@ -23,6 +24,6 @@ class ElevationServerImplSpec extends Specification with Mockito with AsyncResul
 
       // then
       result must beSome(expected)
-    }
+    } tag UnitTest
   }
 }
