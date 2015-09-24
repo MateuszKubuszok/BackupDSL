@@ -8,7 +8,17 @@ import pl.combosolutions.backup.psm.jvm.JVMUtils
 
 import scala.util.{ Failure, Success, Try }
 
-object ElevatedExecutor extends App with Logging {
+trait ElevatedExecutorRMIHandler {
+
+  protected def configureRMI = JVMUtils configureRMIFor getClass
+
+  protected def locateRegistryFor(remotePort: Integer) = LocateRegistry getRegistry remotePort
+
+  protected def exportServer(server: ElevationServer) =
+    UnicastRemoteObject.exportObject(server, 0).asInstanceOf[ElevationServer]
+}
+
+class ElevatedExecutor(args: Array[String]) extends ElevatedExecutorRMIHandler with Logging {
 
   logger debug s"Starting remote ${getClass getSimpleName} with args: ${args toList}"
 
@@ -17,13 +27,13 @@ object ElevatedExecutor extends App with Logging {
   val remotePort = Integer valueOf args(2)
 
   Try {
-    JVMUtils configureRMIFor getClass
-    val registry = LocateRegistry getRegistry remotePort
+    configureRMI
+    val registry = locateRegistryFor(remotePort)
     val notifier = (registry lookup notifierName).asInstanceOf[ElevationReadyNotifier]
 
     Try {
       val server = ElevationServer()
-      val stub = UnicastRemoteObject.exportObject(server, 0).asInstanceOf[ElevationServer]
+      val stub = exportServer(server)
       registry.bind(serverName, stub)
     } match {
       case Success(_) => notifier.notifyReady
@@ -35,6 +45,13 @@ object ElevatedExecutor extends App with Logging {
     case Success(_) => logger debug "Remote ready"
     case Failure(ex) =>
       logger error ("Remote failed", ex)
-      System exit -1
+      terminateOnFailure
   }
+
+  def terminateOnFailure = System exit -1
+}
+
+object ElevatedExecutor extends App {
+
+  val executor = new ElevatedExecutor(args)
 }
