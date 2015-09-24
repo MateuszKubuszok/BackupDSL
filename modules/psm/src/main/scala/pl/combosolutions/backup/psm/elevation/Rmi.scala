@@ -78,3 +78,13 @@ private[elevation] class RmiManager(executorClass: Class[_ <: App]) extends Logg
     else _findFreeName(registry)
   }
 }
+
+private[elevation] trait RMIUserHelper {
+
+  protected def configureRMI = JVMUtils configureRMIFor getClass
+
+  protected def locateRegistryFor(remotePort: Integer) = LocateRegistry getRegistry remotePort
+
+  protected def exportServer(server: ElevationServer) =
+    UnicastRemoteObject.exportObject(server, 0).asInstanceOf[ElevationServer]
+}

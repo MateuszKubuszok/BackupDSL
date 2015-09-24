@@ -1,24 +1,10 @@
 package pl.combosolutions.backup.psm.elevation
 
-import java.rmi.registry.LocateRegistry
-import java.rmi.server.UnicastRemoteObject
-
 import pl.combosolutions.backup.Logging
-import pl.combosolutions.backup.psm.jvm.JVMUtils
 
 import scala.util.{ Failure, Success, Try }
 
-trait ElevatedExecutorRMIHandler {
-
-  protected def configureRMI = JVMUtils configureRMIFor getClass
-
-  protected def locateRegistryFor(remotePort: Integer) = LocateRegistry getRegistry remotePort
-
-  protected def exportServer(server: ElevationServer) =
-    UnicastRemoteObject.exportObject(server, 0).asInstanceOf[ElevationServer]
-}
-
-class ElevatedExecutor(args: Array[String]) extends ElevatedExecutorRMIHandler with Logging {
+class ElevatedExecutor(args: Array[String]) extends RMIUserHelper with Logging {
 
   logger debug s"Starting remote ${getClass getSimpleName} with args: ${args toList}"
 
