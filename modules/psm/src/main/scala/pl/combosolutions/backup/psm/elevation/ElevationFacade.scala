@@ -21,11 +21,11 @@ private[elevation] class ElevationFacade(rmiManager: RmiManager) extends Logging
   private val (registry, remotePort) = rmiManager.createRegister
   private val notifierName = rmiManager findFreeName registry
   private val serverName = rmiManager findFreeName registry
-  private val mutex = new RmiMutex
+  private val mutex = createMutex
 
   private val notifier = rmiManager createReadyNotifier (notifierName, registry, mutex)
   private val server = rmiManager createServer (notifierName, serverName, remotePort)
-  mutex.waitForReadiness
+  waitForReadiness
   private val client = rmiManager createClient (serverName, remotePort)
 
   def runRemotely(program: GenericProgram): AsyncResult[Result[GenericProgram]] = client executeRemote program
@@ -34,4 +34,8 @@ private[elevation] class ElevationFacade(rmiManager: RmiManager) extends Logging
     client.terminate
     server.destroy
   }
+
+  protected def createMutex = new RmiMutex
+
+  protected def waitForReadiness = mutex.waitForReadiness
 }
