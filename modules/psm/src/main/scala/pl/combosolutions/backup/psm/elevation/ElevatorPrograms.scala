@@ -27,7 +27,7 @@ final case class RemoteElevatorProgram[T <: Program[T]](
     result <- optionT[Future](elevationFacade runRemotely program.asGeneric)
   } yield result.asSpecific[T]).run
 
-  override def run2Kill = ReportException onNotImplemented RemoteGeneric
+  override def run2Kill = ReportException onNotImplemented RemoteKilling
 
-  override def asGeneric = ReportException onNotImplemented RemoteKilling
+  override def asGeneric = ReportException onNotImplemented RemoteGeneric
 }

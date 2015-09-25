@@ -39,3 +39,13 @@ private[elevation] class ElevationFacade(rmiManager: RmiManager) extends Logging
 
   protected def waitForReadiness = mutex.waitForReadiness
 }
+
+private[elevation] trait ElevationFacadeComponent {
+
+  def elevationFacadeFor(cleaner: Cleaner): ElevationFacade
+}
+
+private[elevation] trait ElevationFacadeComponentImpl extends ElevationFacadeComponent {
+
+  def elevationFacadeFor(cleaner: Cleaner) = ElevationFacade getFor cleaner
+}
