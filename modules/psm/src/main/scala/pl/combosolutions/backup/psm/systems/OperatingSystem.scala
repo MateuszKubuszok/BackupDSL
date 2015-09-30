@@ -4,7 +4,12 @@ import java.nio.file.{ Files, Paths }
 
 import org.apache.commons.lang3.SystemUtils._
 
+import pl.combosolutions.backup.psm.ImplementationPriority._
+import pl.combosolutions.backup.psm.ImplementationResolver
+import pl.combosolutions.backup.psm.PsmExceptionMessages.NoOperatingSystemAvailable
+
 import OperatingSystem._
+import OperatingSystemComponentImpl.resolve
 
 object OperatingSystem {
 
@@ -60,9 +65,9 @@ trait OperatingSystemComponent {
   def operatingSystem: OperatingSystem
 }
 
-trait OperatingSystemComponentImpl extends OperatingSystemComponent {
+object OperatingSystemComponentImpl extends ImplementationResolver[OperatingSystem] {
 
-  override val operatingSystem = Seq(
+  override lazy val implementations = Seq(
     // Linux family
     ArchSystem,
     DebianSystem,
@@ -88,5 +93,19 @@ trait OperatingSystemComponentImpl extends OperatingSystemComponent {
 
     // Unknown system
     UnknownSystem
-  ) find (_.isCurrent) get
+  )
+
+  override lazy val notFoundMessage = NoOperatingSystemAvailable
+
+  override def byFilter(system: OperatingSystem): Boolean = system.isCurrent
+
+  // TODO: improve
+  override def byPriority(system: OperatingSystem): ImplementationPriority =
+    if (system.isCurrent) Allowed
+    else NotAllowed
+}
+
+trait OperatingSystemComponentImpl extends OperatingSystemComponent {
+
+  override val operatingSystem = resolve
 }

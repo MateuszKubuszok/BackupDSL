@@ -1,6 +1,7 @@
 package pl.combosolutions.backup.psm.elevation
 
-import pl.combosolutions.backup.ReportException
+import pl.combosolutions.backup.psm.ImplementationPriority._
+import pl.combosolutions.backup.psm.ImplementationResolver
 import pl.combosolutions.backup.psm.PsmExceptionMessages.NoElevationAvailable
 import pl.combosolutions.backup.psm.elevation.posix.SudoElevationServiceComponent
 import pl.combosolutions.backup.psm.elevation.posix.linux.{ GKSudoElevationServiceComponent, KDESudoElevationServiceComponent }
@@ -8,7 +9,7 @@ import pl.combosolutions.backup.psm.elevation.windows.{ EmptyElevationServiceCom
 import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.Program
 
-import ElevationServiceComponentImpl._
+import ElevationServiceComponentImpl.resolve
 
 trait ElevationService {
 
@@ -28,9 +29,9 @@ trait ElevationServiceComponent {
   def elevationService: ElevationService
 }
 
-object ElevationServiceComponentImpl {
+object ElevationServiceComponentImpl extends ImplementationResolver[ElevationService] {
 
-  lazy val implementations = Seq(
+  override lazy val implementations = Seq(
     // Windows elevation
     EmptyElevationServiceComponent.elevationService,
     UACElevationServiceComponent.elevationService,
@@ -42,11 +43,18 @@ object ElevationServiceComponentImpl {
     // POSIX elevation
     SudoElevationServiceComponent.elevationService
   )
+
+  override lazy val notFoundMessage = NoElevationAvailable
+
+  override def byFilter(service: ElevationService): Boolean = service.elevationAvailable
+
+  // TODO: improve
+  override def byPriority(service: ElevationService): ImplementationPriority =
+    if (service.elevationAvailable) Allowed
+    else NotAllowed
 }
 
 trait ElevationServiceComponentImpl extends ElevationServiceComponent {
 
-  override lazy val elevationService = implementations.
-    find(_.elevationAvailable).
-    getOrElse(ReportException onIllegalStateOf NoElevationAvailable)
+  override lazy val elevationService = resolve
 }

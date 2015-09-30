@@ -5,6 +5,7 @@ object PsmExceptionMessages {
   val BadClassURL = "Invalid class URL"
   val NoElevationAvailable = "No elevation found"
   val NoFileSystemAvailable = "No file system found"
+  val NoOperatingSystemAvailable = "No known operating system found"
   val NoRepositoriesAvailable = "No repositories found"
   val RemoteFailure = "Failed to initiate remote executor"
   val RemoteGeneric = "Remote elevator cannot be converted into GenericProgram"

@@ -1,12 +1,14 @@
 package pl.combosolutions.backup.psm.repositories
 
+import pl.combosolutions.backup.AsyncResult
+import pl.combosolutions.backup.psm.ImplementationPriority._
+import pl.combosolutions.backup.psm.ImplementationResolver
 import pl.combosolutions.backup.psm.PsmExceptionMessages.NoRepositoriesAvailable
 import pl.combosolutions.backup.psm.elevation.{ ElevationMode, ObligatoryElevationMode }
 import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.repositories.posix.linux.AptRepositoriesServiceComponent
-import pl.combosolutions.backup.{ AsyncResult, ReportException }
 
-import RepositoriesServiceComponentImpl._
+import RepositoriesServiceComponentImpl.resolve
 
 trait RepositoriesService {
 
@@ -32,17 +34,24 @@ trait RepositoriesServiceComponent {
   def repositoriesService: RepositoriesService
 }
 
-object RepositoriesServiceComponentImpl {
+object RepositoriesServiceComponentImpl extends ImplementationResolver[RepositoriesService] {
 
-  lazy val implementations = Seq(
+  override lazy val implementations = Seq(
     // Linux repositories
     AptRepositoriesServiceComponent.repositoriesService
   )
+
+  override lazy val notFoundMessage = NoRepositoriesAvailable
+
+  override def byFilter(service: RepositoriesService): Boolean = service.repositoriesAvailable
+
+  // TODO: improve
+  override def byPriority(service: RepositoriesService): ImplementationPriority =
+    if (service.repositoriesAvailable) Allowed
+    else NotAllowed
 }
 
 trait RepositoriesServiceComponentImpl extends RepositoriesServiceComponent {
 
-  override lazy val repositoriesService = implementations.
-    find(_.repositoriesAvailable).
-    getOrElse(ReportException onIllegalStateOf NoRepositoriesAvailable)
+  override lazy val repositoriesService = resolve
 }
