@@ -9,24 +9,29 @@ import pl.combosolutions.backup.psm.jvm.{ JVMProgram, JVMUtils }
 import pl.combosolutions.backup.{ Logging, ReportException }
 
 import scala.annotation.tailrec
+import scala.concurrent.duration.Duration.Inf
+import scala.concurrent.{ Await, Promise }
 import scala.sys.process.Process
 import scala.util.{ Failure, Random, Success, Try }
 
 private[elevation] class RmiMutex {
 
-  private var failureOccurred = false
+  private val resultP = Promise[Unit]()
+  private val resultF = resultP.future
 
   def waitForReadiness = synchronized {
-    wait
-    if (failureOccurred)
-      ReportException onIllegalStateOf RemoteFailure
+    wait()
+    Await.result(resultF, Inf)
   }
 
-  def notifyReady = synchronized(notifyAll)
+  def notifyReady = synchronized {
+    resultP success Unit
+    notifyAll()
+  }
 
   def notifyFailure = synchronized {
-    failureOccurred = true
-    notifyAll
+    resultP tryComplete Try(ReportException onIllegalStateOf RemoteFailure)
+    notifyAll()
   }
 }
 
