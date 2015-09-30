@@ -17,7 +17,7 @@ class ElevationServerImplSpec extends Specification with Mockito with AsyncResul
       // given
       val program = mock[GenericProgram]
       val expected = Result[GenericProgram](0, List(), List())
-      program.run returns AsyncResult(expected)
+      program.run returns (AsyncResult some expected)
 
       // when
       val result = server runRemote program

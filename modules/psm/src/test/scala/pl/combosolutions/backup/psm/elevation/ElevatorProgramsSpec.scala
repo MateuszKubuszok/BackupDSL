@@ -41,7 +41,7 @@ class ElevatorProgramsSpec extends Specification with Mockito with AsyncResultSp
       // given
       val elevationFacade = mock[ElevationFacade]
       val expected = Result[GenericProgram](0, List(), List())
-      (elevationFacade runRemotely any[GenericProgram]) returns AsyncResult(expected)
+      (elevationFacade runRemotely any[GenericProgram]) returns (AsyncResult some expected)
 
       // when
       val result = RemoteElevatorProgram(program, elevationFacade).run

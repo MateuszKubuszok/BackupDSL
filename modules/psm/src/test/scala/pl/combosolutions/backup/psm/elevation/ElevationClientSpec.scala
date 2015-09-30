@@ -53,7 +53,7 @@ class ElevationClientSpec extends Specification with Mockito with AsyncResultSpe
       val result = (client executeRemote program)
 
       // then
-      await(result) must throwA[RemoteException]
+      result must throwA[RemoteException].await
     } tag UnitTest
 
     "terminate server on termination command" in {

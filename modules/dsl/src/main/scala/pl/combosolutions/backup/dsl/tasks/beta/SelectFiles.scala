@@ -8,10 +8,10 @@ import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
 
 object SelectFiles extends Reporting {
 
-  private def selectFilesAction(files: List[String]): () => AsyncResult[List[Path]] = () => AsyncResult { () =>
+  private def selectFilesAction(files: List[String]): () => AsyncResult[List[Path]] = () => AsyncResult {
     val paths = files map (Paths get _)
     reporter inform s"Selected ${paths.length} files for copying: $paths"
-    paths
+    Some(paths)
   }
 
   class SelectFilesAction[ParentResult, ChildResult](files: List[String])

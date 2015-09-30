@@ -34,7 +34,7 @@ sealed trait SubTask[Result] {
   }
 
   def map[MappedResult](mapping: Result => MappedResult): SubTask[MappedResult] = {
-    val futureMapping = (result: Result) => AsyncResult { mapping(result) }
+    val futureMapping = (result: Result) => (AsyncResult some mapping(result))
     SubTask(futureMapping, this)
   }
 }

@@ -31,7 +31,7 @@ class ElevationFacadeSpec extends Specification with Mockito with AsyncResultSpe
       (rmiManager createReadyNotifier (===(remoteName), ===(registry), any[RmiMutex])) returns notifier
       (rmiManager createServer (===(remoteName), ===(remoteName), ===(remotePort))) returns server
       (rmiManager createClient (===(remoteName), ===(remotePort))) returns client
-      (client executeRemote program) returns AsyncResult(expected)
+      (client executeRemote program) returns (AsyncResult some expected)
 
       // when
       val facade = new TestElevationFacade(rmiManager)
