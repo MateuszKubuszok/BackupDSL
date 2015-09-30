@@ -5,11 +5,13 @@ import java.nio.file.Path
 import pl.combosolutions.backup.psm.PsmExceptionMessages.NoFileSystemAvailable
 import pl.combosolutions.backup.psm.elevation.ElevationMode
 import pl.combosolutions.backup.psm.filesystem.FileType._
-import pl.combosolutions.backup.psm.filesystem.posix.PosixFileSystemService
+import pl.combosolutions.backup.psm.filesystem.posix.PosixFileSystemServiceComponent
 import pl.combosolutions.backup.psm.operations.Cleaner
-import pl.combosolutions.backup.{ AsyncResult, Logging, ReportException }
+import pl.combosolutions.backup.{ AsyncResult, ReportException }
 
 import scala.util.matching.Regex
+
+import FileSystemServiceComponentImpl._
 
 trait FileSystemService {
 
@@ -36,10 +38,17 @@ trait FileSystemServiceComponent {
   def fileSystemService: FileSystemService
 }
 
-trait FileSystemServiceComponentImpl extends FileSystemServiceComponent with Logging {
+object FileSystemServiceComponentImpl {
 
-  override lazy val fileSystemService = Seq(
+  lazy val implementations = Seq(
     // POSIX file system
-    PosixFileSystemService
-  ) find (_.fileSystemAvailable) getOrElse (ReportException onIllegalStateOf NoFileSystemAvailable)
+    PosixFileSystemServiceComponent.fileSystemService
+  )
+}
+
+trait FileSystemServiceComponentImpl extends FileSystemServiceComponent {
+
+  override lazy val fileSystemService = implementations.
+    find(_.fileSystemAvailable).
+    getOrElse(ReportException onIllegalStateOf NoFileSystemAvailable)
 }

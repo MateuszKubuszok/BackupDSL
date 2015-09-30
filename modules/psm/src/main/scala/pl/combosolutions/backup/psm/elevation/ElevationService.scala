@@ -8,6 +8,8 @@ import pl.combosolutions.backup.psm.elevation.windows.{ EmptyElevationServiceCom
 import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.Program
 
+import ElevationServiceComponentImpl._
+
 trait ElevationService {
 
   val elevationAvailable: Boolean
@@ -26,9 +28,9 @@ trait ElevationServiceComponent {
   def elevationService: ElevationService
 }
 
-trait ElevationServiceComponentImpl extends ElevationServiceComponent {
+object ElevationServiceComponentImpl {
 
-  override lazy val elevationService = Seq(
+  lazy val implementations = Seq(
     // Windows elevation
     EmptyElevationServiceComponent.elevationService,
     UACElevationServiceComponent.elevationService,
@@ -39,5 +41,12 @@ trait ElevationServiceComponentImpl extends ElevationServiceComponent {
 
     // POSIX elevation
     SudoElevationServiceComponent.elevationService
-  ) find (_.elevationAvailable) getOrElse (ReportException onIllegalStateOf NoElevationAvailable)
+  )
+}
+
+trait ElevationServiceComponentImpl extends ElevationServiceComponent {
+
+  override lazy val elevationService = implementations.
+    find(_.elevationAvailable).
+    getOrElse(ReportException onIllegalStateOf NoElevationAvailable)
 }

@@ -3,8 +3,10 @@ package pl.combosolutions.backup.psm.repositories
 import pl.combosolutions.backup.psm.PsmExceptionMessages.NoRepositoriesAvailable
 import pl.combosolutions.backup.psm.elevation.{ ElevationMode, ObligatoryElevationMode }
 import pl.combosolutions.backup.psm.operations.Cleaner
-import pl.combosolutions.backup.psm.repositories.posix.linux.AptRepositoriesService
-import pl.combosolutions.backup.{ AsyncResult, Logging, ReportException }
+import pl.combosolutions.backup.psm.repositories.posix.linux.AptRepositoriesServiceComponent
+import pl.combosolutions.backup.{ AsyncResult, ReportException }
+
+import RepositoriesServiceComponentImpl._
 
 trait RepositoriesService {
 
@@ -30,10 +32,17 @@ trait RepositoriesServiceComponent {
   def repositoriesService: RepositoriesService
 }
 
-trait RepositoriesServiceComponentImpl extends RepositoriesServiceComponent with Logging {
+object RepositoriesServiceComponentImpl {
 
-  override lazy val repositoriesService = List(
+  lazy val implementations = Seq(
     // Linux repositories
-    AptRepositoriesService
-  ) find (_.repositoriesAvailable) getOrElse (ReportException onIllegalStateOf NoRepositoriesAvailable)
+    AptRepositoriesServiceComponent.repositoriesService
+  )
+}
+
+trait RepositoriesServiceComponentImpl extends RepositoriesServiceComponent {
+
+  override lazy val repositoriesService = implementations.
+    find(_.repositoriesAvailable).
+    getOrElse(ReportException onIllegalStateOf NoRepositoriesAvailable)
 }
