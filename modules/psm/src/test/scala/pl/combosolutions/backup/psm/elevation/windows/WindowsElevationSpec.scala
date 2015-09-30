@@ -7,6 +7,7 @@ import pl.combosolutions.backup.psm.programs.GenericProgram
 
 class WindowsElevationSpec extends Specification with Mockito {
 
+  val service = EmptyElevationServiceComponent.elevationService
   val program = GenericProgram("test", List())
 
   "EmptyElevationService" should {
@@ -16,7 +17,7 @@ class WindowsElevationSpec extends Specification with Mockito {
       val expected = program
 
       // when
-      val result = EmptyElevationService elevateDirect program
+      val result = service elevateDirect program
 
       // then
       result mustEqual expected
@@ -28,7 +29,7 @@ class WindowsElevationSpec extends Specification with Mockito {
       val expected = program
 
       // when
-      val result = EmptyElevationService elevateRemote (program, cleaner)
+      val result = service elevateRemote (program, cleaner)
 
       // then
       result mustEqual expected

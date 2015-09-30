@@ -2,33 +2,57 @@ package pl.combosolutions.backup.psm.elevation.windows
 
 import pl.combosolutions.backup.ReportException
 import pl.combosolutions.backup.psm.ComponentsHelper
-import pl.combosolutions.backup.psm.elevation.ElevationService
+import pl.combosolutions.backup.psm.elevation.{ ElevationFacadeComponentImpl, ElevationFacadeComponent, ElevationServiceComponent, ElevationService }
 import pl.combosolutions.backup.psm.systems._
 import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.Program
 
-object EmptyElevationService extends ElevationService with ComponentsHelper {
-  this: ElevationService with OperatingSystemComponent =>
+trait EmptyElevationServiceComponent extends ElevationServiceComponent {
+  self: ElevationServiceComponent with ElevationFacadeComponent with OperatingSystemComponent =>
 
-  override val elevationAvailable: Boolean =
-    Set[OperatingSystem](Windows95System, Windows98System, WindowsMESystem) contains operatingSystem
+  override def elevationService: ElevationService = EmptyElevationService
 
-  override val elevationCMD: String = ""
+  trait EmptyElevationService extends ElevationService {
 
-  override def elevateDirect[T <: Program[T]](program: Program[T]): Program[T] = program
+    override val elevationAvailable: Boolean =
+      Set[OperatingSystem](Windows95System, Windows98System, WindowsMESystem) contains operatingSystem
 
-  override def elevateRemote[T <: Program[T]](program: Program[T], cleaner: Cleaner): Program[T] = program
+    override val elevationCMD: String = ""
+
+    override def elevateDirect[T <: Program[T]](program: Program[T]): Program[T] = program
+
+    override def elevateRemote[T <: Program[T]](program: Program[T], cleaner: Cleaner): Program[T] = program
+  }
+
+  object EmptyElevationService extends EmptyElevationService
 }
 
-object UACElevationService extends ElevationService with ComponentsHelper {
-  this: ElevationService with OperatingSystemComponent =>
+object EmptyElevationServiceComponent
+  extends EmptyElevationServiceComponent
+  with ElevationFacadeComponentImpl
+  with OperatingSystemComponentImpl
 
-  override val elevationAvailable: Boolean = operatingSystem.isWindows && !EmptyElevationService.elevationAvailable
+trait UACElevationServiceComponent extends ElevationServiceComponent {
+  self: ElevationServiceComponent with ElevationFacadeComponent with OperatingSystemComponent =>
 
-  override val elevationCMD: String = ""
+  override def elevationService: ElevationService = UACElevationService
 
-  override def elevateDirect[T <: Program[T]](program: Program[T]): Program[T] = ReportException onToDoCodeIn getClass
+  trait UACElevationService extends ElevationService {
 
-  override def elevateRemote[T <: Program[T]](program: Program[T], cleaner: Cleaner): Program[T] =
-    ReportException onToDoCodeIn getClass
+    override val elevationAvailable: Boolean = operatingSystem.isWindows && !EmptyElevationServiceComponent.elevationService.elevationAvailable
+
+    override val elevationCMD: String = ""
+
+    override def elevateDirect[T <: Program[T]](program: Program[T]): Program[T] = ReportException onToDoCodeIn getClass
+
+    override def elevateRemote[T <: Program[T]](program: Program[T], cleaner: Cleaner): Program[T] =
+      ReportException onToDoCodeIn getClass
+  }
+
+  object UACElevationService extends UACElevationService
 }
+
+object UACElevationServiceComponent
+  extends UACElevationServiceComponent
+  with ElevationFacadeComponentImpl
+  with OperatingSystemComponentImpl

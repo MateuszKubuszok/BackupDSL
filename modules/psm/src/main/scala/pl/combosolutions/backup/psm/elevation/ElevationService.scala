@@ -1,12 +1,12 @@
 package pl.combosolutions.backup.psm.elevation
 
+import pl.combosolutions.backup.ReportException
 import pl.combosolutions.backup.psm.PsmExceptionMessages.NoElevationAvailable
-import pl.combosolutions.backup.psm.elevation.posix.SudoElevationService
-import pl.combosolutions.backup.psm.elevation.posix.linux.{ GKSudoElevationService, KDESudoElevationService }
-import pl.combosolutions.backup.psm.elevation.windows.{ EmptyElevationService, UACElevationService }
+import pl.combosolutions.backup.psm.elevation.posix.SudoElevationServiceComponent
+import pl.combosolutions.backup.psm.elevation.posix.linux.{ GKSudoElevationServiceComponent, KDESudoElevationServiceComponent }
+import pl.combosolutions.backup.psm.elevation.windows.{ EmptyElevationServiceComponent, UACElevationServiceComponent }
 import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.Program
-import pl.combosolutions.backup.{ Logging, ReportException }
 
 trait ElevationService {
 
@@ -26,18 +26,18 @@ trait ElevationServiceComponent {
   def elevationService: ElevationService
 }
 
-trait ElevationServiceComponentImpl extends ElevationServiceComponent with Logging {
+trait ElevationServiceComponentImpl extends ElevationServiceComponent {
 
   override lazy val elevationService = Seq(
     // Windows elevation
-    EmptyElevationService,
-    UACElevationService,
+    EmptyElevationServiceComponent.elevationService,
+    UACElevationServiceComponent.elevationService,
 
     // Linux elevation
-    GKSudoElevationService,
-    KDESudoElevationService,
+    GKSudoElevationServiceComponent.elevationService,
+    KDESudoElevationServiceComponent.elevationService,
 
     // POSIX elevation
-    SudoElevationService
+    SudoElevationServiceComponent.elevationService
   ) find (_.elevationAvailable) getOrElse (ReportException onIllegalStateOf NoElevationAvailable)
 }

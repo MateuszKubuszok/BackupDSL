@@ -1,19 +1,42 @@
 package pl.combosolutions.backup.psm.elevation.posix.linux
 
-import pl.combosolutions.backup.psm.elevation.posix.CommonElevationService
+import pl.combosolutions.backup.psm.elevation.{ ElevationService, ElevationFacadeComponentImpl, ElevationFacadeComponent, ElevationServiceComponent }
+import pl.combosolutions.backup.psm.elevation.posix.{ CommonElevationServiceComponent }
 
-trait GKSudoElevationService extends CommonElevationService {
+trait GKSudoElevationServiceComponent extends CommonElevationServiceComponent {
+  self: ElevationServiceComponent with ElevationFacadeComponent =>
 
-  override val elevationCMD = "gksudo"
+  override def elevationService: ElevationService = GKSudoElevationService
 
-  override val elevationArgs = List("-m", "BackupDSL elevation runner", "--")
+  trait GKSudoElevationService extends CommonElevationService {
+
+    override val elevationCMD = "gksudo"
+
+    override val elevationArgs = List("-m", "BackupDSL elevation runner", "--")
+  }
+
+  object GKSudoElevationService extends GKSudoElevationService
 }
-object GKSudoElevationService extends GKSudoElevationService
 
-object KDESudoElevationService extends CommonElevationService {
+object GKSudoElevationServiceComponent
+  extends GKSudoElevationServiceComponent
+  with ElevationFacadeComponentImpl
 
-  override val elevationCMD = "kdesudo"
+trait KDESudoElevationServiceComponent extends CommonElevationServiceComponent {
+  self: ElevationServiceComponent with ElevationFacadeComponent =>
 
-  override val elevationArgs = List("--")
+  override def elevationService: ElevationService = KDESudoElevationService
+
+  trait KDESudoElevationService extends CommonElevationService {
+
+    override val elevationCMD = "gksudo"
+
+    override val elevationArgs = List("-m", "BackupDSL elevation runner", "--")
+  }
+
+  object KDESudoElevationService extends KDESudoElevationService
 }
 
+object KDESudoElevationServiceComponent
+  extends KDESudoElevationServiceComponent
+  with ElevationFacadeComponentImpl

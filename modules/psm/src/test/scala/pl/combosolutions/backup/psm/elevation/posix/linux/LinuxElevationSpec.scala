@@ -2,12 +2,14 @@ package pl.combosolutions.backup.psm.elevation.posix.linux
 
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import pl.combosolutions.backup.psm.elevation.TestElevationFacadeComponent
+import pl.combosolutions.backup.psm.elevation.{ RemoteElevatorProgram, RemoteElevation, ElevationService, TestElevationFacadeComponent }
 import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.{ Program, GenericProgram }
 
 class LinuxElevationSpec extends Specification with Mockito {
 
+  val component = new GKSudoElevationServiceComponent with TestElevationFacadeComponent
+  val service = component.elevationService
   val program = GenericProgram("test-name", List("test-args"))
 
   "GKSudoElevationService" should {
@@ -16,7 +18,6 @@ class LinuxElevationSpec extends Specification with Mockito {
       // given
       val expectedName = "gksudo"
       val expectedArgs = List("-m", "BackupDSL elevation runner", "--") ++ List(program.name) ++ program.arguments
-      val service = new GKSudoElevationService with TestElevationFacadeComponent
 
       // when
       val result: Program[GenericProgram] = service elevateDirect program
@@ -31,11 +32,10 @@ class LinuxElevationSpec extends Specification with Mockito {
       // given
       val expected = program
       val cleaner = new Cleaner {}
-      val service = new GKSudoElevationService with TestElevationFacadeComponent
 
       // when
       val result = service elevateRemote (program, cleaner)
-      val elevated = result.program
+      val elevated = result.asInstanceOf[RemoteElevatorProgram[GenericProgram]].program
 
       // then
       elevated mustEqual expected
