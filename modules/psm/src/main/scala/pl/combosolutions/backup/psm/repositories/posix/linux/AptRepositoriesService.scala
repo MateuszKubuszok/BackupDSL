@@ -29,18 +29,24 @@ trait AptRepositoriesServiceComponent extends RepositoriesServiceComponent {
     override def obtainRepositories(implicit withElevation: ElevationMode, cleaner: Cleaner) =
       ListAptRepos.handleElevation.digest[List[AptRepository]]
 
-    override def addRepositories(repositories: Repositories)(implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
+    // format: OFF
+    override def addRepositories(repositories: Repositories)
+                                (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
       areAllTrueWithinAsyncResults(asApt(repositories) map (AptAddRepository(_).handleElevation.digest[Boolean]))
 
-    override def removeRepositories(repositories: Repositories)(implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
+    override def removeRepositories(repositories: Repositories)
+                                   (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
       areAllTrueWithinAsyncResults(asApt(repositories) map (AptRemoveRepository(_).handleElevation.digest[Boolean]))
 
-    override def installAll(packages: Packages)(implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
+    override def installAll(packages: Packages)
+                           (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
       AptGetInstall(packages toList).handleElevation.digest[Boolean]
 
-    override def areAllInstalled(packages: Packages)(implicit withElevation: ElevationMode, cleaner: Cleaner) = (for {
+    override def areAllInstalled(packages: Packages)
+                                (implicit withElevation: ElevationMode, cleaner: Cleaner) = (for {
       installedPackages <- optionT[Future](DpkgList.handleElevation.digest[List[VersionedPackage]])
     } yield packages.forall(package_ => installedPackages.exists(iPackage => iPackage.name == package_.name))).run
+    // format: ON
 
     private def asApt(list: Repositories) = list collect { case ar: AptRepository => ar }
 

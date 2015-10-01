@@ -39,7 +39,8 @@ trait UACElevationServiceComponent extends ElevationServiceComponent {
 
   trait UACElevationService extends ElevationService {
 
-    override val elevationAvailable: Boolean = operatingSystem.isWindows && !EmptyElevationServiceComponent.elevationService.elevationAvailable
+    override val elevationAvailable: Boolean =
+      operatingSystem.isWindows && !EmptyElevationServiceComponent.elevationService.elevationAvailable
 
     override val elevationCMD: String = ""
 
