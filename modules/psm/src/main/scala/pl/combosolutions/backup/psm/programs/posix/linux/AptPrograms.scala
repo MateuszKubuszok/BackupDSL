@@ -34,11 +34,18 @@ object AptPrograms {
   implicit val ListAptRepos2AptRepositories: ListAptReposInterpreter[List[AptRepository]] = result => for {
     line <- result.stdout
     lineMatch <- aptSourcePattern findFirstMatchIn line
-  } yield AptRepository(isSrc = lineMatch group 1 equalsIgnoreCase "deb-src",
-    url = lineMatch group 4,
-    branch = lineMatch group 5,
-    areas = lineMatch group 6 split "\\s+" toList,
-    architectures = lineMatch group 3 split "," toList)
+    isSrc = Option(lineMatch group 1) map (_ equalsIgnoreCase "deb-src") getOrElse false
+    url = Option(lineMatch group 4).get
+    branch = Option(lineMatch group 5).get
+    areas = Option(lineMatch group 6) map (_ split "\\s+" filterNot (_.isEmpty) toList) getOrElse List()
+    architectures = Option(lineMatch group 3) map (_ split " " toList) getOrElse List()
+  } yield AptRepository(
+    isSrc = isSrc,
+    url = url,
+    branch = branch,
+    areas = areas,
+    architectures = architectures
+  )
 }
 
 case class AptAddRepository(repository: AptRepository) extends Program[AptAddRepository](

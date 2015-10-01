@@ -1,23 +1,29 @@
 package pl.combosolutions.backup.psm.elevation
 
-import org.specs2.mutable.{ BeforeAfter, Specification }
+import org.specs2.mutable.Specification
 import pl.combosolutions.backup.ReportException
 import pl.combosolutions.backup.psm.ComponentsHelper
-import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.GenericProgram
-import pl.combosolutions.backup.test.ProgramResultTestHelper
+import pl.combosolutions.backup.psm.systems.{ PosixSystem, WindowsSystem }
+import pl.combosolutions.backup.test.{ ElevationTestHelper, ProgramResultTestHelper }
 import pl.combosolutions.backup.test.Tags.PlatformTest
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-class PlatformSpecificAdvisedTest extends Specification with ProgramResultTestHelper with ComponentsHelper {
+class PlatformSpecificAdvisedTest
+    extends Specification
+    with ElevationTestHelper
+    with ProgramResultTestHelper
+    with ComponentsHelper {
 
   sequential // gksudo lock causes failure when some process already grabbed it
 
-  val testProgram = if (operatingSystem.isWindows) GenericProgram("cmd", List())
-  else if (operatingSystem.isPosix) GenericProgram("ls", List())
-  else ReportException onNotImplemented "Unknown platform"
+  val testProgram: GenericProgram = operatingSystem match {
+    case system: WindowsSystem => GenericProgram("cmd", List())
+    case system: PosixSystem => GenericProgram("ls", List())
+    case _ => ReportException onNotImplemented "Unknown platform"
+  }
 
   "Current platform's elevator" should {
 
@@ -38,14 +44,5 @@ class PlatformSpecificAdvisedTest extends Specification with ProgramResultTestHe
 
       result should beCorrectProgramResult
     } tag PlatformTest
-  }
-
-  object CleanedContext extends BeforeAfter {
-    def before: Any = {}
-    def after: Any = ElevationTestCleaner.cleanup
-  }
-
-  object ElevationTestCleaner extends Cleaner {
-    def cleanup = clean
   }
 }

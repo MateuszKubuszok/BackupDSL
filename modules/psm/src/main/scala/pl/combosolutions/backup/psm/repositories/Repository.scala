@@ -11,8 +11,8 @@ case class AptRepository(
 
   override def toString = {
     val repoType = "deb" + (if (isSrc) "-src" else "")
-    val areaList = areas reduce (_ + " " + _)
-    val architectureList = if (architectures.nonEmpty) s"[arch=${architectures reduce (_ + "," + _)}]" else ""
-    s"$repoType $architectureList $url $branch $areaList}"
+    val areaList = areas reduce (_ + "," + _)
+    val architectureList = if (architectures.nonEmpty) s" [arch=${architectures reduce (_ + "," + _)}]" else ""
+    s"$repoType$architectureList $url $branch $areaList"
   }
 }
