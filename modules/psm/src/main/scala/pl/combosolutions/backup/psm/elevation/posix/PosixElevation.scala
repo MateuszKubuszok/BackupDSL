@@ -31,6 +31,7 @@ trait SudoElevationServiceComponent extends CommonElevationServiceComponent {
 
   override def elevationService: ElevationService = SudoElevationService
 
+  // TODO: use http://stackoverflow.com/questions/18708087/how-to-execute-bash-command-with-sudo-privileges-in-java
   trait SudoElevationService extends CommonElevationService {
 
     override lazy val elevationAvailable: Boolean = operatingSystem.isPosix

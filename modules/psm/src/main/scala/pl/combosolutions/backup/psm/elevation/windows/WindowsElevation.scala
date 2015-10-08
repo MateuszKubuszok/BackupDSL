@@ -37,6 +37,9 @@ trait UACElevationServiceComponent extends ElevationServiceComponent {
 
   override def elevationService: ElevationService = UACElevationService
 
+  // TODO:
+  // use http://code.kliu.org/misc/elevate/ downloaded with
+  // http://stackoverflow.com/questions/27466869/download-a-zip-from-url-and-extract-it-in-resource-using-sbt
   trait UACElevationService extends ElevationService {
 
     override val elevationAvailable: Boolean =
