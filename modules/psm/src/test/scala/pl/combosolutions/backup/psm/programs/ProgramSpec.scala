@@ -3,11 +3,11 @@ package pl.combosolutions.backup.psm.programs
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-import pl.combosolutions.backup.AsyncResult
+import pl.combosolutions.backup.test.AsyncResultSpecificationHelper
 
 import scala.sys.process.{ Process, ProcessBuilder, ProcessLogger }
 
-class ProgramSpec extends Specification with Mockito {
+class ProgramSpec extends Specification with Mockito with AsyncResultSpecificationHelper {
 
   "Program$" should {
 
@@ -60,7 +60,7 @@ class ProgramSpec extends Specification with Mockito {
     "digest result" in new ClassTestContext {
       // given
       implicit val interpreter: Result[GenericProgram]#Interpreter[String] = { _.toString }
-      val expected = program.result.toString
+      val expected = await(program.result) map (_.toString) get
 
       // when
       val result = program.digest[String]
@@ -103,18 +103,6 @@ class ProgramSpec extends Specification with Mockito {
     override def processFor(name: String, arguments: List[String]) = builder
   }
 
-  trait MockExecuteHelper[T <: Program[T]] {
-    self: Program[T] =>
-
-    val result = Result[T](0, List(), List())
-
-    val process = mock[Process]
-
-    override def run = AsyncResult some result
-
-    override def run2Kill = process
-  }
-
   trait CompanionObjectTestContext extends Scope {
 
     val programObj = new ProgramExecutor with MockProcessHelper
@@ -127,6 +115,6 @@ class ProgramSpec extends Specification with Mockito {
 
     val name = "test-name"
     val arguments = List("test", "test")
-    val program = new Program[GenericProgram](name, arguments) with MockExecuteHelper[GenericProgram]
+    val program = new Program[GenericProgram](name, arguments) with TestProgramHelper[GenericProgram]
   }
 }

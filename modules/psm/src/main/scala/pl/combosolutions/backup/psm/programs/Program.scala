@@ -35,7 +35,7 @@ private[programs] trait ProgramExecutor extends Logging {
     }
   }
 
-  def execute2Kill[T <: Program[T]](program: Program[T]) = {
+  def execute2Kill[T <: Program[T]](program: Program[T]): Process = {
     logger trace s"running  ${program.asGeneric.showCMD}"
     processFor(program.name, program.arguments).run
   }
@@ -49,11 +49,11 @@ import Program._
 
 class Program[T <: Program[T]](val name: String, val arguments: List[String]) extends Serializable {
 
-  def run = execute(this)
+  def run: AsyncResult[Result[T]] = execute(this)
 
-  def run2Kill = execute2Kill(this)
+  def run2Kill: Process = execute2Kill(this)
 
-  def digest[U](implicit interpreter: Result[T]#Interpreter[U]) = (for {
+  def digest[U](implicit interpreter: Result[T]#Interpreter[U]): AsyncResult[U] = (for {
     result <- optionT[Future](run)
   } yield result.interpret(interpreter)).run
 
