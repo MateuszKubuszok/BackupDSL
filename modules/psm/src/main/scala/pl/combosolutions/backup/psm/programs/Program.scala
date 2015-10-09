@@ -10,7 +10,7 @@ import scala.util.{ Failure, Success, Try }
 import scalaz.OptionT._
 import scalaz.std.scalaFuture._
 
-object Program extends Logging {
+private[programs] trait ProgramExecutor extends Logging {
 
   def apply(name: String, arguments: String*) = GenericProgram(name, arguments.toList)
 
@@ -22,7 +22,7 @@ object Program extends Logging {
       var stderr = mutable.MutableList[String]()
       val logger = ProcessLogger(stdout += _, stderr += _)
 
-      val exitValue = Process(program.name, program.arguments) run logger exitValue
+      val exitValue = processFor(program.name, program.arguments) run logger exitValue
 
       Program.logger trace s"finished ${program.asGeneric.toString}"
 
@@ -37,9 +37,13 @@ object Program extends Logging {
 
   def execute2Kill[T <: Program[T]](program: Program[T]) = {
     logger trace s"running  ${program.asGeneric.showCMD}"
-    Process(program.name, program.arguments).run
+    processFor(program.name, program.arguments).run
   }
+
+  protected def processFor(name: String, arguments: List[String]) = Process(name, arguments)
 }
+
+object Program extends ProgramExecutor
 
 import Program._
 
