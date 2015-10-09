@@ -4,13 +4,13 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import pl.combosolutions.backup.AsyncResult
-import pl.combosolutions.backup.psm.elevation.{ ElevationMode, ObligatoryElevationMode, TestElevationFacadeComponent }
+import pl.combosolutions.backup.psm.elevation.{ ObligatoryElevationMode, TestElevationFacadeComponent }
 import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.{ Result, Program }
 import pl.combosolutions.backup.psm.programs.posix.linux._
-import pl.combosolutions.backup.psm.programs.posix.linux.AptPrograms._
 import pl.combosolutions.backup.psm.repositories.{ AptRepository, UnversionedPackage, VersionedPackage }
 import pl.combosolutions.backup.test.AsyncResultSpecificationHelper
+import pl.combosolutions.backup.test.Tags.UnitTest
 
 import scala.reflect.ClassTag
 
@@ -34,7 +34,7 @@ class AptRepositoriesSpec extends Specification with Mockito with AsyncResultSpe
 
       // then
       await(result) must beSome(repositories)
-    }
+    } tag UnitTest
 
     "add repositories" in new TestContext(classOf[AptAddRepository], classOf[Boolean]) {
       // given
@@ -49,7 +49,7 @@ class AptRepositoriesSpec extends Specification with Mockito with AsyncResultSpe
 
       // then
       await(result) must beSome(true)
-    }
+    } tag UnitTest
 
     "remove repositories" in new TestContext(classOf[AptRemoveRepository], classOf[Boolean]) {
       // given
@@ -64,7 +64,7 @@ class AptRepositoriesSpec extends Specification with Mockito with AsyncResultSpe
 
       // then
       await(result) must beSome(true)
-    }
+    } tag UnitTest
 
     "install packages" in new TestContext(classOf[AptGetInstall], classOf[Boolean]) {
       // given
@@ -79,7 +79,7 @@ class AptRepositoriesSpec extends Specification with Mockito with AsyncResultSpe
 
       // then
       await(result) must beSome(true)
-    }
+    } tag UnitTest
 
     "check if all packages are installed" in new TestContext(classOf[DpkgList], classOf[List[VersionedPackage]]) {
       // given
@@ -94,7 +94,7 @@ class AptRepositoriesSpec extends Specification with Mockito with AsyncResultSpe
 
       // then
       await(result) must beSome(true)
-    }
+    } tag UnitTest
   }
 
   class TestContext[ProgramType <: Program[ProgramType], ResultType](

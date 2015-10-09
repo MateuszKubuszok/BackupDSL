@@ -2,11 +2,13 @@ package pl.combosolutions.backup.psm.elevation
 
 import java.rmi.registry.Registry
 
+import org.specs2.matcher.Scope
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import pl.combosolutions.backup.AsyncResult
-import pl.combosolutions.backup.psm.programs.{ Result, GenericProgram }
+import pl.combosolutions.backup.psm.programs.{ GenericProgram, Result }
 import pl.combosolutions.backup.test.AsyncResultSpecificationHelper
+import pl.combosolutions.backup.test.Tags.UnitTest
 
 import scala.sys.process.Process
 
@@ -17,20 +19,10 @@ class ElevationFacadeSpec extends Specification with Mockito with AsyncResultSpe
 
   "ElevationFacade" should {
 
-    "run program on a remote server" in {
+    "run program on a remote server" in new TestContext {
       // given
-      val rmiManager = mock[RmiManager]
-      val registry = mock[Registry]
-      val notifier = mock[ElevationReadyNotifier]
-      val server = mock[Process]
-      val client = mock[ElevationClient]
       val program = GenericProgram("test", List())
       val expected = Result[GenericProgram](0, List(), List())
-      rmiManager.createRegister returns ((registry, remotePort))
-      (rmiManager findFreeName ===(registry)) returns remoteName
-      (rmiManager createReadyNotifier (===(remoteName), ===(registry), any[RmiMutex])) returns notifier
-      (rmiManager createServer (===(remoteName), ===(remoteName), ===(remotePort))) returns server
-      (rmiManager createClient (===(remoteName), ===(remotePort))) returns client
       (client executeRemote program) returns (AsyncResult some expected)
 
       // when
@@ -39,21 +31,10 @@ class ElevationFacadeSpec extends Specification with Mockito with AsyncResultSpe
 
       // then
       await(result) must beSome(expected)
-    }
+    } tag UnitTest
 
-    "close elevated executor" in {
+    "close elevated executor" in new TestContext {
       // given
-      val rmiManager = mock[RmiManager]
-      val registry = mock[Registry]
-      val notifier = mock[ElevationReadyNotifier]
-      val server = mock[Process]
-      val client = mock[ElevationClient]
-      rmiManager.createRegister returns ((registry, remotePort))
-      (rmiManager findFreeName ===(registry)) returns remoteName
-      (rmiManager createReadyNotifier (===(remoteName), ===(registry), any[RmiMutex])) returns notifier
-      (rmiManager createServer (===(remoteName), ===(remoteName), ===(remotePort))) returns server
-      (rmiManager createClient (===(remoteName), ===(remotePort))) returns client
-
       // when
       val facade = new TestElevationFacade(rmiManager)
       facade.close
@@ -61,7 +42,7 @@ class ElevationFacadeSpec extends Specification with Mockito with AsyncResultSpe
       // then
       there was one(client).terminate
       there was one(server).destroy
-    }
+    } tag UnitTest
   }
 
   class TestElevationFacade(rmiManager: RmiManager) extends ElevationFacade(rmiManager) {
@@ -72,5 +53,21 @@ class ElevationFacadeSpec extends Specification with Mockito with AsyncResultSpe
     }
 
     override def waitForReadiness = {}
+  }
+
+  trait TestContext extends Scope {
+
+    val rmiManager = mock[RmiManager]
+    val registry = mock[Registry]
+    val notifier = mock[ElevationReadyNotifier]
+    val server = mock[Process]
+    val client = mock[ElevationClient]
+
+    rmiManager.createRegister returns ((registry, remotePort))
+
+    (rmiManager findFreeName ===(registry)) returns remoteName
+    (rmiManager createReadyNotifier (===(remoteName), ===(registry), any[RmiMutex])) returns notifier
+    (rmiManager createServer (===(remoteName), ===(remoteName), ===(remotePort))) returns server
+    (rmiManager createClient (===(remoteName), ===(remotePort))) returns client
   }
 }

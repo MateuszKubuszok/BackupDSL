@@ -28,20 +28,25 @@ class PlatformSpecificAdvisedTest
   "Current platform's elevator" should {
 
     "allows direct elevation" in {
+      // given
       val program = elevationService elevateDirect testProgram
 
+      // when
       val result = program.run
 
+      // then
       result should beCorrectProgramResult
     } tag PlatformTest
 
     "allows remote elevation" in CleanedContext {
+      // given
       val program = elevationService elevateRemote (testProgram, ElevationTestCleaner)
 
+      // when
       val result = program.run
+      Await.result(result, Duration.Inf)
 
-      val w8 = Await.result(result, Duration.Inf)
-
+      // then
       result should beCorrectProgramResult
     } tag PlatformTest
   }

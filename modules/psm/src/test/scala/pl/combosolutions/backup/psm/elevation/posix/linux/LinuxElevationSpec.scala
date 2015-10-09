@@ -2,9 +2,10 @@ package pl.combosolutions.backup.psm.elevation.posix.linux
 
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import pl.combosolutions.backup.psm.elevation.{ RemoteElevatorProgram, RemoteElevation, ElevationService, TestElevationFacadeComponent }
+import pl.combosolutions.backup.psm.elevation.{ RemoteElevatorProgram, TestElevationFacadeComponent }
 import pl.combosolutions.backup.psm.operations.Cleaner
-import pl.combosolutions.backup.psm.programs.{ Program, GenericProgram }
+import pl.combosolutions.backup.psm.programs.{ GenericProgram, Program }
+import pl.combosolutions.backup.test.Tags.UnitTest
 
 class LinuxElevationSpec extends Specification with Mockito {
 
@@ -26,7 +27,7 @@ class LinuxElevationSpec extends Specification with Mockito {
       // then
       resultAsGeneric.name mustEqual expectedName
       resultAsGeneric.arguments mustEqual expectedArgs
-    }
+    } tag UnitTest
 
     "elevate remotely using RemoteElevationProgram" in {
       // given
@@ -39,6 +40,6 @@ class LinuxElevationSpec extends Specification with Mockito {
 
       // then
       elevated mustEqual expected
-    }
+    } tag UnitTest
   }
 }

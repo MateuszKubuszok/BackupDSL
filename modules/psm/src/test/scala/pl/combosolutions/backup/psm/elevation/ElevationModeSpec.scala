@@ -4,6 +4,7 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.GenericProgram
+import pl.combosolutions.backup.test.Tags.UnitTest
 
 class ElevationModeSpec extends Specification with Mockito {
 
@@ -22,7 +23,7 @@ class ElevationModeSpec extends Specification with Mockito {
 
       // then
       result mustEqual program
-    }
+    } tag UnitTest
   }
 
   "DirectElevation" should {
@@ -39,7 +40,7 @@ class ElevationModeSpec extends Specification with Mockito {
       // then
       result mustEqual expected
       there was one(mode.testElevationService).elevateDirect(===(program))
-    }
+    } tag UnitTest
   }
 
   "RemoteElevation" should {
@@ -56,7 +57,7 @@ class ElevationModeSpec extends Specification with Mockito {
       // then
       result mustEqual expected
       there was one(mode.testElevationService).elevateRemote(===(program), ===(cleaner))
-    }
+    } tag UnitTest
   }
 
   "ElevateIfNeeded" should {
@@ -73,6 +74,6 @@ class ElevationModeSpec extends Specification with Mockito {
 
       // then
       result mustEqual expected
-    }
+    } tag UnitTest
   }
 }

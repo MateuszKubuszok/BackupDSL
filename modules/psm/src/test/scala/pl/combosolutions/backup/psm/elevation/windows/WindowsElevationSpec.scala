@@ -4,6 +4,7 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.GenericProgram
+import pl.combosolutions.backup.test.Tags.UnitTest
 
 class WindowsElevationSpec extends Specification with Mockito {
 
@@ -21,7 +22,7 @@ class WindowsElevationSpec extends Specification with Mockito {
 
       // then
       result mustEqual expected
-    }
+    } tag UnitTest
 
     "only mock remote elevation" in {
       // given
@@ -33,6 +34,6 @@ class WindowsElevationSpec extends Specification with Mockito {
 
       // then
       result mustEqual expected
-    }
+    } tag UnitTest
   }
 }

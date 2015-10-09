@@ -3,8 +3,10 @@ package pl.combosolutions.backup.psm.elevation
 import java.rmi.RemoteException
 import java.rmi.registry.Registry
 
+import org.specs2.matcher.Scope
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
+import pl.combosolutions.backup.test.Tags.UnitTest
 
 class ElevatedExecutorSpec extends Specification with Mockito {
 
@@ -19,25 +21,18 @@ class ElevatedExecutorSpec extends Specification with Mockito {
 
   "ElevatedExecutor" should {
 
-    "export ElevationServer and notify about successful initialization" in {
+    "export ElevationServer and notify about successful initialization" in new TestContext {
       // given
-      val registry = mock[Registry]
-      val notifier = mock[ElevationReadyNotifier]
-      (registry lookup notifierName) returns notifier
-
       // when
       new TestElevatedExecutor(registry)(arguments)
 
       // then
       there was one(registry).bind(===(serverName), any[ElevationServer])
       there was one(notifier).notifyReady
-    }
+    } tag UnitTest
 
-    "notify about failed initialization" in {
+    "notify about failed initialization" in new TestContext {
       // given
-      val registry = mock[Registry]
-      val notifier = mock[ElevationReadyNotifier]
-      (registry lookup notifierName) returns notifier
       (registry.bind(===(serverName), any[ElevationServer])) throws (new RemoteException)
 
       // when
@@ -46,7 +41,7 @@ class ElevatedExecutorSpec extends Specification with Mockito {
       // then
       there was one(registry).bind(===(serverName), any[ElevationServer])
       there was one(notifier).notifyFailure
-    }
+    } tag UnitTest
   }
 
   class TestElevatedExecutor(mockRegistry: Registry)(args: Array[String])
@@ -59,5 +54,13 @@ class ElevatedExecutorSpec extends Specification with Mockito {
     override def exportServer(server: ElevationServer) = server
 
     override def terminateOnFailure = {}
+  }
+
+  trait TestContext extends Scope {
+
+    val registry = mock[Registry]
+    val notifier = mock[ElevationReadyNotifier]
+
+    (registry lookup notifierName) returns notifier
   }
 }

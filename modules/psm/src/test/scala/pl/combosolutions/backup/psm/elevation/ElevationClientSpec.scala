@@ -2,11 +2,12 @@ package pl.combosolutions.backup.psm.elevation
 
 import java.rmi.RemoteException
 
+import org.specs2.matcher.Scope
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import pl.combosolutions.backup.psm.programs.{ Result, GenericProgram }
+import pl.combosolutions.backup.psm.programs.{ GenericProgram, Result }
+import pl.combosolutions.backup.test.AsyncResultSpecificationHelper
 import pl.combosolutions.backup.test.Tags.UnitTest
-import pl.combosolutions.backup.test.{ Tags, AsyncResultSpecificationHelper }
 
 class ElevationClientSpec extends Specification with Mockito with AsyncResultSpecificationHelper {
 
@@ -16,10 +17,8 @@ class ElevationClientSpec extends Specification with Mockito with AsyncResultSpe
 
   "ElevationClient" should {
 
-    "return Some successful AsyncResult for Some successful response" in {
+    "return Some successful AsyncResult for Some successful response" in new TestContext {
       // given
-      val server = mock[ElevationServer]
-      val client = elevationClientFor(server)
       val expected = Result[GenericProgram](0, List(), List())
       (server runRemote program) returns Some(expected)
 
@@ -30,10 +29,8 @@ class ElevationClientSpec extends Specification with Mockito with AsyncResultSpe
       result must beSome(expected)
     } tag UnitTest
 
-    "return None successful AsyncResult for None successful response" in {
+    "return None successful AsyncResult for None successful response" in new TestContext {
       // given
-      val server = mock[ElevationServer]
-      val client = elevationClientFor(server)
       (server runRemote program) returns None
 
       // when
@@ -43,10 +40,8 @@ class ElevationClientSpec extends Specification with Mockito with AsyncResultSpe
       result must beNone
     } tag UnitTest
 
-    "return failed AsyncResult for failed request" in {
+    "return failed AsyncResult for failed request" in new TestContext {
       // given
-      val server = mock[ElevationServer]
-      val client = elevationClientFor(server)
       (server runRemote program) throws (new RemoteException("test exception"))
 
       // when
@@ -56,11 +51,8 @@ class ElevationClientSpec extends Specification with Mockito with AsyncResultSpe
       result must throwA[RemoteException].await
     } tag UnitTest
 
-    "terminate server on termination command" in {
+    "terminate server on termination command" in new TestContext {
       // given
-      val server = mock[ElevationServer]
-      val client = elevationClientFor(server)
-
       // when
       client.terminate
 
@@ -72,5 +64,11 @@ class ElevationClientSpec extends Specification with Mockito with AsyncResultSpe
   private def elevationClientFor(mockServer: ElevationServer) = new ElevationClient(name, remotePort) {
 
     override protected def server = mockServer
+  }
+
+  trait TestContext extends Scope {
+
+    val server = mock[ElevationServer]
+    val client = elevationClientFor(server)
   }
 }

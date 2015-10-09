@@ -1,10 +1,11 @@
 package pl.combosolutions.backup.psm.repositories
 
+import org.specs2.matcher.Scope
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import pl.combosolutions.backup.ReportException
 import pl.combosolutions.backup.psm.ComponentsHelper
-import pl.combosolutions.backup.psm.elevation.{ NotElevated, RemoteElevation }
+import pl.combosolutions.backup.psm.elevation.RemoteElevation
 import pl.combosolutions.backup.psm.repositories.posix.linux.AptRepositoriesServiceComponent.AptRepositoriesService
 import pl.combosolutions.backup.test.ElevationTestHelper
 import pl.combosolutions.backup.test.Tags.PlatformTest
@@ -35,10 +36,10 @@ class PlatformSpecificAdvisedTest
 
   "Current platform's repositories" should {
 
-    "obtains repositories" in {
+    "obtains repositories" in new TestContext {
       // given
-      implicit val withElevation = NotElevated
-      implicit val cleaner = ElevationTestCleaner
+      implicit val e = withElevation
+      implicit val c = cleaner
 
       // when
       val result = repositoriesService.obtainRepositories
@@ -47,11 +48,10 @@ class PlatformSpecificAdvisedTest
       result must beSome.await
     } tag PlatformTest
 
-    "adds test repository" in {
+    "adds test repository" in new TestContext {
       // given
-      implicit val withElevation = RemoteElevation
-      implicit val cleaner = ElevationTestCleaner
-      val repositories = List(testRepository)
+      implicit val e = withElevation
+      implicit val c = cleaner
 
       // when
       val result = repositoriesService addRepositories repositories
@@ -60,11 +60,10 @@ class PlatformSpecificAdvisedTest
       result must beSome(true).await
     } tag PlatformTest
 
-    "removes test repository" in {
+    "removes test repository" in new TestContext {
       // given
-      implicit val withElevation = RemoteElevation
-      implicit val cleaner = ElevationTestCleaner
-      val repositories = List(testRepository)
+      implicit val e = withElevation
+      implicit val c = cleaner
 
       // when
       val result = repositoriesService removeRepositories repositories
@@ -73,11 +72,10 @@ class PlatformSpecificAdvisedTest
       result must beSome(true).await
     } tag PlatformTest
 
-    "installs package" in {
+    "installs package" in new TestContext {
       // given
-      implicit val withElevation = RemoteElevation
-      implicit val cleaner = ElevationTestCleaner
-      val packages = List(testPackage)
+      implicit val e = withElevation
+      implicit val c = cleaner
 
       // when
       val result = repositoriesService installAll packages
@@ -86,11 +84,10 @@ class PlatformSpecificAdvisedTest
       result must beSome(true).await(timeout = timeout)
     } tag PlatformTest
 
-    "checks if all packages are installed" in {
+    "checks if all packages are installed" in new TestContext {
       // given
-      implicit val withElevation = RemoteElevation
-      implicit val cleaner = ElevationTestCleaner
-      val packages = List(testPackage)
+      implicit val e = withElevation
+      implicit val c = cleaner
 
       // when
       val result = repositoriesService areAllInstalled packages
@@ -98,5 +95,13 @@ class PlatformSpecificAdvisedTest
       // then
       result must beSome(true).await(timeout = timeout)
     } tag PlatformTest
+  }
+
+  trait TestContext extends Scope {
+
+    val withElevation = RemoteElevation
+    val cleaner = ElevationTestCleaner
+    val repositories = List(testRepository)
+    val packages = List(testPackage)
   }
 }
