@@ -48,6 +48,7 @@ object Settings extends Dependencies {
 
   private def excludeTags(tags: String*) = Argument(Specs2, "exclude", tags.reduce(_ + "," + _))
   private def includeTags(tags: String*) = Argument(Specs2, "include", tags.reduce(_ + "," + _))
+  private def sequential = Argument(Specs2, "sequential")
 
   abstract class Configurator(project: Project, config: Configuration, tag: String) {
 
@@ -56,6 +57,10 @@ object Settings extends Dependencies {
       settings(inConfig(config)(testTasks): _*).
       settings(testOptions in config := Seq(includeTags(tag))).
       settings(libraryDependencies ++= testDeps map (_ % tag))
+
+    protected def configureSequential() = configure.
+      settings(testOptions in config ++= Seq(sequential)).
+      settings(parallelExecution in config := false)
   }
 }
 
@@ -69,7 +74,7 @@ trait Settings {
   implicit class PlatformConfigurator(project: Project)
     extends Configurator(project, PlatformTest, platformTestTag) {
 
-    def configurePlatform() = configure
+    def configurePlatform() = configureSequential
   }
 
   implicit class FunctionalConfigurator(project: Project)

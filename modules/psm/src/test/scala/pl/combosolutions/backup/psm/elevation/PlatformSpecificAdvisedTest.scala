@@ -17,8 +17,6 @@ class PlatformSpecificAdvisedTest
     with ProgramResultTestHelper
     with ComponentsHelper {
 
-  sequential // gksudo lock causes failure when some process already grabbed it
-
   val testProgram: GenericProgram = operatingSystem match {
     case system: WindowsSystem => GenericProgram("cmd", List())
     case system: PosixSystem => GenericProgram("ls", List())

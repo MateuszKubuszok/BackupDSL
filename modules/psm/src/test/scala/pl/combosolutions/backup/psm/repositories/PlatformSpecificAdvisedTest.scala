@@ -18,8 +18,6 @@ class PlatformSpecificAdvisedTest
     with ElevationTestHelper
     with ComponentsHelper {
 
-  sequential
-
   type Repositories = List[Repository]
 
   val testRepository: Repository = repositoriesService match {
