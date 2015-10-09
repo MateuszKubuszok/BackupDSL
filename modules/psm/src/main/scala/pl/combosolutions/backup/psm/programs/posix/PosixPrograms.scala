@@ -1,31 +1,28 @@
 package pl.combosolutions.backup.psm.programs.posix
 
 import pl.combosolutions.backup.ReportException
-import pl.combosolutions.backup.psm.ComponentsHelper
 import pl.combosolutions.backup.psm.PsmExceptionMessages.UnknownFileType
-import pl.combosolutions.backup.psm.filesystem.{ FileSystemServiceComponent, FileType }
-import FileType.FileType
+import pl.combosolutions.backup.psm.filesystem.FileType.{ Directory, File, FileType, SymbolicLink }
 import pl.combosolutions.backup.psm.programs.{ Program, Result }
 
-object PosixPrograms extends ComponentsHelper {
-  this: FileSystemServiceComponent =>
+object PosixPrograms {
 
-  val fileIsDirectory = fileSystemService.fileIsDirectory
-  val fileIsSymlinkPattern = fileSystemService.fileIsSymlinkPattern
-  val fileIsFile = fileSystemService.fileIsFile
+  val fileIsFile = "(.*): .*".r
+  val fileIsDirectory = "(.*): directory".r
+  val fileIsSymlink = "(.*): symbolic link to .*".r
 
   type CatFileInterpreter[U] = Result[CatFile]#Interpreter[U]
   implicit val CatFile2Content: CatFileInterpreter[List[String]] = _.stdout
 
-  type ListFileInterpreter[U] = Result[FileInfo]#Interpreter[U]
-  implicit val FileInfo2FileType: ListFileInterpreter[FileType] = _.stdout.headOption map {
-    case fileSystemService.fileIsDirectory(fileName) => FileType.Directory
-    case fileSystemService.fileIsSymlinkPattern(fileName) => FileType.SymbolicLink
-    case fileSystemService.fileIsFile(fileName) => FileType.File
+  type FileInfoInterpreter[U] = Result[FileInfo]#Interpreter[U]
+  implicit val FileInfo2FileType: FileInfoInterpreter[FileType] = _.stdout.headOption map {
+    case fileIsDirectory(fileName) => Directory
+    case fileIsSymlink(fileName) => SymbolicLink
+    case fileIsFile(fileName) => File
   } getOrElse (ReportException onIllegalStateOf UnknownFileType)
 
   type GrepFilesInterpreter[U] = Result[GrepFiles]#Interpreter[U]
-  implicit val GrepFiles2ListString: ListFileInterpreter[List[String]] = _.stdout
+  implicit val GrepFiles2ListString: GrepFilesInterpreter[List[String]] = _.stdout
 
   type WhichProgramInterpreter[U] = Result[WhichProgram]#Interpreter[U]
   implicit val WhichProgram2Boolean: WhichProgramInterpreter[Boolean] = _.exitValue == 0

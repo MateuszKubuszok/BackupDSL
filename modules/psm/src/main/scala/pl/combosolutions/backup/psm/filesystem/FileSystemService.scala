@@ -19,9 +19,6 @@ trait FileSystemService {
 
   val fileSystemAvailable: Boolean
 
-  val fileIsFile: Regex
-  val fileIsDirectory: Regex
-  val fileIsSymlinkPattern: Regex
   def getFileType(forPath: Path)(implicit withElevation: ElevationMode, cleaner: Cleaner): AsyncResult[FileType]
 
   /* // TODO

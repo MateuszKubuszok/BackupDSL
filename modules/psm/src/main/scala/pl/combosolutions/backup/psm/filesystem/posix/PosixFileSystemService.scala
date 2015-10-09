@@ -20,10 +20,6 @@ trait PosixFileSystemServiceComponent extends FileSystemServiceComponent {
 
     override lazy val fileSystemAvailable = operatingSystem.isPosix
 
-    override lazy val fileIsFile = "(.*): directory".r
-    override lazy val fileIsDirectory = "(.*): directory".r
-    override lazy val fileIsSymlinkPattern = "(.*): symbolic link to .*'".r
-
     override def getFileType(forPath: Path)(implicit withElevation: ElevationMode, cleaner: Cleaner) =
       FileInfo(forPath.toAbsolutePath.toString).handleElevation.digest[FileType]
   }
