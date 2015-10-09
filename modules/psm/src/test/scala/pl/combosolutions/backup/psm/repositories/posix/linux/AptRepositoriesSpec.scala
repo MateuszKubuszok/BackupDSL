@@ -2,14 +2,17 @@ package pl.combosolutions.backup.psm.repositories.posix.linux
 
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
+import org.specs2.specification.Scope
 import pl.combosolutions.backup.AsyncResult
 import pl.combosolutions.backup.psm.elevation.{ ElevationMode, ObligatoryElevationMode, TestElevationFacadeComponent }
 import pl.combosolutions.backup.psm.operations.Cleaner
-import pl.combosolutions.backup.psm.programs.Program
+import pl.combosolutions.backup.psm.programs.{ Result, Program }
 import pl.combosolutions.backup.psm.programs.posix.linux._
 import pl.combosolutions.backup.psm.programs.posix.linux.AptPrograms._
 import pl.combosolutions.backup.psm.repositories.{ AptRepository, UnversionedPackage, VersionedPackage }
 import pl.combosolutions.backup.test.AsyncResultSpecificationHelper
+
+import scala.reflect.ClassTag
 
 class AptRepositoriesSpec extends Specification with Mockito with AsyncResultSpecificationHelper {
 
@@ -18,18 +21,13 @@ class AptRepositoriesSpec extends Specification with Mockito with AsyncResultSpe
 
   "AptRepositoriesService" should {
 
-    "obtain available repositories" in {
+    "obtain available repositories" in new TestContext(classOf[ListAptRepos], classOf[List[AptRepository]]) {
       // given
-      type ProgramType = Program[ListAptRepos]
-      type ResultType = List[AptRepository]
-      type InterpreterType = ListAptReposInterpreter[ResultType]
+      implicit val e = elevationMode
+      implicit val c = cleaner
       val repository = AptRepository(true, "test", "test", List(), List())
       val repositories = List(repository)
-      val program = mock[ProgramType]
-      implicit val elevationMode = mock[ElevationMode]
-      implicit val cleaner = new Cleaner {}
-      program.digest[ResultType](any[InterpreterType]) returns AsyncResult.some(repositories)
-      elevationMode(any[ProgramType], ===(cleaner)) returns program
+      makeDigestReturn(repositories)
 
       // when
       val result = service.obtainRepositories
@@ -38,18 +36,13 @@ class AptRepositoriesSpec extends Specification with Mockito with AsyncResultSpe
       await(result) must beSome(repositories)
     }
 
-    "add repositories" in {
+    "add repositories" in new TestContext(classOf[AptAddRepository], classOf[Boolean]) {
       // given
-      type ProgramType = Program[AptAddRepository]
-      type ResultType = Boolean
-      type InterpreterType = AptAddRepositoryInterpreter[ResultType]
+      implicit val e = elevationMode
+      implicit val c = cleaner
       val repository = AptRepository(true, "test", "test", List(), List())
       val repositories = List(repository)
-      val program = mock[ProgramType]
-      implicit val elevationMode = mock[ObligatoryElevationMode]
-      implicit val cleaner = new Cleaner {}
-      program.digest[ResultType](any[InterpreterType]) returns AsyncResult.some(true)
-      elevationMode(any[ProgramType], ===(cleaner)) returns program
+      makeDigestReturn(true)
 
       // when
       val result = service addRepositories repositories
@@ -58,18 +51,13 @@ class AptRepositoriesSpec extends Specification with Mockito with AsyncResultSpe
       await(result) must beSome(true)
     }
 
-    "remove repositories" in {
+    "remove repositories" in new TestContext(classOf[AptRemoveRepository], classOf[Boolean]) {
       // given
-      type ProgramType = Program[AptRemoveRepository]
-      type ResultType = Boolean
-      type InterpreterType = AptRemoveRepositoryInterpreter[ResultType]
+      implicit val e = elevationMode
+      implicit val c = cleaner
       val repository = AptRepository(true, "test", "test", List(), List())
       val repositories = List(repository)
-      val program = mock[ProgramType]
-      implicit val elevationMode = mock[ObligatoryElevationMode]
-      implicit val cleaner = new Cleaner {}
-      program.digest[ResultType](any[InterpreterType]) returns AsyncResult.some(true)
-      elevationMode(any[ProgramType], ===(cleaner)) returns program
+      makeDigestReturn(true)
 
       // when
       val result = service removeRepositories repositories
@@ -78,18 +66,13 @@ class AptRepositoriesSpec extends Specification with Mockito with AsyncResultSpe
       await(result) must beSome(true)
     }
 
-    "install packages" in {
+    "install packages" in new TestContext(classOf[AptGetInstall], classOf[Boolean]) {
       // given
-      type ProgramType = Program[AptGetInstall]
-      type ResultType = Boolean
-      type InterpreterType = AptGetInstallInterpreter[ResultType]
+      implicit val e = elevationMode
+      implicit val c = cleaner
       val package_ = UnversionedPackage("test")
       val packages = List(package_)
-      val program = mock[ProgramType]
-      implicit val elevationMode = mock[ObligatoryElevationMode]
-      implicit val cleaner = new Cleaner {}
-      program.digest[ResultType](any[InterpreterType]) returns AsyncResult.some(true)
-      elevationMode(any[ProgramType], ===(cleaner)) returns program
+      makeDigestReturn(true)
 
       // when
       val result = service installAll packages
@@ -98,18 +81,13 @@ class AptRepositoriesSpec extends Specification with Mockito with AsyncResultSpe
       await(result) must beSome(true)
     }
 
-    "check if all packages are installed" in {
+    "check if all packages are installed" in new TestContext(classOf[DpkgList], classOf[List[VersionedPackage]]) {
       // given
-      type ProgramType = Program[DpkgList]
-      type ResultType = List[VersionedPackage]
-      type InterpreterType = DpkgListInterpreter[ResultType]
+      implicit val e = elevationMode
+      implicit val c = cleaner
       val package_ = VersionedPackage("test", "test")
       val packages = List(package_)
-      val program = mock[ProgramType]
-      implicit val elevationMode = mock[ObligatoryElevationMode]
-      implicit val cleaner = new Cleaner {}
-      program.digest[ResultType](any[InterpreterType]) returns AsyncResult.some(packages)
-      elevationMode(any[ProgramType], ===(cleaner)) returns program
+      makeDigestReturn(packages)
 
       // when
       val result = service areAllInstalled packages
@@ -117,5 +95,24 @@ class AptRepositoriesSpec extends Specification with Mockito with AsyncResultSpe
       // then
       await(result) must beSome(true)
     }
+  }
+
+  class TestContext[ProgramType <: Program[ProgramType], ResultType](
+      programClass: Class[ProgramType],
+      resultClass: Class[ResultType]) extends Scope {
+
+    type InterpreterType = Result[ProgramType]#Interpreter[ResultType]
+
+    implicit val programTag: ClassTag[ProgramType] = ClassTag(programClass)
+    implicit val resultTag: ClassTag[InterpreterType] = ClassTag(classOf[InterpreterType])
+
+    val program = mock[Program[ProgramType]]
+    val elevationMode = mock[ObligatoryElevationMode]
+    val cleaner = new Cleaner {}
+
+    elevationMode[ProgramType](any[ProgramType], ===(cleaner)) returns program
+
+    def makeDigestReturn(result: ResultType): Unit =
+      program.digest[ResultType](any[InterpreterType]) returns AsyncResult.some(result)
   }
 }
