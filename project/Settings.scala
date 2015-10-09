@@ -6,6 +6,8 @@ import sbt._
 import sbt.Keys._
 
 import Settings._
+import scoverage.ScoverageKeys._
+import scoverage.ScoverageSbtPlugin
 
 object Settings extends Dependencies {
 
@@ -41,7 +43,8 @@ object Settings extends Dependencies {
     libraryDependencies ++= mainDeps,
     libraryDependencies ++= testDeps map (_ % "test"),
 
-    testOptions in Test += excludeTags(platformTestTag)
+    testOptions in Test += excludeTags(platformTestTag),
+    coverageEnabled := true
   )
 
   private val commonSettings = scalariformSettings ++ customSettings
@@ -56,7 +59,8 @@ object Settings extends Dependencies {
       configs(config).
       settings(inConfig(config)(testTasks): _*).
       settings(testOptions in config := Seq(includeTags(tag))).
-      settings(libraryDependencies ++= testDeps map (_ % tag))
+      settings(libraryDependencies ++= testDeps map (_ % tag)).
+      enablePlugins(ScoverageSbtPlugin)
 
     protected def configureSequential() = configure.
       settings(testOptions in config ++= Seq(sequential)).
