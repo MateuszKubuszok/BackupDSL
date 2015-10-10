@@ -2,6 +2,8 @@ package pl.combosolutions.backup.psm.elevation.windows
 
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
+import pl.combosolutions.backup.Result
+import pl.combosolutions.backup.psm.commands.TestCommand
 import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.GenericProgram
 import pl.combosolutions.backup.test.Tags.UnitTest
@@ -9,11 +11,12 @@ import pl.combosolutions.backup.test.Tags.UnitTest
 class WindowsElevationSpec extends Specification with Mockito {
 
   val service = EmptyElevationServiceComponent.elevationService
+  val command = TestCommand(Result(0, List(), List()))
   val program = GenericProgram("test", List())
 
   "EmptyElevationService" should {
 
-    "only mock direct elevation" in {
+    "only mock direct program elevation" in {
       // given
       val expected = program
 
@@ -24,7 +27,19 @@ class WindowsElevationSpec extends Specification with Mockito {
       result mustEqual expected
     } tag UnitTest
 
-    "only mock remote elevation" in {
+    "only mock remote command elevation" in {
+      // given
+      val cleaner = new Cleaner {}
+      val expected = command
+
+      // when
+      val result = service elevateRemote (command, cleaner)
+
+      // then
+      result mustEqual expected
+    } tag UnitTest
+
+    "only mock remote program elevation" in {
       // given
       val cleaner = new Cleaner {}
       val expected = program

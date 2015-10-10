@@ -3,6 +3,7 @@ package pl.combosolutions.backup.psm.elevation
 import pl.combosolutions.backup.psm.ImplementationPriority._
 import pl.combosolutions.backup.psm.ImplementationResolver
 import pl.combosolutions.backup.psm.PsmExceptionMessages.NoElevationAvailable
+import pl.combosolutions.backup.psm.commands.Command
 import pl.combosolutions.backup.psm.elevation.posix.SudoElevationServiceComponent
 import pl.combosolutions.backup.psm.elevation.posix.linux.{ GKSudoElevationServiceComponent, KDESudoElevationServiceComponent }
 import pl.combosolutions.backup.psm.elevation.windows.{ EmptyElevationServiceComponent, UACElevationServiceComponent }
@@ -20,6 +21,8 @@ trait ElevationService {
   val elevationArgs: List[String] = List()
 
   def elevateDirect[T <: Program[T]](program: Program[T]): Program[T]
+
+  def elevateRemote[T <: Command[T]](command: Command[T], cleaner: Cleaner): Command[T]
 
   def elevateRemote[T <: Program[T]](program: Program[T], cleaner: Cleaner): Program[T]
 }

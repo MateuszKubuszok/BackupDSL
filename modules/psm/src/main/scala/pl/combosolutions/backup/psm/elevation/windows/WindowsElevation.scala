@@ -1,6 +1,7 @@
 package pl.combosolutions.backup.psm.elevation.windows
 
 import pl.combosolutions.backup.ReportException
+import pl.combosolutions.backup.psm.commands.Command
 import pl.combosolutions.backup.psm.elevation.{ ElevationFacadeComponent, ElevationFacadeComponentImpl, ElevationService, ElevationServiceComponent }
 import pl.combosolutions.backup.psm.systems._
 import pl.combosolutions.backup.psm.operations.Cleaner
@@ -19,6 +20,8 @@ trait EmptyElevationServiceComponent extends ElevationServiceComponent {
     override val elevationCMD: String = ""
 
     override def elevateDirect[T <: Program[T]](program: Program[T]): Program[T] = program
+
+    override def elevateRemote[T <: Command[T]](command: Command[T], cleaner: Cleaner): Command[T] = command
 
     override def elevateRemote[T <: Program[T]](program: Program[T], cleaner: Cleaner): Program[T] = program
   }
@@ -47,6 +50,9 @@ trait UACElevationServiceComponent extends ElevationServiceComponent {
     override val elevationCMD: String = ""
 
     override def elevateDirect[T <: Program[T]](program: Program[T]): Program[T] = ReportException onToDoCodeIn getClass
+
+    override def elevateRemote[T <: Command[T]](command: Command[T], cleaner: Cleaner): Command[T] =
+      ReportException onToDoCodeIn getClass
 
     override def elevateRemote[T <: Program[T]](program: Program[T], cleaner: Cleaner): Program[T] =
       ReportException onToDoCodeIn getClass

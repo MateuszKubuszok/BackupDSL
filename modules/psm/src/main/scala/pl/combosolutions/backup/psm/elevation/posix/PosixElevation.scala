@@ -1,5 +1,6 @@
 package pl.combosolutions.backup.psm.elevation.posix
 
+import pl.combosolutions.backup.psm.commands.Command
 import pl.combosolutions.backup.psm.elevation._
 import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.Program
@@ -20,6 +21,9 @@ trait CommonElevationServiceComponent extends ElevationServiceComponent {
 
     override def elevateDirect[T <: Program[T]](program: Program[T]) =
       DirectElevatorProgram[T](program, this)
+
+    override def elevateRemote[T <: Command[T]](command: Command[T], cleaner: Cleaner) =
+      RemoteElevatorCommand[T](command, elevationFacadeFor(cleaner))
 
     override def elevateRemote[T <: Program[T]](program: Program[T], cleaner: Cleaner) =
       RemoteElevatorProgram[T](program, elevationFacadeFor(cleaner))

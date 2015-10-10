@@ -1,8 +1,7 @@
 package pl.combosolutions.backup.psm.elevation
 
-import pl.combosolutions.backup.{ Async, Logging, Result }
+import pl.combosolutions.backup.{ Async, Executable, Logging, Result }
 import pl.combosolutions.backup.psm.operations.Cleaner
-import pl.combosolutions.backup.psm.programs.GenericProgram
 
 private[elevation] object ElevationFacade {
 
@@ -28,7 +27,7 @@ private[elevation] class ElevationFacade(rmiManager: RmiManager) extends Logging
   waitForReadiness
   private val client = rmiManager createClient (serverName, remotePort)
 
-  def runRemotely(program: GenericProgram): Async[Result[GenericProgram]] = client executeRemote program
+  def runRemotely[T <: Executable[T]](executable: Executable[T]): Async[Result[T]] = client executeRemote executable
 
   def close = {
     client.terminate

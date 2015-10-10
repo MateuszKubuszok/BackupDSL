@@ -5,6 +5,7 @@ import java.rmi.registry.Registry
 import org.specs2.matcher.Scope
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
+import pl.combosolutions.backup.psm.commands.TestCommand
 import pl.combosolutions.backup.{ Async, Result }
 import pl.combosolutions.backup.psm.programs.GenericProgram
 import pl.combosolutions.backup.test.AsyncSpecificationHelper
@@ -18,6 +19,20 @@ class ElevationFacadeSpec extends Specification with Mockito with AsyncSpecifica
   val remoteName = "test"
 
   "ElevationFacade" should {
+
+    "run command on a remote server" in new TestContext {
+      // given
+      val expected = Result[GenericProgram](0, List(), List())
+      val command = TestCommand(expected)
+      (client executeRemote command) returns (Async some expected.asSpecific)
+
+      // when
+      val facade = new TestElevationFacade(rmiManager)
+      val result = facade runRemotely command
+
+      // then
+      await(result) must beSome(expected)
+    } tag UnitTest
 
     "run program on a remote server" in new TestContext {
       // given
