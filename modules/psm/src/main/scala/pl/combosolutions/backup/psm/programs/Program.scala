@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.psm.programs
 
-import pl.combosolutions.backup.{ Async, Logging, Result }
+import pl.combosolutions.backup.{ Executable, Async, Logging, Result }
 import pl.combosolutions.backup.psm.ExecutionContexts.Program.context
 
 import scala.collection.mutable
@@ -47,13 +47,13 @@ object Program extends ProgramExecutor
 
 import Program._
 
-class Program[T <: Program[T]](val name: String, val arguments: List[String]) extends Serializable {
+class Program[T <: Program[T]](val name: String, val arguments: List[String]) extends Executable[T] {
 
-  def run: Async[Result[T]] = execute(this)
+  override def run: Async[Result[T]] = execute(this)
 
   def run2Kill: Process = execute2Kill(this)
 
-  def digest[U](implicit interpreter: Result[T]#Interpreter[U]): Async[U] = (for {
+  override def digest[U](implicit interpreter: Result[T]#Interpreter[U]): Async[U] = (for {
     result <- optionT[Future](run)
   } yield result.interpret(interpreter)).run
 

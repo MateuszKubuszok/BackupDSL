@@ -1,8 +1,15 @@
 package pl.combosolutions.backup.psm.commands
 
-import pl.combosolutions.backup.{ Async, Result }
+import pl.combosolutions.backup._
+import pl.combosolutions.backup.psm.ExecutionContexts.Command.context
 
-trait Command[T <: Command[T]] extends Serializable {
+import scala.concurrent.Future
+import scalaz.OptionT._
+import scalaz.std.scalaFuture._
 
-  def execute(): Async[Result[T]]
+trait Command[T <: Command[T]] extends Executable[T] {
+
+  override def digest[U](implicit interpreter: Result[T]#Interpreter[U]): Async[U] = (for {
+    result <- optionT[Future](run)
+  } yield result.interpret(interpreter)).run
 }

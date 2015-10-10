@@ -9,6 +9,7 @@ import scala.concurrent.ExecutionContext
 
 object ExecutionContexts {
 
+  private val commandProxy = new ExecutionContextsProxy
   private val programProxy = new ExecutionContextsProxy
   private val taskProxy = new ExecutionContextsProxy
 
@@ -20,6 +21,10 @@ object ExecutionContexts {
 
   def setTaskSize(poolSize: Integer): Unit =
     taskProxy setExecutionContextTo (ExecutionContext fromExecutor (Executors newFixedThreadPool poolSize))
+
+  object Command {
+    implicit val context: ExecutionContext = commandProxy
+  }
 
   object Program {
     implicit val context: ExecutionContext = programProxy

@@ -2,8 +2,7 @@ package pl.combosolutions.backup.psm.elevation
 
 import java.rmi.{ Remote, RemoteException }
 
-import pl.combosolutions.backup.{ Logging, Result }
-import pl.combosolutions.backup.psm.programs.GenericProgram
+import pl.combosolutions.backup.{ Executable, Logging, Result }
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -11,7 +10,7 @@ import scala.concurrent.duration.Duration
 sealed trait ElevationServer extends Remote {
 
   @throws(classOf[RemoteException])
-  def runRemote(program: GenericProgram): Option[Result[GenericProgram]]
+  def runRemote(executable: Executable[_]): Option[Result[_]]
 
   @throws(classOf[RemoteException])
   def terminate: Unit
@@ -24,9 +23,9 @@ object ElevationServer {
 
 private[elevation] final class ElevationServerImpl extends ElevationServer with Logging {
 
-  def runRemote(program: GenericProgram): Option[Result[GenericProgram]] = {
-    logger debug s"Run ${program} remotely"
-    Await result (program.run, Duration.Inf)
+  def runRemote(executable: Executable[_]): Option[Result[_]] = {
+    logger debug s"Run ${executable} remotely"
+    Await result (executable.run, Duration.Inf)
   }
 
   def terminate: Unit = System exit 0

@@ -2,22 +2,21 @@ package pl.combosolutions.backup.psm.elevation
 
 import java.rmi.registry.LocateRegistry
 
-import pl.combosolutions.backup.{ Async, Logging, Result }
+import pl.combosolutions.backup.{ Executable, Async, Logging, Result }
 import pl.combosolutions.backup.psm.ExecutionContexts.Program.context
-import pl.combosolutions.backup.psm.programs.GenericProgram
 
 import scala.util.{ Failure, Success, Try }
 
 private[elevation] class ElevationClient(var name: String, val remotePort: Integer) extends Logging {
 
-  def executeRemote(program: GenericProgram): Async[Result[GenericProgram]] = Async {
-    logger debug s"Sending remote command: ${program}"
+  def executeRemote[T <: Executable[T]](executable: Executable[T]): Async[Result[T]] = Async {
+    logger debug s"Sending remote command: ${executable}"
     Try {
-      server runRemote program
+      server runRemote executable
     } match {
       case Success(result) =>
-        logger trace s"Received remote result ${program} for command ${program}"
-        result
+        logger trace s"Received remote result for command ${executable}"
+        result.asInstanceOf[Option[Result[T]]]
       case Failure(ex) =>
         logger error ("Remote execution failed", ex)
         throw ex
