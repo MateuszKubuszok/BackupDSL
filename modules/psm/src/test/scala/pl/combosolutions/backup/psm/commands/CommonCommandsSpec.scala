@@ -23,6 +23,30 @@ class CommonCommandsSpec extends Specification with Mockito {
       result must beSome(Result[CopyCommand](0, List(fromFileName), List())).await
       there was one(command.testFilesService).copy(===(fromPath), ===(intoPath))
     } tag UnitTest
+
+    "be digested to Boolean with built-in Interpreter" in new TestCopyContext {
+      // given
+      import CommonCommands.CopyCommand2Boolean
+      val expected = true
+
+      // when
+      val result = command.digest[Boolean]
+
+      // then
+      result must beSome(expected).await
+    } tag UnitTest
+
+    "be digested to (List[String],List[String]) with built-in Interpreter" in new TestCopyContext {
+      // given
+      import CommonCommands.CopyCommand2Tuple
+      val expected = (List(fromFileName), List[String]())
+
+      // when
+      val result = command.digest[(List[String], List[String])]
+
+      // then
+      result must beSome(expected).await
+    } tag UnitTest
   }
 
   "DeleteCommand" should {
@@ -36,6 +60,30 @@ class CommonCommandsSpec extends Specification with Mockito {
       result must beSome(Result[DeleteCommand](0, List(fileName), List())).await
       there was one(command.testFilesService).delete(===(filePath))
     } tag UnitTest
+
+    "be digested to Boolean with built-in Interpreter" in new TestDeleteContext {
+      // given
+      import CommonCommands.DeleteCommand2Boolean
+      val expected = true
+
+      // when
+      val result = command.digest[Boolean]
+
+      // then
+      result must beSome(expected).await
+    } tag UnitTest
+
+    "be digested to (List[String],List[String]) with built-in Interpreter" in new TestDeleteContext {
+      // given
+      import CommonCommands.DeleteCommand2Tuple
+      val expected = (List(fileName), List[String]())
+
+      // when
+      val result = command.digest[(List[String], List[String])]
+
+      // then
+      result must beSome(expected).await
+    } tag UnitTest
   }
 
   "MoveCommand" should {
@@ -48,6 +96,30 @@ class CommonCommandsSpec extends Specification with Mockito {
       // then
       result must beSome(Result[MoveCommand](0, List(fromFileName), List())).await
       there was one(command.testFilesService).move(===(fromPath), ===(intoPath))
+    } tag UnitTest
+
+    "be digested to Boolean with built-in Interpreter" in new TestMoveContext {
+      // given
+      import CommonCommands.MoveCommand2Boolean
+      val expected = true
+
+      // when
+      val result = command.digest[Boolean]
+
+      // then
+      result must beSome(expected).await
+    } tag UnitTest
+
+    "be digested to (List[String],List[String]) with built-in Interpreter" in new TestMoveContext {
+      // given
+      import CommonCommands.MoveCommand2Tuple
+      val expected = (List(fromFileName), List[String]())
+
+      // when
+      val result = command.digest[(List[String], List[String])]
+
+      // then
+      result must beSome(expected).await
     } tag UnitTest
   }
 

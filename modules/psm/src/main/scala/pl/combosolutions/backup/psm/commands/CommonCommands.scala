@@ -6,11 +6,19 @@ import pl.combosolutions.backup.psm.filesystem.FilesServiceComponentImpl
 import pl.combosolutions.backup.{ Async, Result }
 import pl.combosolutions.backup.psm.ExecutionContexts.Command.context
 
-class CommonCommands {
+object CommonCommands {
 
   type CopyCommandInterpreter[U] = Result[CopyCommand]#Interpreter[U]
   implicit val CopyCommand2Boolean: CopyCommandInterpreter[Boolean] = _.exitValue == 0
   implicit val CopyCommand2Tuple: CopyCommandInterpreter[(List[String], List[String])] = r => (r.stdout, r.stderr)
+
+  type DeleteCommandInterpreter[U] = Result[DeleteCommand]#Interpreter[U]
+  implicit val DeleteCommand2Boolean: DeleteCommandInterpreter[Boolean] = _.exitValue == 0
+  implicit val DeleteCommand2Tuple: DeleteCommandInterpreter[(List[String], List[String])] = r => (r.stdout, r.stderr)
+
+  type MoveCommandInterpreter[U] = Result[MoveCommand]#Interpreter[U]
+  implicit val MoveCommand2Boolean: MoveCommandInterpreter[Boolean] = _.exitValue == 0
+  implicit val MoveCommand2Tuple: MoveCommandInterpreter[(List[String], List[String])] = r => (r.stdout, r.stderr)
 }
 
 private[commands] abstract class FilesCommand[T <: Command[T]]
