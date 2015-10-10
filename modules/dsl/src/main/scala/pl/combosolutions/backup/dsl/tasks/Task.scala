@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.dsl.tasks
 
-import pl.combosolutions.backup.{ AsyncResult, Logging }
+import pl.combosolutions.backup.{ Async, Logging }
 import pl.combosolutions.backup.dsl.Settings
 import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
 
@@ -18,9 +18,9 @@ abstract class Task[PBR, PRR, BR, RR](description: String) extends Logging {
     child
   }
 
-  protected def backup(parentResult: PBR)(implicit withSettings: Settings): AsyncResult[BR]
+  protected def backup(parentResult: PBR)(implicit withSettings: Settings): Async[BR]
 
-  protected def restore(parentResult: PRR)(implicit withSettings: Settings): AsyncResult[RR]
+  protected def restore(parentResult: PRR)(implicit withSettings: Settings): Async[RR]
 
   private[dsl] def performBackupWithResult(parentResult: PBR)(implicit withSettings: Settings): Unit = {
     logger debug s"BACKUP  [${description}}] started"

@@ -22,6 +22,8 @@ trait PosixFileSystemServiceComponent extends FileSystemServiceComponent {
 
     override def getFileType(forPath: Path)(implicit withElevation: ElevationMode, cleaner: Cleaner) =
       FileInfo(forPath.toAbsolutePath.toString).handleElevation.digest[FileType]
+
+    override def isSupportingSymbolicLinks: Boolean = true
   }
 
   object PosixFileSystemService extends PosixFileSystemService

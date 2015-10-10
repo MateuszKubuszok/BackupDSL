@@ -5,11 +5,12 @@ import java.rmi.RemoteException
 import org.specs2.matcher.Scope
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import pl.combosolutions.backup.psm.programs.{ GenericProgram, Result }
-import pl.combosolutions.backup.test.AsyncResultSpecificationHelper
+import pl.combosolutions.backup.Result
+import pl.combosolutions.backup.psm.programs.GenericProgram
+import pl.combosolutions.backup.test.AsyncSpecificationHelper
 import pl.combosolutions.backup.test.Tags.UnitTest
 
-class ElevationClientSpec extends Specification with Mockito with AsyncResultSpecificationHelper {
+class ElevationClientSpec extends Specification with Mockito with AsyncSpecificationHelper {
 
   private val name = "mock-repository"
   private val remotePort = 6000
@@ -17,7 +18,7 @@ class ElevationClientSpec extends Specification with Mockito with AsyncResultSpe
 
   "ElevationClient" should {
 
-    "return Some successful AsyncResult for Some successful response" in new TestContext {
+    "return Some successful Async for Some successful response" in new TestContext {
       // given
       val expected = Result[GenericProgram](0, List(), List())
       (server runRemote program) returns Some(expected)
@@ -29,7 +30,7 @@ class ElevationClientSpec extends Specification with Mockito with AsyncResultSpe
       result must beSome(expected)
     } tag UnitTest
 
-    "return None successful AsyncResult for None successful response" in new TestContext {
+    "return None successful Async for None successful response" in new TestContext {
       // given
       (server runRemote program) returns None
 
@@ -40,7 +41,7 @@ class ElevationClientSpec extends Specification with Mockito with AsyncResultSpe
       result must beNone
     } tag UnitTest
 
-    "return failed AsyncResult for failed request" in new TestContext {
+    "return failed Async for failed request" in new TestContext {
       // given
       (server runRemote program) throws (new RemoteException("test exception"))
 

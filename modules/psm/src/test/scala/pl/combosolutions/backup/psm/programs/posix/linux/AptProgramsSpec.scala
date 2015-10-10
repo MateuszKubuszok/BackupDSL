@@ -2,8 +2,8 @@ package pl.combosolutions.backup.psm.programs.posix.linux
 
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import pl.combosolutions.backup.AsyncResult
-import pl.combosolutions.backup.psm.programs.{ Program, Result, TestProgramHelper }
+import pl.combosolutions.backup.{ Async, Result }
+import pl.combosolutions.backup.psm.programs.{ Program, TestProgramHelper }
 import pl.combosolutions.backup.psm.repositories.posix.linux.AptRepositoriesServiceComponent._
 import pl.combosolutions.backup.psm.repositories.{ VersionedPackage, AptRepository }
 import pl.combosolutions.backup.test.Tags.UnitTest
@@ -154,7 +154,7 @@ class AptProgramsSpec extends Specification with Mockito {
       // given
       import AptPrograms.DpkgList2VersionedPackages
       val program = new Program[DpkgList]("", List()) with TestProgramHelper[DpkgList]
-      program.result = AsyncResult some Result[DpkgList](0, List("ii test-package test-version"), List())
+      program.result = Async some Result[DpkgList](0, List("ii test-package test-version"), List())
 
       // when
       val result = program.digest[List[VersionedPackage]]
@@ -181,7 +181,7 @@ class AptProgramsSpec extends Specification with Mockito {
       import AptPrograms.ListAptRepos2AptRepositories
       val expected = AptRepository(false, "test-package", "test-version", List(), List())
       val program = new Program[ListAptRepos]("", List()) with TestProgramHelper[ListAptRepos]
-      program.result = AsyncResult some Result[ListAptRepos](0, List(s"/etc/apt/sources.list:$expected"), List())
+      program.result = Async some Result[ListAptRepos](0, List(s"/etc/apt/sources.list:$expected"), List())
 
       // when
       val result = program.digest[List[AptRepository]]

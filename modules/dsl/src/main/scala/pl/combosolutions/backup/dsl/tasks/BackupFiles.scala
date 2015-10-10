@@ -2,8 +2,8 @@ package pl.combosolutions.backup.dsl.tasks
 
 import java.nio.file.{ Files, Paths, Path }
 
-import pl.combosolutions.backup.AsyncResult
-import pl.combosolutions.backup.wrapAsyncResultForMapping
+import pl.combosolutions.backup.Async
+import pl.combosolutions.backup.wrapAsyncForMapping
 import pl.combosolutions.backup.dsl.Settings
 import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
 
@@ -19,24 +19,24 @@ object BackupFiles {
 
 case class BackupFiles[PBR, PRR](files: List[String]) extends Task[PBR, PRR, BackupResult, RestoreResult]("backup files") {
 
-  override protected def backup(parentResult: PBR)(implicit withSettings: Settings): AsyncResult[BackupResult] =
+  override protected def backup(parentResult: PBR)(implicit withSettings: Settings): Async[BackupResult] =
     combineSubResults { paths =>
       print(s"Backing up ${paths._2} into ${paths._3}... ")
       paths._3.toFile.mkdirs
       Files.copy(paths._2, paths._3, withSettings.copyOptions: _*)
     }
 
-  override protected def restore(parentResult: PRR)(implicit withSettings: Settings): AsyncResult[RestoreResult] =
+  override protected def restore(parentResult: PRR)(implicit withSettings: Settings): Async[RestoreResult] =
     combineSubResults { paths =>
       print(s"Restoring ${paths._3} into ${paths._2}... ")
       paths._2.toFile.mkdirs
       Files.copy(paths._3, paths._2, withSettings.copyOptions: _*)
     }
 
-  private def combineSubResults(copyAction: ((String, Path, Path)) => Path)(implicit withSettings: Settings): AsyncResult[List[String]] =
-    (AsyncResult incompleteSequence {
+  private def combineSubResults(copyAction: ((String, Path, Path)) => Path)(implicit withSettings: Settings): Async[List[String]] =
+    (Async incompleteSequence {
       hashPaths map { paths =>
-        AsyncResult {
+        Async {
           Try {
             copyAction(paths)
           } match {

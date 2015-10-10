@@ -2,7 +2,7 @@ package pl.combosolutions.backup.dsl.tasks.beta
 
 import java.nio.file.{ Files, Path, Paths }
 
-import pl.combosolutions.backup.{ AsyncResult, Reporting }
+import pl.combosolutions.backup.{ Async, Reporting }
 import pl.combosolutions.backup.dsl.tasks.beta.BackupFiles.{ BackupSubTaskBuilder, RestoreSubTaskBuilder }
 import pl.combosolutions.backup.dsl.Settings
 import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
@@ -11,7 +11,7 @@ import scala.util.{ Failure, Success, Try }
 
 object BackupFiles extends Reporting {
 
-  private def backupPassedFilesAction(implicit withSettings: Settings): (List[Path]) => AsyncResult[List[Path]] =
+  private def backupPassedFilesAction(implicit withSettings: Settings): (List[Path]) => Async[List[Path]] =
     (files: List[Path]) =>
       combineSubResults(files) { paths =>
         reporter details s"Backing up ${paths._2} into ${paths._3}... "
@@ -19,7 +19,7 @@ object BackupFiles extends Reporting {
         Files.copy(paths._2, paths._3, withSettings.copyOptions: _*) // TODO: compress into TAR archive and allow elevation
       }
 
-  private def restorePassedFilesAction(implicit withSettings: Settings): (List[Path]) => AsyncResult[List[Path]] =
+  private def restorePassedFilesAction(implicit withSettings: Settings): (List[Path]) => Async[List[Path]] =
     (files: List[Path]) =>
       combineSubResults(files) { paths =>
         reporter details s"Restoring ${paths._3} into ${paths._2}... "
@@ -27,10 +27,10 @@ object BackupFiles extends Reporting {
         Files.copy(paths._3, paths._2, withSettings.copyOptions: _*) // TODO: compress into TAR archive and allow elevation
       }
 
-  private def combineSubResults(files: List[Path])(copyAction: ((Path, Path, Path)) => Path)(implicit withSettings: Settings): AsyncResult[List[Path]] =
-    AsyncResult incompleteSequence {
+  private def combineSubResults(files: List[Path])(copyAction: ((Path, Path, Path)) => Path)(implicit withSettings: Settings): Async[List[Path]] =
+    Async incompleteSequence {
       hashPaths(files) map { paths =>
-        AsyncResult {
+        Async {
           Try {
             copyAction(paths)
           } match {

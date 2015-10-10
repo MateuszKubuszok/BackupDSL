@@ -2,13 +2,13 @@ package pl.combosolutions.backup.psm.elevation
 
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import pl.combosolutions.backup.AsyncResult
-import pl.combosolutions.backup.psm.programs.{ GenericProgram, Result }
+import pl.combosolutions.backup.{ Async, Result }
+import pl.combosolutions.backup.psm.programs.GenericProgram
 import pl.combosolutions.backup.psm.programs.posix.GrepFiles
+import pl.combosolutions.backup.test.AsyncSpecificationHelper
 import pl.combosolutions.backup.test.Tags.UnitTest
-import pl.combosolutions.backup.test.{ Tags, AsyncResultSpecificationHelper }
 
-class ElevatorProgramsSpec extends Specification with Mockito with AsyncResultSpecificationHelper {
+class ElevatorProgramsSpec extends Specification with Mockito with AsyncSpecificationHelper {
 
   val program = GrepFiles("1", List("2", "3"))
   val programName = program.name
@@ -41,7 +41,7 @@ class ElevatorProgramsSpec extends Specification with Mockito with AsyncResultSp
       // given
       val elevationFacade = mock[ElevationFacade]
       val expected = Result[GenericProgram](0, List(), List())
-      (elevationFacade runRemotely any[GenericProgram]) returns (AsyncResult some expected)
+      (elevationFacade runRemotely any[GenericProgram]) returns (Async some expected)
 
       // when
       val result = RemoteElevatorProgram(program, elevationFacade).run

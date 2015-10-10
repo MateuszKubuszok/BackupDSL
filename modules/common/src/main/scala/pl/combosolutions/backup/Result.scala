@@ -1,4 +1,4 @@
-package pl.combosolutions.backup.psm.programs
+package pl.combosolutions.backup
 
 case class Result[T](exitValue: Int, stdout: List[String], stderr: List[String]) {
 

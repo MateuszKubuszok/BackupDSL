@@ -1,5 +1,6 @@
 package pl.combosolutions.backup.psm.programs
 
+import pl.combosolutions.backup.Result
 import pl.combosolutions.backup.psm.ExecutionContexts.Program.context
 import Program._
 

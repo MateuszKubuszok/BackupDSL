@@ -1,9 +1,9 @@
 package pl.combosolutions.backup.psm.programs.posix
 
-import pl.combosolutions.backup.ReportException
+import pl.combosolutions.backup.{ ReportException, Result }
 import pl.combosolutions.backup.psm.PsmExceptionMessages.UnknownFileType
 import pl.combosolutions.backup.psm.filesystem.FileType.{ Directory, File, FileType, SymbolicLink }
-import pl.combosolutions.backup.psm.programs.{ Program, Result }
+import pl.combosolutions.backup.psm.programs.Program
 
 object PosixPrograms {
 

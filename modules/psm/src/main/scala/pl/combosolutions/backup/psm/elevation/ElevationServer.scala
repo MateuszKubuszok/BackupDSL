@@ -2,8 +2,8 @@ package pl.combosolutions.backup.psm.elevation
 
 import java.rmi.{ Remote, RemoteException }
 
-import pl.combosolutions.backup.Logging
-import pl.combosolutions.backup.psm.programs.{ GenericProgram, Result }
+import pl.combosolutions.backup.{ Logging, Result }
+import pl.combosolutions.backup.psm.programs.GenericProgram
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration

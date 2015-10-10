@@ -3,12 +3,13 @@ package pl.combosolutions.backup.psm.programs
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-import pl.combosolutions.backup.test.AsyncResultSpecificationHelper
+import pl.combosolutions.backup.Result
+import pl.combosolutions.backup.test.AsyncSpecificationHelper
 import pl.combosolutions.backup.test.Tags.UnitTest
 
 import scala.sys.process.{ Process, ProcessBuilder, ProcessLogger }
 
-class ProgramSpec extends Specification with Mockito with AsyncResultSpecificationHelper {
+class ProgramSpec extends Specification with Mockito with AsyncSpecificationHelper {
 
   "Program$" should {
 

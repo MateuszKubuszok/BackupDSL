@@ -3,18 +3,18 @@ package pl.combosolutions.backup.psm.repositories.posix.linux
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-import pl.combosolutions.backup.AsyncResult
+import pl.combosolutions.backup.{ Async, Result }
 import pl.combosolutions.backup.psm.elevation.{ ObligatoryElevationMode, TestElevationFacadeComponent }
 import pl.combosolutions.backup.psm.operations.Cleaner
-import pl.combosolutions.backup.psm.programs.{ Result, Program }
+import pl.combosolutions.backup.psm.programs.Program
 import pl.combosolutions.backup.psm.programs.posix.linux._
 import pl.combosolutions.backup.psm.repositories.{ AptRepository, UnversionedPackage, VersionedPackage }
-import pl.combosolutions.backup.test.AsyncResultSpecificationHelper
+import pl.combosolutions.backup.test.AsyncSpecificationHelper
 import pl.combosolutions.backup.test.Tags.UnitTest
 
 import scala.reflect.ClassTag
 
-class AptRepositoriesSpec extends Specification with Mockito with AsyncResultSpecificationHelper {
+class AptRepositoriesSpec extends Specification with Mockito with AsyncSpecificationHelper {
 
   val component = new AptRepositoriesServiceComponent with TestElevationFacadeComponent
   val service = component.repositoriesService
@@ -113,6 +113,6 @@ class AptRepositoriesSpec extends Specification with Mockito with AsyncResultSpe
     elevationMode[ProgramType](any[ProgramType], ===(cleaner)) returns program
 
     def makeDigestReturn(result: ResultType): Unit =
-      program.digest[ResultType](any[InterpreterType]) returns AsyncResult.some(result)
+      program.digest[ResultType](any[InterpreterType]) returns Async.some(result)
   }
 }

@@ -1,7 +1,7 @@
 package pl.combosolutions.backup.psm.repositories.posix.linux
 
-import pl.combosolutions.backup.AsyncResult
-import pl.combosolutions.backup.wrapAsyncResultForMapping
+import pl.combosolutions.backup.Async
+import pl.combosolutions.backup.wrapAsyncForMapping
 import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
 import pl.combosolutions.backup.psm.elevation.{ ElevateIfNeeded, ElevationMode, ObligatoryElevationMode }
 import ElevateIfNeeded._
@@ -32,11 +32,11 @@ trait AptRepositoriesServiceComponent extends RepositoriesServiceComponent {
     // format: OFF
     override def addRepositories(repositories: Repositories)
                                 (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
-      areAllTrueWithinAsyncResults(asApt(repositories) map (AptAddRepository(_).handleElevation.digest[Boolean]))
+      areAllTrueWithinAsyncs(asApt(repositories) map (AptAddRepository(_).handleElevation.digest[Boolean]))
 
     override def removeRepositories(repositories: Repositories)
                                    (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
-      areAllTrueWithinAsyncResults(asApt(repositories) map (AptRemoveRepository(_).handleElevation.digest[Boolean]))
+      areAllTrueWithinAsyncs(asApt(repositories) map (AptRemoveRepository(_).handleElevation.digest[Boolean]))
 
     override def installAll(packages: Packages)
                            (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
@@ -50,8 +50,8 @@ trait AptRepositoriesServiceComponent extends RepositoriesServiceComponent {
 
     private def asApt(list: Repositories) = list collect { case ar: AptRepository => ar }
 
-    private def areAllTrueWithinAsyncResults(futureOptBooleans: List[AsyncResult[Boolean]]): AsyncResult[Boolean] =
-      (AsyncResult completeSequence futureOptBooleans).asAsync map (_ forall identity)
+    private def areAllTrueWithinAsyncs(futureOptBooleans: List[Async[Boolean]]): Async[Boolean] =
+      (Async completeSequence futureOptBooleans).asAsync map (_ forall identity)
   }
 
   object AptRepositoriesService extends AptRepositoriesService

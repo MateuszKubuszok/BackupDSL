@@ -5,14 +5,14 @@ import java.rmi.registry.Registry
 import org.specs2.matcher.Scope
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import pl.combosolutions.backup.AsyncResult
-import pl.combosolutions.backup.psm.programs.{ GenericProgram, Result }
-import pl.combosolutions.backup.test.AsyncResultSpecificationHelper
+import pl.combosolutions.backup.{ Async, Result }
+import pl.combosolutions.backup.psm.programs.GenericProgram
+import pl.combosolutions.backup.test.AsyncSpecificationHelper
 import pl.combosolutions.backup.test.Tags.UnitTest
 
 import scala.sys.process.Process
 
-class ElevationFacadeSpec extends Specification with Mockito with AsyncResultSpecificationHelper {
+class ElevationFacadeSpec extends Specification with Mockito with AsyncSpecificationHelper {
 
   val remotePort: Integer = 6666
   val remoteName = "test"
@@ -23,7 +23,7 @@ class ElevationFacadeSpec extends Specification with Mockito with AsyncResultSpe
       // given
       val program = GenericProgram("test", List())
       val expected = Result[GenericProgram](0, List(), List())
-      (client executeRemote program) returns (AsyncResult some expected)
+      (client executeRemote program) returns (Async some expected)
 
       // when
       val facade = new TestElevationFacade(rmiManager)

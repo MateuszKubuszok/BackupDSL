@@ -1,6 +1,7 @@
 package pl.combosolutions.backup.psm.programs.posix.linux
 
-import pl.combosolutions.backup.psm.programs.{ ProgramAlias, Program, Result }
+import pl.combosolutions.backup.Result
+import pl.combosolutions.backup.psm.programs.{ ProgramAlias, Program }
 import pl.combosolutions.backup.psm.programs.posix.GrepFiles
 import pl.combosolutions.backup.psm.repositories
 import pl.combosolutions.backup.psm.repositories.{ AptRepository, VersionedPackage }

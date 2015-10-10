@@ -4,16 +4,16 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 package object backup {
 
-  type AsyncResult[U] = Future[Option[U]]
+  type Async[U] = Future[Option[U]]
 
-  implicit def wrapAsyncResultForMapping[Result](result: AsyncResult[Result]) = new AsyncResultTransformer(result)
+  implicit def wrapAsyncForMapping[Result](result: Async[Result]) = new AsyncTransformer(result)
 
-  implicit class AsyncResultTransformer[Result](result: AsyncResult[Result]) {
+  implicit class AsyncTransformer[Result](result: Async[Result]) {
 
     def asAsync = this
 
-    def flatMap[NewResult](function: Result => AsyncResult[NewResult])(implicit executor: ExecutionContext) = AsyncResult.flatMap(result, function)
+    def flatMap[NewResult](function: Result => Async[NewResult])(implicit executor: ExecutionContext) = Async.flatMap(result, function)
 
-    def map[NewResult](function: Result => NewResult)(implicit executor: ExecutionContext) = AsyncResult.map(result, function)
+    def map[NewResult](function: Result => NewResult)(implicit executor: ExecutionContext) = Async.map(result, function)
   }
 }

@@ -2,7 +2,7 @@ package pl.combosolutions.backup.psm.filesystem
 
 import java.nio.file.Path
 
-import pl.combosolutions.backup.AsyncResult
+import pl.combosolutions.backup.Async
 import pl.combosolutions.backup.psm.ImplementationPriority._
 import pl.combosolutions.backup.psm.ImplementationResolver
 import pl.combosolutions.backup.psm.PsmExceptionMessages.NoFileSystemAvailable
@@ -11,15 +11,15 @@ import pl.combosolutions.backup.psm.filesystem.FileType._
 import pl.combosolutions.backup.psm.filesystem.posix.PosixFileSystemServiceComponent
 import pl.combosolutions.backup.psm.operations.Cleaner
 
-import scala.util.matching.Regex
-
 import FileSystemServiceComponentImpl.resolve
 
 trait FileSystemService {
 
   val fileSystemAvailable: Boolean
 
-  def getFileType(forPath: Path)(implicit withElevation: ElevationMode, cleaner: Cleaner): AsyncResult[FileType]
+  def getFileType(forPath: Path)(implicit withElevation: ElevationMode, cleaner: Cleaner): Async[FileType]
+
+  def isSupportingSymbolicLinks: Boolean
 
   /* // TODO
   def createSymlink(from: Path, to: Path, withElevation: Boolean) = throw new NotImplementedError("TODO")

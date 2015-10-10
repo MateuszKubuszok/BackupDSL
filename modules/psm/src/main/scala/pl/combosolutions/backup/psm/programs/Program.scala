@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.psm.programs
 
-import pl.combosolutions.backup.{ AsyncResult, Logging }
+import pl.combosolutions.backup.{ Async, Logging, Result }
 import pl.combosolutions.backup.psm.ExecutionContexts.Program.context
 
 import scala.collection.mutable
@@ -14,7 +14,7 @@ private[programs] trait ProgramExecutor extends Logging {
 
   def apply(name: String, arguments: String*) = GenericProgram(name, arguments.toList)
 
-  def execute[T <: Program[T]](program: Program[T]): AsyncResult[Result[T]] = AsyncResult {
+  def execute[T <: Program[T]](program: Program[T]): Async[Result[T]] = Async {
     Try {
       Program.logger trace s"running  ${program.asGeneric.showCMD} and awaiting results"
 
@@ -49,11 +49,11 @@ import Program._
 
 class Program[T <: Program[T]](val name: String, val arguments: List[String]) extends Serializable {
 
-  def run: AsyncResult[Result[T]] = execute(this)
+  def run: Async[Result[T]] = execute(this)
 
   def run2Kill: Process = execute2Kill(this)
 
-  def digest[U](implicit interpreter: Result[T]#Interpreter[U]): AsyncResult[U] = (for {
+  def digest[U](implicit interpreter: Result[T]#Interpreter[U]): Async[U] = (for {
     result <- optionT[Future](run)
   } yield result.interpret(interpreter)).run
 

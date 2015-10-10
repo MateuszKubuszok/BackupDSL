@@ -2,13 +2,13 @@ package pl.combosolutions.backup.dsl.tasks.beta
 
 import java.nio.file.{ Path, Paths }
 
-import pl.combosolutions.backup.{ AsyncResult, Reporting }
+import pl.combosolutions.backup.{ Async, Reporting }
 import pl.combosolutions.backup.dsl.tasks.beta.SelectFiles.SelectFilesAction
 import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
 
 object SelectFiles extends Reporting {
 
-  private def selectFilesAction(files: List[String]): () => AsyncResult[List[Path]] = () => AsyncResult {
+  private def selectFilesAction(files: List[String]): () => Async[List[Path]] = () => Async {
     val paths = files map (Paths get _)
     reporter inform s"Selected ${paths.length} files for copying: $paths"
     Some(paths)

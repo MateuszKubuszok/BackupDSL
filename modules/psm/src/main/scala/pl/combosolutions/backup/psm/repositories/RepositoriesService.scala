@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.psm.repositories
 
-import pl.combosolutions.backup.AsyncResult
+import pl.combosolutions.backup.Async
 import pl.combosolutions.backup.psm.ImplementationPriority._
 import pl.combosolutions.backup.psm.ImplementationResolver
 import pl.combosolutions.backup.psm.PsmExceptionMessages.NoRepositoriesAvailable
@@ -16,16 +16,16 @@ trait RepositoriesService {
 
   // format: OFF
   type Repositories = List[Repository]
-  def obtainRepositories(implicit withElevation: ElevationMode, cleaner: Cleaner): AsyncResult[Repositories]
+  def obtainRepositories(implicit withElevation: ElevationMode, cleaner: Cleaner): Async[Repositories]
   def addRepositories(repositories: Repositories)
-                     (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner): AsyncResult[Boolean]
+                     (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner): Async[Boolean]
   def removeRepositories(repositories: Repositories)
-                        (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner): AsyncResult[Boolean]
+                        (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner): Async[Boolean]
 
   type Packages = List[Package]
-  def areAllInstalled(packages: Packages)(implicit withElevation: ElevationMode, cleaner: Cleaner): AsyncResult[Boolean]
+  def areAllInstalled(packages: Packages)(implicit withElevation: ElevationMode, cleaner: Cleaner): Async[Boolean]
   def installAll(packages: Packages)
-                (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner): AsyncResult[Boolean]
+                (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner): Async[Boolean]
   // format: ON
 }
 
