@@ -5,9 +5,8 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import pl.combosolutions.backup.ReportException
 import pl.combosolutions.backup.psm.ComponentsHelper
-import pl.combosolutions.backup.psm.elevation.RemoteElevation
+import pl.combosolutions.backup.psm.elevation.{ ElevationTestHelper, RemoteElevation }
 import pl.combosolutions.backup.psm.repositories.posix.linux.AptRepositoriesServiceComponent.AptRepositoriesService
-import pl.combosolutions.backup.test.ElevationTestHelper
 import pl.combosolutions.backup.test.Tags.PlatformTest
 
 import scala.concurrent.duration.DurationInt

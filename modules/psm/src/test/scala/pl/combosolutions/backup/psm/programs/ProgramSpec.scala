@@ -4,6 +4,7 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import pl.combosolutions.backup.test.AsyncResultSpecificationHelper
+import pl.combosolutions.backup.test.Tags.UnitTest
 
 import scala.sys.process.{ Process, ProcessBuilder, ProcessLogger }
 
@@ -20,7 +21,7 @@ class ProgramSpec extends Specification with Mockito with AsyncResultSpecificati
 
       // then
       result mustEqual expected
-    }
+    } tag UnitTest
 
     "run process and return result" in new CompanionObjectTestContext {
       // given
@@ -32,7 +33,7 @@ class ProgramSpec extends Specification with Mockito with AsyncResultSpecificati
 
       // then
       result must beSome(expected).await
-    }
+    } tag UnitTest
 
     "run process and return failure" in new CompanionObjectTestContext {
       // given
@@ -43,7 +44,7 @@ class ProgramSpec extends Specification with Mockito with AsyncResultSpecificati
 
       // then
       result must beNone.await
-    }
+    } tag UnitTest
 
     "run process and return handler to it" in new CompanionObjectTestContext {
       // given
@@ -52,7 +53,7 @@ class ProgramSpec extends Specification with Mockito with AsyncResultSpecificati
 
       // then
       result mustEqual programObj.process
-    }
+    } tag UnitTest
   }
 
   "Program" should {
@@ -67,7 +68,7 @@ class ProgramSpec extends Specification with Mockito with AsyncResultSpecificati
 
       // then
       result must beSome(expected).await
-    }
+    } tag UnitTest
 
     "convert into GenericProgram" in new ClassTestContext {
       // given
@@ -78,7 +79,7 @@ class ProgramSpec extends Specification with Mockito with AsyncResultSpecificati
 
       // then
       result mustEqual expected
-    }
+    } tag UnitTest
 
     "show CMD" in new ClassTestContext {
       // given
@@ -89,7 +90,7 @@ class ProgramSpec extends Specification with Mockito with AsyncResultSpecificati
 
       // then
       result mustEqual expected
-    }
+    } tag UnitTest
   }
 
   trait MockProcessHelper {

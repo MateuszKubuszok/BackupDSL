@@ -1,8 +1,7 @@
 package pl.combosolutions.backup.psm.elevation.windows
 
 import pl.combosolutions.backup.ReportException
-import pl.combosolutions.backup.psm.ComponentsHelper
-import pl.combosolutions.backup.psm.elevation.{ ElevationFacadeComponentImpl, ElevationFacadeComponent, ElevationServiceComponent, ElevationService }
+import pl.combosolutions.backup.psm.elevation.{ ElevationFacadeComponent, ElevationFacadeComponentImpl, ElevationService, ElevationServiceComponent }
 import pl.combosolutions.backup.psm.systems._
 import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.Program

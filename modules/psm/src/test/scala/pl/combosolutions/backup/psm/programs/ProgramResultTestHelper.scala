@@ -1,9 +1,8 @@
-package pl.combosolutions.backup.test
+package pl.combosolutions.backup.psm.programs
 
 import org.specs2.matcher._
 import org.specs2.mutable.Specification
 import pl.combosolutions.backup.AsyncResult
-import pl.combosolutions.backup.psm.programs.Result
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration

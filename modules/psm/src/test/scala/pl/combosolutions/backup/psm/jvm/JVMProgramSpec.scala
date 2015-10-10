@@ -5,6 +5,7 @@ import java.io.File.pathSeparator
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import pl.combosolutions.backup.psm.jvm.JVMUtils._
+import pl.combosolutions.backup.test.Tags.UnitTest
 
 class JVMProgramSpec extends Specification with Mockito {
 
@@ -28,7 +29,7 @@ class JVMProgramSpec extends Specification with Mockito {
       program.arguments.drop(program.arguments.size - expectedArgs.size) mustEqual expectedArgs
       program.arguments.drop(program.arguments.size - expectedArgs.size - 2).take(2) mustEqual expectedCP
       program.arguments.take(expectedJVMargs.size) mustEqual expectedJVMargs
-    }
+    } tag UnitTest
   }
 
 }

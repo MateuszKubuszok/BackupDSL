@@ -32,7 +32,10 @@ object Settings extends Dependencies {
       "-language:existentials",
       "-language:higherKinds",
       "-language:implicitConversions",
-      "-language:postfixOps"
+      "-language:postfixOps",
+      "-Ywarn-dead-code",
+      "-Ywarn-infer-any",
+      "-Ywarn-unused-import"
     ),
 
     resolvers ++= Seq(

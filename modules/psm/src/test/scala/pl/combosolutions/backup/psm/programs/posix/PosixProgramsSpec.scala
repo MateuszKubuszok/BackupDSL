@@ -3,9 +3,9 @@ package pl.combosolutions.backup.psm.programs.posix
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import pl.combosolutions.backup.AsyncResult
-import pl.combosolutions.backup.psm.filesystem.FileType
 import pl.combosolutions.backup.psm.filesystem.FileType.{ Directory, File, FileType, SymbolicLink }
 import pl.combosolutions.backup.psm.programs.{ Result, TestProgramHelper }
+import pl.combosolutions.backup.test.Tags.UnitTest
 
 class PosixProgramsSpec extends Specification with Mockito {
 
@@ -21,7 +21,7 @@ class PosixProgramsSpec extends Specification with Mockito {
       // then
       program.name mustEqual "cat"
       program.arguments mustEqual List(file)
-    }
+    } tag UnitTest
 
     "be digested to List[String] with built-in Interpreter" in {
       // given
@@ -35,7 +35,7 @@ class PosixProgramsSpec extends Specification with Mockito {
 
       // then
       result must beSome(expected).await
-    }
+    } tag UnitTest
   }
 
   "FileInfo" should {
@@ -50,7 +50,7 @@ class PosixProgramsSpec extends Specification with Mockito {
       // then
       program.name mustEqual "file"
       program.arguments mustEqual List(file)
-    }
+    } tag UnitTest
 
     "be digested to FileType with built-in Interpreter" in {
       // given
@@ -74,7 +74,7 @@ class PosixProgramsSpec extends Specification with Mockito {
       result1 must beSome(expected1).await
       result2 must beSome(expected2).await
       result3 must beSome(expected3).await
-    }
+    } tag UnitTest
   }
 
   "GrepFile" should {
@@ -90,7 +90,7 @@ class PosixProgramsSpec extends Specification with Mockito {
       // then
       program.name mustEqual "grep"
       program.arguments mustEqual List("-h", pattern, file)
-    }
+    } tag UnitTest
 
     "be digested to List[String] with built-in Interpreter" in {
       // given
@@ -104,7 +104,7 @@ class PosixProgramsSpec extends Specification with Mockito {
 
       // then
       result must beSome(expected).await
-    }
+    } tag UnitTest
   }
 
   "WhichProgram" should {
@@ -119,7 +119,7 @@ class PosixProgramsSpec extends Specification with Mockito {
       // then
       program.name mustEqual "which"
       program.arguments mustEqual List(executable)
-    }
+    } tag UnitTest
 
     "be digested to Boolean with built-in Interpreter" in {
       // given
@@ -132,6 +132,6 @@ class PosixProgramsSpec extends Specification with Mockito {
 
       // then
       result must beSome(expected).await
-    }
+    } tag UnitTest
   }
 }

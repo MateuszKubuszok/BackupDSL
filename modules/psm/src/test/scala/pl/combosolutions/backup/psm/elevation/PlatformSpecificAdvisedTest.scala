@@ -3,9 +3,8 @@ package pl.combosolutions.backup.psm.elevation
 import org.specs2.mutable.Specification
 import pl.combosolutions.backup.ReportException
 import pl.combosolutions.backup.psm.ComponentsHelper
-import pl.combosolutions.backup.psm.programs.GenericProgram
+import pl.combosolutions.backup.psm.programs.{ GenericProgram, ProgramResultTestHelper }
 import pl.combosolutions.backup.psm.systems.{ PosixSystem, WindowsSystem }
-import pl.combosolutions.backup.test.{ ElevationTestHelper, ProgramResultTestHelper }
 import pl.combosolutions.backup.test.Tags.PlatformTest
 
 import scala.concurrent.Await
