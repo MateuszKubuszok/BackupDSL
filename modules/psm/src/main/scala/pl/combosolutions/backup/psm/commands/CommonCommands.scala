@@ -1,13 +1,10 @@
 package pl.combosolutions.backup.psm.commands
 
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption.{ ATOMIC_MOVE, COPY_ATTRIBUTES, REPLACE_EXISTING }
 
+import pl.combosolutions.backup.psm.filesystem.FilesServiceComponentImpl
 import pl.combosolutions.backup.{ Async, Result }
 import pl.combosolutions.backup.psm.ExecutionContexts.Command.context
-
-import scala.util.Try
 
 class CommonCommands {
 
@@ -16,20 +13,42 @@ class CommonCommands {
   implicit val CopyCommand2Tuple: CopyCommandInterpreter[(List[String], List[String])] = r => (r.stdout, r.stderr)
 }
 
-case class CopyCommand(files: List[(String, String)]) extends Command[CopyCommand] {
+private[commands] abstract class FilesCommand[T <: Command[T]]
+    extends Command[T]
+    with FilesServiceComponentImpl {
 
-  override def run: Async[Result[CopyCommand]] = Async {
-    val rawResults = for {
-      (fromFileName, toFileName) <- files
-      fromFile = new File(fromFileName).getAbsoluteFile.toPath
-      toFile = new File(toFileName).getAbsoluteFile.toPath
-    } yield (fromFileName, Try(Files.copy(fromFile, toFile, ATOMIC_MOVE, COPY_ATTRIBUTES, REPLACE_EXISTING)))
+  protected def filesOperation: List[(String, Boolean)]
 
-    val parsedResults = rawResults.groupBy(_._2.isSuccess).mapValues { values => values.map(_._1) }
-
-    val copiedFiles = parsedResults(true)
-    val failedFiles = parsedResults(false)
-
-    Some(Result(failedFiles.size, copiedFiles, failedFiles))
+  override def run: Async[Result[T]] = Async {
+    val parsedResults = filesOperation groupBy (_._2) mapValues (_.map(_._1))
+    val succeedFiles = parsedResults.getOrElse(true, List())
+    val failedFiles = parsedResults.getOrElse(false, List())
+    Some(Result(failedFiles.size, succeedFiles, failedFiles))
   }
+}
+
+case class CopyCommand(files: List[(String, String)]) extends FilesCommand[CopyCommand] {
+
+  override def filesOperation = for {
+    (fromFileName, intoFileName) <- files
+    fromFile = new File(fromFileName).getAbsoluteFile.toPath
+    intoFile = new File(intoFileName).getAbsoluteFile.toPath
+  } yield (fromFileName, filesService copy (fromFile, intoFile))
+}
+
+case class DeleteCommand(files: List[String]) extends FilesCommand[DeleteCommand] {
+
+  override def filesOperation = for {
+    fileName <- files
+    file = new File(fileName).getAbsoluteFile.toPath
+  } yield (fileName, filesService delete file)
+}
+
+case class MoveCommand(files: List[(String, String)]) extends FilesCommand[MoveCommand] {
+
+  override def filesOperation = for {
+    (fromFileName, intoFileName) <- files
+    fromFile = new File(fromFileName).getAbsoluteFile.toPath
+    intoFile = new File(intoFileName).getAbsoluteFile.toPath
+  } yield (fromFileName, filesService move (fromFile, intoFile))
 }

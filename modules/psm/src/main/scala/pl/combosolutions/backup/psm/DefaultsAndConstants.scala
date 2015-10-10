@@ -16,6 +16,7 @@ object DefaultsAndConstants {
   val BackupDirPath = java.nio.file.Paths.get(SystemUtils.getUserHome.getPath, BackupDirName)
   val CopyOptions = Array[CopyOption](REPLACE_EXISTING, COPY_ATTRIBUTES)
 
+  val CommandThreadPoolSize = 10
   val ProgramThreadPoolSize = 10
   val TaskThreadPoolSize = 10
 }

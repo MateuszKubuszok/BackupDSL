@@ -3,7 +3,7 @@ package pl.combosolutions.backup.psm
 import java.util.concurrent.Executors
 
 import pl.combosolutions.backup.Logging
-import pl.combosolutions.backup.psm.DefaultsAndConstants.{ ProgramThreadPoolSize, TaskThreadPoolSize }
+import pl.combosolutions.backup.psm.DefaultsAndConstants.{ CommandThreadPoolSize, ProgramThreadPoolSize, TaskThreadPoolSize }
 
 import scala.concurrent.ExecutionContext
 
@@ -13,8 +13,12 @@ object ExecutionContexts {
   private val programProxy = new ExecutionContextsProxy
   private val taskProxy = new ExecutionContextsProxy
 
+  setCommandSize(CommandThreadPoolSize)
   setProgramSize(ProgramThreadPoolSize)
   setTaskSize(TaskThreadPoolSize)
+
+  def setCommandSize(poolSize: Integer): Unit =
+    commandProxy setExecutionContextTo (ExecutionContext fromExecutor (Executors newFixedThreadPool poolSize))
 
   def setProgramSize(poolSize: Integer): Unit =
     programProxy setExecutionContextTo (ExecutionContext fromExecutor (Executors newFixedThreadPool poolSize))

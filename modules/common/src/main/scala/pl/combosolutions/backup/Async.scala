@@ -15,8 +15,11 @@ object Async {
 
   def failed[Result](exception: Throwable): Async[Result] = Future failed exception
 
-  def completeSequence[Result, M[X] <: TraversableOnce[X]](in: M[Async[Result]])(implicit cbf: CanBuildFrom[M[Future[Option[Result]]], Option[Result], M[Option[Result]]],
-    cbf2: CanBuildFrom[M[Option[Result]], Result, M[Result]], executor: ExecutionContext): Async[M[Result]] =
+  // format: OFF
+  def completeSequence[Result, M[X] <: TraversableOnce[X]]
+      (in: M[Async[Result]])
+      (implicit cbf: CanBuildFrom[M[Future[Option[Result]]], Option[Result], M[Option[Result]]],
+       cbf2: CanBuildFrom[M[Option[Result]], Result, M[Result]], executor: ExecutionContext): Async[M[Result]] =
     Future sequence in map { resultOpts =>
       if (resultOpts exists (_.isEmpty)) None
       else
@@ -25,17 +28,22 @@ object Async {
         } map (_.result())
     }
 
-  def incompleteSequence[Result, M[X] <: TraversableOnce[X]](in: M[Async[Result]])(implicit cbf: CanBuildFrom[M[Future[Option[Result]]], Option[Result], M[Option[Result]]],
-    cbf2: CanBuildFrom[M[Option[Result]], Result, M[Result]], executor: ExecutionContext): Async[M[Result]] =
+  def incompleteSequence[Result, M[X] <: TraversableOnce[X]]
+      (in: M[Async[Result]])
+      (implicit cbf: CanBuildFrom[M[Future[Option[Result]]], Option[Result], M[Option[Result]]],
+       cbf2: CanBuildFrom[M[Option[Result]], Result, M[Result]], executor: ExecutionContext): Async[M[Result]] =
     Future sequence in map { resultOpts =>
       resultOpts.foldLeft(Option(cbf2(resultOpts))) {
         (or, oa) => for (r <- or; a <- oa) yield r += a
       } map (_.result())
     }
 
-  def flatMap[Result, NewResult](result: Async[Result], function: Result => Async[NewResult])(implicit executor: ExecutionContext): Async[NewResult] =
+  def flatMap[Result, NewResult](result: Async[Result], function: Result => Async[NewResult])
+                                (implicit executor: ExecutionContext): Async[NewResult] =
     result flatMap (_ map (function(_)) getOrElse none)
 
-  def map[Result, NewResult](result: Async[Result], function: Result => NewResult)(implicit executor: ExecutionContext): Async[NewResult] =
+  def map[Result, NewResult](result: Async[Result], function: Result => NewResult)
+                            (implicit executor: ExecutionContext): Async[NewResult] =
     result map (_ map function)
+  // format: ON
 }
