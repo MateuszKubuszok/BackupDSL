@@ -2,6 +2,8 @@ package pl.combosolutions.backup.psm.elevation
 
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
+import pl.combosolutions.backup.Result
+import pl.combosolutions.backup.psm.commands.TestCommand
 import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.GenericProgram
 import pl.combosolutions.backup.test.Tags.UnitTest
@@ -9,7 +11,9 @@ import pl.combosolutions.backup.test.Tags.UnitTest
 class ElevationModeSpec extends Specification with Mockito {
 
   val program = GenericProgram("test", List())
-  val expected = GenericProgram("returned", List())
+  val expectedProgram = GenericProgram("returned", List())
+  val command = TestCommand(Result(0, List("1"), List()))
+  val expectedCommand = TestCommand(Result(0, List("2"), List()))
 
   "NotElevated" should {
 
@@ -32,30 +36,44 @@ class ElevationModeSpec extends Specification with Mockito {
       // given
       val cleaner = new Cleaner {}
       val mode = new DirectElevation with TestElevationServiceComponent
-      (mode.testElevationService elevateDirect program) returns expected
+      (mode.testElevationService elevateDirect program) returns expectedProgram
 
       // when
       val result = mode(program, cleaner)
 
       // then
-      result mustEqual expected
+      result mustEqual expectedProgram
       there was one(mode.testElevationService).elevateDirect(===(program))
     } tag UnitTest
   }
 
   "RemoteElevation" should {
 
+    "create remotely elevated command" in {
+      // given
+      val cleaner = new Cleaner {}
+      val mode = new RemoteElevation with TestElevationServiceComponent
+      mode.testElevationService.elevateRemote(command, cleaner) returns expectedCommand
+
+      // when
+      val result = mode(command, cleaner)
+
+      // then
+      result mustEqual expectedCommand
+      there was one(mode.testElevationService).elevateRemote(===(command), ===(cleaner))
+    } tag UnitTest
+
     "create remotely elevated program" in {
       // given
       val cleaner = new Cleaner {}
       val mode = new RemoteElevation with TestElevationServiceComponent
-      mode.testElevationService.elevateRemote(program, cleaner) returns expected
+      mode.testElevationService.elevateRemote(program, cleaner) returns expectedProgram
 
       // when
       val result = mode(program, cleaner)
 
       // then
-      result mustEqual expected
+      result mustEqual expectedProgram
       there was one(mode.testElevationService).elevateRemote(===(program), ===(cleaner))
     } tag UnitTest
   }
@@ -64,16 +82,19 @@ class ElevationModeSpec extends Specification with Mockito {
 
     "run ElevationMode from implicit context" in {
       // given
-      import ElevateIfNeeded._
+      import ElevateProgramIfNeeded._
       implicit val mode = mock[ElevationMode]
       implicit val cleaner = new Cleaner {}
-      mode.apply(===(program), ===(cleaner)) returns expected
+      mode.apply(===(command), ===(cleaner)) returns expectedCommand
+      mode.apply(===(program), ===(cleaner)) returns expectedProgram
 
       // when
-      val result = program.handleElevation
+      val resultCommand = command.handleElevation
+      val resultProgram = program.handleElevation
 
       // then
-      result mustEqual expected
+      resultCommand mustEqual expectedCommand
+      resultProgram mustEqual expectedProgram
     } tag UnitTest
   }
 }

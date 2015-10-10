@@ -2,8 +2,8 @@ package pl.combosolutions.backup.psm.filesystem.posix
 
 import java.nio.file.Path
 
-import pl.combosolutions.backup.psm.elevation.{ ElevateIfNeeded, ElevationMode }
-import ElevateIfNeeded._
+import pl.combosolutions.backup.psm.elevation.{ ElevateProgramIfNeeded, ElevationMode }
+import ElevateProgramIfNeeded._
 import pl.combosolutions.backup.psm.filesystem.{ FileSystemService, FileSystemServiceComponent }
 import pl.combosolutions.backup.psm.filesystem.FileType.FileType
 import pl.combosolutions.backup.psm.operations.Cleaner
