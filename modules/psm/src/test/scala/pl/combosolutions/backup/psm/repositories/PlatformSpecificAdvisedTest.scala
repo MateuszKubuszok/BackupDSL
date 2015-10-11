@@ -1,10 +1,8 @@
 package pl.combosolutions.backup.psm.repositories
 
 import org.specs2.matcher.Scope
-import org.specs2.mock.Mockito
-import org.specs2.mutable.Specification
 import pl.combosolutions.backup.ReportException
-import pl.combosolutions.backup.psm.ComponentsHelper
+import pl.combosolutions.backup.psm.PlatformSpecificSpecification
 import pl.combosolutions.backup.psm.elevation.{ ElevationTestHelper, RemoteElevation }
 import pl.combosolutions.backup.psm.repositories.posix.linux.AptRepositoriesServiceComponent.AptRepositoriesService
 import pl.combosolutions.backup.test.Tags.PlatformTest
@@ -12,10 +10,8 @@ import pl.combosolutions.backup.test.Tags.PlatformTest
 import scala.concurrent.duration.DurationInt
 
 class PlatformSpecificAdvisedTest
-    extends Specification
-    with Mockito
-    with ElevationTestHelper
-    with ComponentsHelper {
+    extends PlatformSpecificSpecification
+    with ElevationTestHelper {
 
   type Repositories = List[Repository]
 

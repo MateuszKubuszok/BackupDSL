@@ -1,11 +1,17 @@
 package pl.combosolutions.backup.psm.filesystem
 
-import java.nio.file.{ Files, Path }
-import java.nio.file.StandardCopyOption._
+import java.nio.file.Path
 
-import scala.util.Try
+import pl.combosolutions.backup.psm.ImplementationPriority._
+import pl.combosolutions.backup.psm.ImplementationResolver
+import pl.combosolutions.backup.psm.PsmExceptionMessages._
+import pl.combosolutions.backup.psm.filesystem.posix.PosixFilesServiceComponent
+
+import FilesServiceComponentImpl.resolve
 
 trait FilesService {
+
+  val filesAvailable: Boolean
 
   def copy(from: Path, into: Path): Boolean
 
@@ -19,22 +25,24 @@ trait FilesServiceComponent {
   def filesService: FilesService
 }
 
-trait FilesServiceComponentImpl extends FilesServiceComponent {
+object FilesServiceComponentImpl extends ImplementationResolver[FilesService] {
 
-  def filesService: FilesService = FilesServiceImpl
+  override lazy val implementations = Seq(
+    // POSIX file system
+    PosixFilesServiceComponent.filesService
+  )
 
-  trait FilesServiceImpl extends FilesService {
+  override lazy val notFoundMessage = NoFileSystemAvailable
 
-    private val withOptions = List(ATOMIC_MOVE, COPY_ATTRIBUTES, REPLACE_EXISTING)
+  override def byFilter(service: FilesService): Boolean = service.filesAvailable
 
-    override def copy(from: Path, into: Path): Boolean = Try(Files copy (from, into, withOptions: _*)).isSuccess
-
-    override def delete(file: Path): Boolean = Try(Files delete file).isSuccess
-
-    override def move(from: Path, into: Path): Boolean = Try(Files move (from, into, withOptions: _*)).isSuccess
-  }
-
-  object FilesServiceImpl extends FilesServiceImpl
+  // TODO: improve
+  override def byPriority(service: FilesService): ImplementationPriority =
+    if (service.filesAvailable) Allowed
+    else NotAllowed
 }
 
-object FilesServiceComponentImpl extends FilesServiceComponentImpl
+trait FilesServiceComponentImpl extends FilesServiceComponent {
+
+  override lazy val filesService = resolve
+}

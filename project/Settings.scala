@@ -20,6 +20,8 @@ object Settings extends Dependencies {
   private val unitTestTag = TestTag.UnitTest
   val UnitTest = config(unitTestTag) extend Test describedAs "Runs only unit tests"
 
+  private val disabledTestTag = TestTag.DisabledTest
+
   private val customSettings = Seq(
     organization := "pl.combosolutions",
     version := "0.1.0-SNAPSHOT",
@@ -46,7 +48,7 @@ object Settings extends Dependencies {
     libraryDependencies ++= mainDeps,
     libraryDependencies ++= testDeps map (_ % "test"),
 
-    testOptions in Test += excludeTags(platformTestTag),
+    testOptions in Test += excludeTags(platformTestTag, disabledTestTag),
     coverageEnabled := true
   )
 

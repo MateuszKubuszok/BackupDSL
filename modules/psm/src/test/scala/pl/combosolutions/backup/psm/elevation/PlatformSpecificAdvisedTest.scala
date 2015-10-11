@@ -1,8 +1,7 @@
 package pl.combosolutions.backup.psm.elevation
 
-import org.specs2.mutable.Specification
 import pl.combosolutions.backup.ReportException
-import pl.combosolutions.backup.psm.ComponentsHelper
+import pl.combosolutions.backup.psm.PlatformSpecificSpecification
 import pl.combosolutions.backup.psm.programs.{ GenericProgram, ProgramResultTestHelper }
 import pl.combosolutions.backup.psm.systems.{ PosixSystem, WindowsSystem }
 import pl.combosolutions.backup.test.Tags.PlatformTest
@@ -11,10 +10,9 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 class PlatformSpecificAdvisedTest
-    extends Specification
+    extends PlatformSpecificSpecification
     with ElevationTestHelper
-    with ProgramResultTestHelper
-    with ComponentsHelper {
+    with ProgramResultTestHelper {
 
   val testProgram: GenericProgram = operatingSystem match {
     case system: WindowsSystem => GenericProgram("cmd", List())

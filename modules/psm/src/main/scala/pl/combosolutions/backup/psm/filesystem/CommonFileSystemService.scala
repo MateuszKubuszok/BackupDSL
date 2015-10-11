@@ -3,7 +3,7 @@ package pl.combosolutions.backup.psm.filesystem
 import java.io.File
 import java.nio.file.Path
 
-import pl.combosolutions.backup.{ Async, wrapAsyncForMapping }
+import pl.combosolutions.backup.wrapAsyncForMapping
 import pl.combosolutions.backup.psm.ExecutionContexts.Command.context
 import pl.combosolutions.backup.psm.commands.CommonCommands._
 import pl.combosolutions.backup.psm.commands.{ CopyCommand, DeleteCommand, MoveCommand }

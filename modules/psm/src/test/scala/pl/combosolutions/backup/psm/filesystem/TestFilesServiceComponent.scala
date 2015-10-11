@@ -6,5 +6,5 @@ trait TestFilesServiceComponent extends FilesServiceComponent with Mockito {
 
   val testFilesService = mock[FilesService]
 
-  override def filesService = testFilesService
+  override lazy val filesService = testFilesService
 }

@@ -1,10 +1,26 @@
 <configuration>
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%msg%n</pattern>
+    <!-- Reports task details for user -->
+
+    <appender name="REPORTER" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} | %msg%n</pattern>
         </encoder>
     </appender>
-    <root level="OFF">
-        <appender-ref ref="CONSOLE"/>
+
+    <logger name="TaskReporter" level="info">
+        <appender-ref ref="REPORTER" />
+    </logger>
+
+    <!-- Logs internal actions for programmer -->
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} | %-5level %-40logger{38} | %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="error">
+    <!--<root level="off">-->
+        <appender-ref ref="STDOUT" />
     </root>
 </configuration>
