@@ -77,6 +77,35 @@ class PosixProgramsSpec extends Specification with Mockito {
     } tag UnitTest
   }
 
+  "LinkFile" should {
+
+    "create ln -s command" in {
+      // given
+      val fromFile = "from-file"
+      val toFile = "to-file"
+
+      // when
+      val program = LinkFile(fromFile, toFile)
+
+      // then
+      program.name mustEqual "ln"
+      program.arguments mustEqual List("-s", fromFile, toFile)
+    } tag UnitTest
+
+    "be digested to Boolean with built-in Interpreter" in {
+      // given
+      import PosixPrograms.LinkFile2Boolean
+      val expected = true
+      val program = new LinkFile("from-file", "to-file") with TestProgramHelper[LinkFile]
+
+      // when
+      val result = program.digest[Boolean]
+
+      // then
+      result must beSome(expected).await
+    } tag UnitTest
+  }
+
   "GrepFile" should {
 
     "create grep command" in {

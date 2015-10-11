@@ -21,6 +21,9 @@ object PosixPrograms {
     case fileIsFile(fileName) => File
   } getOrElse (ReportException onIllegalStateOf UnknownFileType)
 
+  type LinkFileInterpreter[U] = Result[LinkFile]#Interpreter[U]
+  implicit val LinkFile2Boolean: LinkFileInterpreter[Boolean] = _.exitValue == 0
+
   type GrepFilesInterpreter[U] = Result[GrepFiles]#Interpreter[U]
   implicit val GrepFiles2ListString: GrepFilesInterpreter[List[String]] = _.stdout
 
@@ -31,6 +34,8 @@ object PosixPrograms {
 case class CatFile(fileName: String) extends Program[CatFile]("cat", List(fileName))
 
 case class FileInfo(fileName: String) extends Program[FileInfo]("file", List(fileName))
+
+case class LinkFile(fromFile: String, toFile: String) extends Program[LinkFile]("ln", List("-s", fromFile, toFile))
 
 case class GrepFiles(pattern: String, files: List[String]) extends Program[GrepFiles]("grep", "-h" :: pattern :: files)
 
