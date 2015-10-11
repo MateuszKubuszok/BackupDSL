@@ -82,7 +82,7 @@ class ElevationModeSpec extends Specification with Mockito {
 
     "run ElevationMode from implicit context" in {
       // given
-      import ElevateProgramIfNeeded._
+      import ElevateIfNeeded._
       implicit val mode = mock[ElevationMode]
       implicit val cleaner = new Cleaner {}
       mode.apply(===(command), ===(cleaner)) returns expectedCommand

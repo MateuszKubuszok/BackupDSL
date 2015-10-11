@@ -1,11 +1,8 @@
 package example
 
-import java.io.File
-
 import pl.combosolutions.backup.dsl.Script
 import pl.combosolutions.backup.psm.programs.GenericProgram
 
-import scala.collection.JavaConversions._
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ Await, Future }
 

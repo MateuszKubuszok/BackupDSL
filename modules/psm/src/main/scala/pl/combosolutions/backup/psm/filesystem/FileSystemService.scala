@@ -23,13 +23,13 @@ trait FileSystemService {
 
   /* // TODO
   def createSymlink(from: Path, to: Path, withElevation: Boolean) = throw new NotImplementedError("TODO")
-
-  def copyFiles(files: List[Path], withElevation: Boolean) = throw new NotImplementedError("TODO")
-
-  def deleteFiles(files: List[Path], withElevation: Boolean) = throw new NotImplementedError("TODO")
-
-  def moveFiles(files: List[Path], withElevation: Boolean) = throw new NotImplementedError("TODO")
   */
+
+  def copyFiles(files: List[(Path, Path)])(implicit withElevation: ElevationMode, cleaner: Cleaner): Async[List[Path]]
+
+  def deleteFiles(files: List[Path])(implicit withElevation: ElevationMode, cleaner: Cleaner): Async[List[Path]]
+
+  def moveFiles(files: List[(Path, Path)])(implicit withElevation: ElevationMode, cleaner: Cleaner): Async[List[Path]]
 }
 
 trait FileSystemServiceComponent {

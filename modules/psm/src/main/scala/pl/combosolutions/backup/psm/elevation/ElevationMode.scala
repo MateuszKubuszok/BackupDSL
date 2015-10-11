@@ -62,7 +62,7 @@ private[elevation] class ElevateProgramIfNeeded[T <: Program[T]](
   def handleElevation = withElevation(program, cleaner)
 }
 
-object ElevateProgramIfNeeded {
+object ElevateIfNeeded {
 
   // format: OFF
   implicit def possiblyElevated[T <: Command[T]](command: Command[T])

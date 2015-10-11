@@ -8,7 +8,7 @@ package object backup {
 
   implicit def wrapAsyncForMapping[Result](result: Async[Result]) = new AsyncTransformer(result)
 
-  implicit class AsyncTransformer[Result](result: Async[Result]) {
+  class AsyncTransformer[Result](result: Async[Result]) {
 
     def asAsync = this
 
