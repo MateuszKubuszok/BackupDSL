@@ -25,13 +25,13 @@ trait CommonFileSystemServiceComponent extends FileSystemServiceComponent {
     override def moveFiles(files: List[(Path, Path)])(implicit withElevation: ElevationMode, cleaner: Cleaner) =
       MoveCommand(paths2Strings(files)).handleElevation.digest[(List[String], List[String])].asAsync.map(strings => string2Path(strings._1))
 
-    private def path2String(files: List[Path]): List[String] =
+    protected def path2String(files: List[Path]): List[String] =
       files map (_.toString)
 
-    private def paths2Strings(files: List[(Path, Path)]): List[(String, String)] =
+    protected def paths2Strings(files: List[(Path, Path)]): List[(String, String)] =
       files map (paths => (paths._1.toString, paths._2.toString))
 
-    private def string2Path(files: List[String]): List[Path] =
+    protected def string2Path(files: List[String]): List[Path] =
       files map (new File(_).toPath)
   }
 }

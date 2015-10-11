@@ -21,9 +21,7 @@ trait FileSystemService {
 
   def isSupportingSymbolicLinks: Boolean
 
-  /* // TODO
-  def createSymlink(from: Path, to: Path, withElevation: Boolean) = throw new NotImplementedError("TODO")
-  */
+  def linkFiles(files: List[(Path, Path)])(implicit withElevation: ElevationMode, cleaner: Cleaner): Async[List[Path]]
 
   def copyFiles(files: List[(Path, Path)])(implicit withElevation: ElevationMode, cleaner: Cleaner): Async[List[Path]]
 
