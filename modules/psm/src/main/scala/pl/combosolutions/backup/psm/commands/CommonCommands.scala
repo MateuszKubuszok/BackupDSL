@@ -10,14 +10,17 @@ object CommonCommands {
 
   type CopyCommandInterpreter[U] = Result[CopyCommand]#Interpreter[U]
   implicit val CopyCommand2Boolean: CopyCommandInterpreter[Boolean] = _.exitValue == 0
+  implicit val CopyCommand2List: CopyCommandInterpreter[List[String]] = _.stdout
   implicit val CopyCommand2Tuple: CopyCommandInterpreter[(List[String], List[String])] = r => (r.stdout, r.stderr)
 
   type DeleteCommandInterpreter[U] = Result[DeleteCommand]#Interpreter[U]
   implicit val DeleteCommand2Boolean: DeleteCommandInterpreter[Boolean] = _.exitValue == 0
+  implicit val DeleteCommand2List: DeleteCommandInterpreter[List[String]] = _.stdout
   implicit val DeleteCommand2Tuple: DeleteCommandInterpreter[(List[String], List[String])] = r => (r.stdout, r.stderr)
 
   type MoveCommandInterpreter[U] = Result[MoveCommand]#Interpreter[U]
   implicit val MoveCommand2Boolean: MoveCommandInterpreter[Boolean] = _.exitValue == 0
+  implicit val MoveCommand2List: MoveCommandInterpreter[List[String]] = _.stdout
   implicit val MoveCommand2Tuple: MoveCommandInterpreter[(List[String], List[String])] = r => (r.stdout, r.stderr)
 }
 

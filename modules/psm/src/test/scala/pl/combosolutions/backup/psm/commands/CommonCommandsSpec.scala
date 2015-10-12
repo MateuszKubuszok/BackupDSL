@@ -36,6 +36,18 @@ class CommonCommandsSpec extends Specification with Mockito {
       result must beSome(expected).await
     } tag UnitTest
 
+    "be digested to List[String] with built-in Interpreter" in new TestCopyContext {
+      // given
+      import CommonCommands.CopyCommand2List
+      val expected = List(fromFileName)
+
+      // when
+      val result = command.digest[List[String]]
+
+      // then
+      result must beSome(expected).await
+    } tag UnitTest
+
     "be digested to (List[String],List[String]) with built-in Interpreter" in new TestCopyContext {
       // given
       import CommonCommands.CopyCommand2Tuple
@@ -73,6 +85,18 @@ class CommonCommandsSpec extends Specification with Mockito {
       result must beSome(expected).await
     } tag UnitTest
 
+    "be digested to List[String] with built-in Interpreter" in new TestDeleteContext {
+      // given
+      import CommonCommands.DeleteCommand2List
+      val expected = List(fileName)
+
+      // when
+      val result = command.digest[List[String]]
+
+      // then
+      result must beSome(expected).await
+    } tag UnitTest
+
     "be digested to (List[String],List[String]) with built-in Interpreter" in new TestDeleteContext {
       // given
       import CommonCommands.DeleteCommand2Tuple
@@ -105,6 +129,18 @@ class CommonCommandsSpec extends Specification with Mockito {
 
       // when
       val result = command.digest[Boolean]
+
+      // then
+      result must beSome(expected).await
+    } tag UnitTest
+
+    "be digested to List[String] with built-in Interpreter" in new TestMoveContext {
+      // given
+      import CommonCommands.MoveCommand2List
+      val expected = List(fromFileName)
+
+      // when
+      val result = command.digest[List[String]]
 
       // then
       result must beSome(expected).await
