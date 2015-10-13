@@ -14,14 +14,12 @@ object BackupProject extends Build with Settings with Dependencies {
 
   lazy val tasks = project.from("tasks").
     configureCommon.
-    configurePlatform.
     configureFunctional.
     configureUnit.
     dependsOnProjects(common, psm)
 
   lazy val dsl = project.from("dsl").
     configureCommon.
-    configurePlatform.
     configureFunctional.
     configureUnit.
     dependsOnProjects(common, psm, tasks)
