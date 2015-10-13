@@ -1,5 +1,7 @@
 # Backup DSL
 
+[![Build status](https://api.shippable.com/projects/561d0f141895ca44741d627e/badge/master)](https://app.shippable.com/projects/561d0f141895ca44741d627e)
+
 Project of a DSL for performing backup and restore of some specific parts of
 the system.
 

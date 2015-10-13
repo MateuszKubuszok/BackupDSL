@@ -1,6 +1,6 @@
 # Roadmap
 
-## 0.1 - 1 supported configuration
+## 0.1 - 1 supported configuration [✓]
 
  *  *fully* supports elevation with GKSudo,
  *  *fully* supports APT repositories,
