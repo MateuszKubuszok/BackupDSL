@@ -10,6 +10,7 @@ import pl.combosolutions.backup.psm.programs.posix.{ PosixPrograms, WhichProgram
 import PosixPrograms._
 import pl.combosolutions.backup.psm.programs.posix.linux._
 import AptPrograms._
+import DpkgPrograms._
 import pl.combosolutions.backup.psm.repositories.{ AptRepository, RepositoriesService, RepositoriesServiceComponent, VersionedPackage }
 
 import scala.concurrent.duration.Duration

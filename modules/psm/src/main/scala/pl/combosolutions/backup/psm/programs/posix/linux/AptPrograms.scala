@@ -3,8 +3,7 @@ package pl.combosolutions.backup.psm.programs.posix.linux
 import pl.combosolutions.backup.Result
 import pl.combosolutions.backup.psm.programs.{ ProgramAlias, Program }
 import pl.combosolutions.backup.psm.programs.posix.GrepFiles
-import pl.combosolutions.backup.psm.repositories
-import pl.combosolutions.backup.psm.repositories.{ AptRepository, VersionedPackage }
+import pl.combosolutions.backup.psm.repositories.{ AptRepository, Package }
 import pl.combosolutions.backup.psm.repositories.posix.linux.AptRepositoriesServiceComponent._
 
 object AptPrograms {
@@ -23,13 +22,6 @@ object AptPrograms {
 
   type AptGetUpdateInterpreter[U] = Result[AptGetUpdate]#Interpreter[U]
   implicit val AptGetUpdate2Boolean: AptGetUpdateInterpreter[Boolean] = _.exitValue == 0
-
-  type DpkgListInterpreter[U] = Result[DpkgList]#Interpreter[U]
-  implicit val DpkgList2VersionedPackages: DpkgListInterpreter[List[VersionedPackage]] = result => for {
-    line <- result.stdout
-    lineMatch <- installedPattern findFirstMatchIn line
-  } yield VersionedPackage(lineMatch group 1,
-    lineMatch group 2)
 
   type ListAptReposInterpreter[U] = Result[ListAptRepos]#Interpreter[U]
   implicit val ListAptRepos2AptRepositories: ListAptReposInterpreter[List[AptRepository]] = result => for {
@@ -59,12 +51,12 @@ case class AptRemoveRepository(repository: AptRepository) extends Program[AptRem
   List("--yes", "--remove", repository toString)
 )
 
-case class AptGetInstall(packages: List[repositories.Package]) extends Program[AptGetInstall](
+case class AptGetInstall(packages: List[Package]) extends Program[AptGetInstall](
   "apt-get",
   List("install", "-y", "-qq") ++ packages.map(_.name)
 )
 
-case class AptGetRemove(packages: List[repositories.Package]) extends Program[AptGetRemove](
+case class AptGetRemove(packages: List[Package]) extends Program[AptGetRemove](
   "apt-get",
   List("remove", "-y", "-qq") ++ packages.map(_.name)
 )
@@ -73,12 +65,6 @@ trait AptGetUpdate extends Program[AptGetUpdate]
 case object AptGetUpdate extends Program[AptGetUpdate](
   "apt-get",
   List("update", "-y", "-qq")
-)
-
-trait DpkgList extends Program[DpkgList]
-case object DpkgList extends Program[DpkgList](
-  "dpkg",
-  List("--list")
 )
 
 trait ListAptRepos extends Program[ListAptRepos]

@@ -2,17 +2,12 @@ package pl.combosolutions.backup.psm.repositories.posix.linux
 
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import org.specs2.specification.Scope
-import pl.combosolutions.backup.{ Async, Result }
-import pl.combosolutions.backup.psm.elevation.{ ObligatoryElevationMode, TestElevationFacadeComponent }
-import pl.combosolutions.backup.psm.operations.Cleaner
-import pl.combosolutions.backup.psm.programs.{ ProgramContextHelper, Program }
+import pl.combosolutions.backup.psm.elevation.TestElevationFacadeComponent
+import pl.combosolutions.backup.psm.programs.ProgramContextHelper
 import pl.combosolutions.backup.psm.programs.posix.linux._
 import pl.combosolutions.backup.psm.repositories.{ AptRepository, UnversionedPackage, VersionedPackage }
 import pl.combosolutions.backup.test.AsyncSpecificationHelper
 import pl.combosolutions.backup.test.Tags.UnitTest
-
-import scala.reflect.ClassTag
 
 class AptRepositoriesSpec
     extends Specification
