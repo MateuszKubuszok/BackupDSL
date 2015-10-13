@@ -1,4 +1,4 @@
-package pl.combosolutions.backup.dsl.tasks.beta
+package pl.combosolutions.backup.tasks
 
 object TasksExceptionMessages {
 

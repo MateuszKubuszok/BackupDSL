@@ -1,12 +1,13 @@
 package pl.combosolutions.backup.dsl
 
 import pl.combosolutions.backup.Logging
-import pl.combosolutions.backup.dsl.tasks.{ BackupFiles, RootTask, Task }
-import pl.combosolutions.backup.dsl.Action._
+import pl.combosolutions.backup.dsl.oldtasks.{ BackupFiles, RootTask, Task }
 import pl.combosolutions.backup.psm.elevation.ElevationServiceComponent
 import pl.combosolutions.backup.psm.{ ComponentsHelper, ExecutionContexts }
 import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.Program
+import pl.combosolutions.backup.tasks.Action._
+import pl.combosolutions.backup.tasks.{ Action, Settings }
 
 import scala.concurrent.ExecutionContext
 

@@ -1,6 +1,6 @@
-package pl.combosolutions.backup.dsl.tasks
+package pl.combosolutions.backup.dsl.oldtasks
 
-import pl.combosolutions.backup.dsl.Settings
+import pl.combosolutions.backup.tasks.Settings
 
 import scala.concurrent.Future
 

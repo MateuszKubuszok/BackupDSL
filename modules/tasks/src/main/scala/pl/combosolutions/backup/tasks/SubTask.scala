@@ -1,9 +1,8 @@
-package pl.combosolutions.backup.dsl.tasks.beta
+package pl.combosolutions.backup.tasks
 
-import pl.combosolutions.backup.{ Async, ReportException }
-import pl.combosolutions.backup.wrapAsyncForMapping
-import pl.combosolutions.backup.dsl.tasks.beta.TasksExceptionMessages._
+import pl.combosolutions.backup.{ Async, ReportException, wrapAsyncForMapping }
 import pl.combosolutions.backup.psm.ExecutionContexts
+import pl.combosolutions.backup.tasks.TasksExceptionMessages._
 
 import scala.concurrent.ExecutionContext
 
@@ -61,7 +60,7 @@ final class SubTaskProxy[Result](proxyDependencyType: DependencyType.Value) exte
 
   private var implementation: Option[SubTask[Result]] = None
 
-  private[beta] def setImplementation[T <: SubTask[Result]](subTask: T): Unit = {
+  private[tasks] def setImplementation[T <: SubTask[Result]](subTask: T): Unit = {
     assert(implementation.isEmpty, ProxyInitialized)
     assert(dependencyType == subTask.dependencyType, CircularDependency)
 

@@ -1,7 +1,7 @@
-package pl.combosolutions.backup.dsl.tasks
+package pl.combosolutions.backup.dsl.oldtasks
 
+import pl.combosolutions.backup.tasks.Settings
 import pl.combosolutions.backup.{ Async, Logging }
-import pl.combosolutions.backup.dsl.Settings
 import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
 
 import scala.collection.mutable.MutableList
@@ -22,7 +22,7 @@ abstract class Task[PBR, PRR, BR, RR](description: String) extends Logging {
 
   protected def restore(parentResult: PRR)(implicit withSettings: Settings): Async[RR]
 
-  private[dsl] def performBackupWithResult(parentResult: PBR)(implicit withSettings: Settings): Unit = {
+  private[oldtasks] def performBackupWithResult(parentResult: PBR)(implicit withSettings: Settings): Unit = {
     logger debug s"BACKUP  [${description}}] started"
     logger trace s"        with settings: ${withSettings}"
     (for {
@@ -33,7 +33,7 @@ abstract class Task[PBR, PRR, BR, RR](description: String) extends Logging {
     }).run
   }
 
-  private[dsl] def performRestoreWithResult(parentResult: PRR)(implicit withSettings: Settings): Unit = {
+  private[oldtasks] def performRestoreWithResult(parentResult: PRR)(implicit withSettings: Settings): Unit = {
     logger debug s"RESTORE [${description}}] started"
     logger trace s"        with settings: ${withSettings}"
     (for {

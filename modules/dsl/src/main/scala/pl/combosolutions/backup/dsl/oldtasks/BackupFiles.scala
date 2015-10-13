@@ -1,11 +1,11 @@
-package pl.combosolutions.backup.dsl.tasks
+package pl.combosolutions.backup.dsl.oldtasks
 
 import java.nio.file.{ Files, Paths, Path }
 
 import pl.combosolutions.backup.Async
 import pl.combosolutions.backup.wrapAsyncForMapping
-import pl.combosolutions.backup.dsl.Settings
 import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
+import pl.combosolutions.backup.tasks.Settings
 
 import scala.util.{ Success, Try }
 

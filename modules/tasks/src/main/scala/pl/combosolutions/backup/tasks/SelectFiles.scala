@@ -1,9 +1,8 @@
-package pl.combosolutions.backup.dsl.tasks.beta
+package pl.combosolutions.backup.tasks
 
 import java.nio.file.{ Path, Paths }
 
 import pl.combosolutions.backup.{ Async, Reporting }
-import pl.combosolutions.backup.dsl.tasks.beta.SelectFiles.SelectFilesAction
 import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
 
 object SelectFiles extends Reporting {
@@ -17,6 +16,8 @@ object SelectFiles extends Reporting {
   class SelectFilesAction[ParentResult, ChildResult](files: List[String])
     extends IndependentSubTaskBuilder[List[Path], ParentResult, ChildResult](selectFilesAction(files))
 }
+
+import SelectFiles._
 
 class SelectFiles[ParentBackupResult, ChildBackupResult, ParentRestoreResult, ChildRestoreResult](files: List[String])
   extends TaskBuilder[List[Path], ParentBackupResult, ChildBackupResult, List[Path], ParentRestoreResult, ChildRestoreResult](

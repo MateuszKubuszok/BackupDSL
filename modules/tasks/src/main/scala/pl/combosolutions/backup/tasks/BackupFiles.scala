@@ -1,10 +1,8 @@
-package pl.combosolutions.backup.dsl.tasks.beta
+package pl.combosolutions.backup.tasks
 
 import java.nio.file.{ Files, Path, Paths }
 
 import pl.combosolutions.backup.{ Async, Reporting }
-import pl.combosolutions.backup.dsl.tasks.beta.BackupFiles.{ BackupSubTaskBuilder, RestoreSubTaskBuilder }
-import pl.combosolutions.backup.dsl.Settings
 import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
 
 import scala.util.{ Failure, Success, Try }
@@ -57,6 +55,8 @@ object BackupFiles extends Reporting {
   class RestoreSubTaskBuilder[ChildResult](withSettings: Settings)
     extends ParentDependentSubTaskBuilder[List[Path], List[Path], ChildResult](restorePassedFilesAction(withSettings))
 }
+
+import BackupFiles._
 
 class BackupFiles[ChildBackupResult, ChildRestoreResult](withSettings: Settings)
   extends TaskBuilder[List[Path], List[Path], ChildBackupResult, List[Path], List[Path], ChildRestoreResult](

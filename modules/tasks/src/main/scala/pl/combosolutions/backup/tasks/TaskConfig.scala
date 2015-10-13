@@ -1,4 +1,4 @@
-package pl.combosolutions.backup.dsl.tasks.beta
+package pl.combosolutions.backup.tasks
 
 case class TaskConfig[BackupResult, ParentBackupResult, ChildBackupResult, RestoreResult, ParentRestoreResult, ChildRestoreResult](
     parent: Option[TaskBuilder[ParentBackupResult, _, _, ParentRestoreResult, _, _]] = None,
