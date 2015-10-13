@@ -60,14 +60,17 @@ final class SubTaskProxy[Result](proxyDependencyType: DependencyType.Value) exte
 
   private var implementation: Option[SubTask[Result]] = None
 
-  private[tasks] def setImplementation[T <: SubTask[Result]](subTask: T): Unit = {
+  private[tasks] def setImplementation[T <: SubTask[Result]](subTask: T): Unit = synchronized {
     assert(implementation.isEmpty, ProxyInitialized)
-    assert(dependencyType == subTask.dependencyType, CircularDependency)
+    require(dependencyType == subTask.dependencyType, CircularDependency)
 
     implementation = Some(subTask)
   }
 
-  def execute = implementation map (_.result) getOrElse (ReportException onIllegalStateOf ProxyNotInitialized)
+  def execute = synchronized {
+    assert(implementation.isDefined, ProxyNotInitialized)
+    implementation.get.result
+  }
 }
 
 sealed abstract class SubTaskBuilder[Result, ParentResult, ChildResult](dependencyType: DependencyType.Value) {
