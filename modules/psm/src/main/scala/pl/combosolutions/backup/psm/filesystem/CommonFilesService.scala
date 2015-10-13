@@ -20,23 +20,20 @@ trait CommonFilesServiceComponent extends FilesServiceComponent {
 
     override lazy val filesAvailable = available
 
-    override def copy(from: Path, into: Path): Boolean = Try(Files copy (from, into, withCopyOptions: _*)) recover {
-      case ex: Throwable =>
-        logger error (s"Failed to copy '$from' '$into'", ex)
-        ex
-    } isSuccess
+    override def copy(from: Path, into: Path): Boolean =
+      Try(Files copy (from, into, withCopyOptions: _*)) recover logError(s"Failed to copy '$from' -> '$into'") isSuccess
 
-    override def delete(file: Path): Boolean = Try(Files delete file) recover {
-      case ex: Throwable =>
-        logger error (s"Failed to delete '$file'", ex)
-        ex
-    } isSuccess
+    override def delete(file: Path): Boolean =
+      Try(Files delete file) recover logError(s"Failed to delete '$file'") isSuccess
 
-    override def move(from: Path, into: Path): Boolean = Try(Files move (from, into, withMoveOptions: _*)) recover {
+    override def move(from: Path, into: Path): Boolean =
+      Try(Files move (from, into, withMoveOptions: _*)) recover logError(s"Failed to move '$from' -> '$into'") isSuccess
+
+    private def logError(message: String): PartialFunction[Throwable, Throwable] = {
       case ex: Throwable =>
-        logger error (s"Failed to move '$from' '$into'", ex)
+        logger error (message, ex)
         ex
-    } isSuccess
+    }
   }
 
   object FilesServiceImpl extends FilesServiceImpl

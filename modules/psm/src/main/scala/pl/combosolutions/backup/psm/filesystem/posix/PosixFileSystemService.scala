@@ -32,7 +32,7 @@ trait PosixFileSystemServiceComponent
       import pl.combosolutions.backup.psm.ExecutionContexts.Command.context
       Async.completeSequence(paths2Strings(files) map { pair =>
         LinkFile(pair._1, pair._2).handleElevation.digest[Boolean].asAsync.map(if (_) string2Path(List(pair._1)) else List())
-      }).asAsync.map(_.flatten)
+      }).asAsync map (_.flatten)
     }
   }
 
