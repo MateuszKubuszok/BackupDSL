@@ -39,6 +39,9 @@ trait AptRepositoriesServiceComponent extends RepositoriesServiceComponent {
                                    (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
       areAllTrueWithinAsyncs(asApt(repositories) map (AptRemoveRepository(_).handleElevation.digest[Boolean]))
 
+    override def updateRepositories(implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
+      AptGetUpdate.handleElevation.digest[Boolean]
+
     override def installAll(packages: Packages)
                            (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
       AptGetInstall(packages toList).handleElevation.digest[Boolean]

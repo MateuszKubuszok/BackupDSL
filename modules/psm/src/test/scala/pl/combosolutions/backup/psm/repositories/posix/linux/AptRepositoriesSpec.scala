@@ -65,6 +65,19 @@ class AptRepositoriesSpec
       await(result) must beSome(true)
     } tag UnitTest
 
+    "update repositories" in new ProgramContext(classOf[AptGetUpdate], classOf[Boolean]) {
+      // given
+      implicit val e = elevationMode
+      implicit val c = cleaner
+      makeDigestReturn(true)
+
+      // when
+      val result = service.updateRepositories
+
+      // then
+      await(result) must beSome(true)
+    } tag UnitTest
+
     "install packages" in new ProgramContext(classOf[AptGetInstall], classOf[Boolean]) {
       // given
       implicit val e = elevationMode

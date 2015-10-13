@@ -21,6 +21,7 @@ trait RepositoriesService {
                      (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner): Async[Boolean]
   def removeRepositories(repositories: Repositories)
                         (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner): Async[Boolean]
+  def updateRepositories(implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner): Async[Boolean]
 
   type Packages = List[Package]
   def areAllInstalled(packages: Packages)(implicit withElevation: ElevationMode, cleaner: Cleaner): Async[Boolean]

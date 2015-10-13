@@ -25,7 +25,7 @@ class PlatformSpecificAdvisedTest
     case _ => ReportException onNotImplemented "Unknown repository"
   }
 
-  val timeout = DurationInt(10) seconds
+  val timeout = DurationInt(60) seconds
 
   "Current platform's repositories" should {
 
@@ -63,6 +63,18 @@ class PlatformSpecificAdvisedTest
 
       // then
       result must beSome(true).await
+    } tag PlatformTest
+
+    "updates repositories" in new TestContext {
+      // given
+      implicit val e = withElevation
+      implicit val c = cleaner
+
+      // when
+      val result = repositoriesService.updateRepositories
+
+      // then
+      result must beSome(true).await(timeout = timeout)
     } tag PlatformTest
 
     "installs package" in new TestContext {
