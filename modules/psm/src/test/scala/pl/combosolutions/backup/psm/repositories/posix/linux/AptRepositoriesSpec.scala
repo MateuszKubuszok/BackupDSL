@@ -6,7 +6,7 @@ import org.specs2.specification.Scope
 import pl.combosolutions.backup.{ Async, Result }
 import pl.combosolutions.backup.psm.elevation.{ ObligatoryElevationMode, TestElevationFacadeComponent }
 import pl.combosolutions.backup.psm.operations.Cleaner
-import pl.combosolutions.backup.psm.programs.Program
+import pl.combosolutions.backup.psm.programs.{ ProgramContextHelper, Program }
 import pl.combosolutions.backup.psm.programs.posix.linux._
 import pl.combosolutions.backup.psm.repositories.{ AptRepository, UnversionedPackage, VersionedPackage }
 import pl.combosolutions.backup.test.AsyncSpecificationHelper
@@ -14,14 +14,18 @@ import pl.combosolutions.backup.test.Tags.UnitTest
 
 import scala.reflect.ClassTag
 
-class AptRepositoriesSpec extends Specification with Mockito with AsyncSpecificationHelper {
+class AptRepositoriesSpec
+    extends Specification
+    with Mockito
+    with AsyncSpecificationHelper
+    with ProgramContextHelper {
 
   val component = new AptRepositoriesServiceComponent with TestElevationFacadeComponent
   val service = component.repositoriesService
 
   "AptRepositoriesService" should {
 
-    "obtain available repositories" in new TestContext(classOf[ListAptRepos], classOf[List[AptRepository]]) {
+    "obtain available repositories" in new ProgramContext(classOf[ListAptRepos], classOf[List[AptRepository]]) {
       // given
       implicit val e = elevationMode
       implicit val c = cleaner
@@ -36,7 +40,7 @@ class AptRepositoriesSpec extends Specification with Mockito with AsyncSpecifica
       await(result) must beSome(repositories)
     } tag UnitTest
 
-    "add repositories" in new TestContext(classOf[AptAddRepository], classOf[Boolean]) {
+    "add repositories" in new ProgramContext(classOf[AptAddRepository], classOf[Boolean]) {
       // given
       implicit val e = elevationMode
       implicit val c = cleaner
@@ -51,7 +55,7 @@ class AptRepositoriesSpec extends Specification with Mockito with AsyncSpecifica
       await(result) must beSome(true)
     } tag UnitTest
 
-    "remove repositories" in new TestContext(classOf[AptRemoveRepository], classOf[Boolean]) {
+    "remove repositories" in new ProgramContext(classOf[AptRemoveRepository], classOf[Boolean]) {
       // given
       implicit val e = elevationMode
       implicit val c = cleaner
@@ -66,7 +70,7 @@ class AptRepositoriesSpec extends Specification with Mockito with AsyncSpecifica
       await(result) must beSome(true)
     } tag UnitTest
 
-    "install packages" in new TestContext(classOf[AptGetInstall], classOf[Boolean]) {
+    "install packages" in new ProgramContext(classOf[AptGetInstall], classOf[Boolean]) {
       // given
       implicit val e = elevationMode
       implicit val c = cleaner
@@ -81,7 +85,7 @@ class AptRepositoriesSpec extends Specification with Mockito with AsyncSpecifica
       await(result) must beSome(true)
     } tag UnitTest
 
-    "check if all packages are installed" in new TestContext(classOf[DpkgList], classOf[List[VersionedPackage]]) {
+    "check if all packages are installed" in new ProgramContext(classOf[DpkgList], classOf[List[VersionedPackage]]) {
       // given
       implicit val e = elevationMode
       implicit val c = cleaner
@@ -95,24 +99,5 @@ class AptRepositoriesSpec extends Specification with Mockito with AsyncSpecifica
       // then
       await(result) must beSome(true)
     } tag UnitTest
-  }
-
-  class TestContext[ProgramType <: Program[ProgramType], ResultType](
-      programClass: Class[ProgramType],
-      resultClass: Class[ResultType]) extends Scope {
-
-    type InterpreterType = Result[ProgramType]#Interpreter[ResultType]
-
-    implicit val programTag: ClassTag[ProgramType] = ClassTag(programClass)
-    implicit val resultTag: ClassTag[InterpreterType] = ClassTag(classOf[InterpreterType])
-
-    val program = mock[Program[ProgramType]]
-    val elevationMode = mock[ObligatoryElevationMode]
-    val cleaner = new Cleaner {}
-
-    elevationMode[ProgramType](any[ProgramType], ===(cleaner)) returns program
-
-    def makeDigestReturn(result: ResultType): Unit =
-      program.digest[ResultType](any[InterpreterType]) returns Async.some(result)
   }
 }
