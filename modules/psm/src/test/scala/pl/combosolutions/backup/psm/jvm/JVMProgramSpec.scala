@@ -16,22 +16,25 @@ class JVMProgramSpec extends Specification with Mockito {
       val mainClass = TestApp.getClass
       val args = List("1", "2", "3")
       val expectedArgs = List(
-        mainClass.getName.subSequence(0, mainClass.getName.size - 1)
+        mainClass.getName.subSequence(0, mainClass.getName.length - 1)
       ) ::: args
       val expectedCP = List("-cp", JVMUtils classPathFor mainClass reduce (_ + pathSeparator + _))
       val expectedJVMargs = JVMUtils.jvmArgsExceptDebug
+      val cpSize = expectedCP.size
+      val commandSize = expectedArgs.size
 
       // when
       val program = JVMProgram(mainClass, args).asGeneric
 
       // then
+      val beginningOfOwnArgs = program.arguments.size - commandSize
+      val beginningOfCPArgs = beginningOfOwnArgs - cpSize
       program.name mustEqual javaExec.toString
-      program.arguments.drop(program.arguments.size - expectedArgs.size) mustEqual expectedArgs
-      program.arguments.drop(program.arguments.size - expectedArgs.size - 2).take(2) mustEqual expectedCP
-      program.arguments.take(expectedJVMargs.size) mustEqual expectedJVMargs
+      program.arguments drop beginningOfOwnArgs mustEqual expectedArgs
+      program.arguments slice (beginningOfCPArgs, beginningOfCPArgs + cpSize) mustEqual expectedCP
+      program.arguments take expectedJVMargs.size mustEqual expectedJVMargs
     } tag UnitTest
   }
-
 }
 
 object TestApp extends App

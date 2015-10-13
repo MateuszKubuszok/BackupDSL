@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.tasks
 
-import pl.combosolutions.backup.{ Async, ReportException, wrapAsyncForMapping }
+import pl.combosolutions.backup.{ Async, AsyncTransformer, ReportException }
 import pl.combosolutions.backup.psm.ExecutionContexts
 import pl.combosolutions.backup.tasks.TasksExceptionMessages._
 
@@ -33,7 +33,7 @@ sealed trait SubTask[Result] {
   }
 
   def map[MappedResult](mapping: Result => MappedResult): SubTask[MappedResult] = {
-    val futureMapping = (result: Result) => (Async some mapping(result))
+    val futureMapping = (result: Result) => Async some mapping(result)
     SubTask(futureMapping, this)
   }
 }
@@ -96,7 +96,7 @@ final class IndependentSubTask[Result](action: () => Async[Result]) extends SubT
 
   val dependencyType = DependencyType.Independent
 
-  final override def execute = action()
+  override def execute = action()
 }
 
 case class IndependentSubTaskBuilder[Result, ParentResult, ChildResult](action: () => Async[Result]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.Independent) {
@@ -118,9 +118,9 @@ final class ParentDependentSubTask[Result, ParentResult](action: Function[Parent
 
   type Behavior = Function[ParentResult, Async[Result]]
 
-  final protected def execute = parent.result.asAsync flatMap (executeWithParentResult(_))
+  protected def execute = parent.result.asAsync flatMap (executeWithParentResult(_))
 
-  final val executeWithParentResult: Behavior = action
+  val executeWithParentResult: Behavior = action
 }
 
 case class ParentDependentSubTaskBuilder[Result, ParentResult, ChildResult](action: Function[ParentResult, Async[Result]]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.ParentDependent) {
@@ -150,9 +150,9 @@ final class ChildDependentSubTask[Result, ChildResult](action: Function[Traversa
 
   type Behavior = Function[Traversable[ChildResult], Async[Result]]
 
-  final protected def execute = compose(children).asAsync flatMap (executeWithChildrenResults(_))
+  protected def execute = compose(children).asAsync flatMap (executeWithChildrenResults(_))
 
-  final val executeWithChildrenResults: Behavior = action
+  val executeWithChildrenResults: Behavior = action
 }
 
 case class ChildDependentSubTaskBuilder[Result, ParentResult, ChildResult](action: Function[Traversable[ChildResult], Async[Result]]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.ChildDependent) {

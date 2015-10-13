@@ -60,14 +60,14 @@ object Settings extends Dependencies {
 
   abstract class Configurator(project: Project, config: Configuration, tag: String) {
 
-    protected def configure() = project.
+    protected def configure = project.
       configs(config).
       settings(inConfig(config)(testTasks): _*).
       settings(testOptions in config := Seq(includeTags(tag))).
       settings(libraryDependencies ++= testDeps map (_ % tag)).
       enablePlugins(ScoverageSbtPlugin)
 
-    protected def configureSequential() = configure.
+    protected def configureSequential = configure.
       settings(testOptions in config ++= Seq(sequential)).
       settings(parallelExecution in config := false)
   }
@@ -77,24 +77,24 @@ trait Settings {
 
   implicit class CommonConfigurator(project: Project) {
 
-    def configureCommon() = project.settings(commonSettings: _*)
+    def configureCommon = project.settings(commonSettings: _*)
   }
 
   implicit class PlatformConfigurator(project: Project)
     extends Configurator(project, PlatformTest, platformTestTag) {
 
-    def configurePlatform() = configureSequential
+    def configurePlatform = configureSequential
   }
 
   implicit class FunctionalConfigurator(project: Project)
     extends Configurator(project, FunctionalTest, functionalTestTag) {
 
-    def configureFunctional() = configure
+    def configureFunctional = configure
   }
 
   implicit class UnitConfigurator(project: Project)
     extends Configurator(project, UnitTest, unitTestTag) {
 
-    def configureUnit() = configure
+    def configureUnit = configure
   }
 }

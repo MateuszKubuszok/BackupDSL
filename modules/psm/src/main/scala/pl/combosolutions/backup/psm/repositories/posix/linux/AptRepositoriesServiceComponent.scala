@@ -1,7 +1,6 @@
 package pl.combosolutions.backup.psm.repositories.posix.linux
 
-import pl.combosolutions.backup.Async
-import pl.combosolutions.backup.wrapAsyncForMapping
+import pl.combosolutions.backup.{ Async, AsyncTransformer }
 import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
 import pl.combosolutions.backup.psm.elevation.{ ElevateIfNeeded, ElevationMode, ObligatoryElevationMode }
 import ElevateIfNeeded._

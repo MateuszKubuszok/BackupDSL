@@ -27,7 +27,7 @@ object AptPrograms {
   implicit val ListAptRepos2AptRepositories: ListAptReposInterpreter[List[AptRepository]] = result => for {
     line <- result.stdout
     lineMatch <- aptSourcePattern findFirstMatchIn line
-    isSrc = Option(lineMatch group 1) map (_ equalsIgnoreCase "deb-src") getOrElse false
+    isSrc = Option(lineMatch group 1) exists (_ equalsIgnoreCase "deb-src")
     url = Option(lineMatch group 4).get
     branch = Option(lineMatch group 5).get
     areas = Option(lineMatch group 6) map (_ split "\\s+" filterNot (_.isEmpty) toList) getOrElse List()

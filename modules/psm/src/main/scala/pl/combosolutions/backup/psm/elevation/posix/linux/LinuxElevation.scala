@@ -1,7 +1,7 @@
 package pl.combosolutions.backup.psm.elevation.posix.linux
 
 import pl.combosolutions.backup.psm.elevation.{ ElevationService, ElevationFacadeComponentImpl, ElevationFacadeComponent, ElevationServiceComponent }
-import pl.combosolutions.backup.psm.elevation.posix.{ CommonElevationServiceComponent }
+import pl.combosolutions.backup.psm.elevation.posix.CommonElevationServiceComponent
 
 trait GKSudoElevationServiceComponent extends CommonElevationServiceComponent {
   self: ElevationServiceComponent with ElevationFacadeComponent =>

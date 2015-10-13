@@ -8,7 +8,7 @@ class CommonProgramsSpec extends Specification with Mockito {
 
   "GenericProgram" should {
 
-    "pass called program name and agruments without change" in {
+    "pass called program name and arguments without change" in {
       // given
       val name = "test-program"
       val arguments = List("test1", "test2")

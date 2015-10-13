@@ -31,7 +31,7 @@ private[elevation] class ElevationFacade(rmiManager: RmiManager) extends Logging
 
   def close = {
     client.terminate
-    server.destroy
+    server.destroy()
   }
 
   protected def createMutex = new RmiMutex

@@ -23,8 +23,8 @@ class ElevatorProgramsSpec extends Specification with Mockito with AsyncSpecific
       val elevationService = mock[ElevationService]
       val expectedName = elevationName
       val expectedArgs = elevationArgs ++ List(programName) ++ programArgs
-      (elevationService.elevationCMD) returns elevationName
-      (elevationService.elevationArgs) returns elevationArgs
+      elevationService.elevationCMD returns elevationName
+      elevationService.elevationArgs returns elevationArgs
 
       // when
       val elevated = DirectElevatorProgram(program, elevationService).asGeneric

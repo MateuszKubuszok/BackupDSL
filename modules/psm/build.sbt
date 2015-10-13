@@ -1,3 +1,3 @@
 name := "backup-psm"
 
-initialCommands := "import pl.combosoutions.backup.psm._"
+initialCommands := "import pl.combosolutions.backup.psm._"

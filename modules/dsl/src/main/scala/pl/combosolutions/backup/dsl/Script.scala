@@ -21,7 +21,8 @@ abstract class Script(name: String) extends Cleaner with Logging with Components
 
     (arg[Action]("action")
       action { (action, conf) => conf.copy(action = action) }
-      text "whether to perform backup or restore" required)
+      text "whether to perform backup or restore"
+      required ())
 
     (help("help")
       text "displays help")
@@ -40,12 +41,12 @@ abstract class Script(name: String) extends Cleaner with Logging with Components
 
   private final def execute(config: ScriptConfig): Unit = config.action match {
     case Action.Backup =>
-      logger info s"Running BACKUP: ${name}"
-      logger trace s"with configuration ${config}"
+      logger info s"Running BACKUP: $name"
+      logger trace s"with configuration $config"
       backup
     case Action.Restore =>
-      logger info s"Running RESTORE: ${name}"
-      logger trace s"with configuration ${config}"
+      logger info s"Running RESTORE: $name"
+      logger trace s"with configuration $config"
       restore
   }
 

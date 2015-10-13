@@ -43,10 +43,10 @@ class ElevationClientSpec extends Specification with Mockito with AsyncSpecifica
 
     "return failed Async for failed request" in new TestContext {
       // given
-      (server runRemote program) throws (new RemoteException("test exception"))
+      server runRemote program throws new RemoteException("test exception")
 
       // when
-      val result = (client executeRemote program)
+      val result = client executeRemote program
 
       // then
       result must throwA[RemoteException].await

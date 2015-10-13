@@ -16,12 +16,12 @@ class PlatformSpecificAdvisedTest
   type Repositories = List[Repository]
 
   val testRepository: Repository = repositoriesService match {
-    case repository: AptRepositoriesService => AptRepository(false, "test-url", "test-branch", List("test"), List("x368"))
+    case repository: AptRepositoriesService => AptRepository(isSrc = false, "test-url", "test-branch", List("test"), List("x368"))
     case _ => ReportException onNotImplemented "Unknown repository"
   }
 
   val testPackage: Package = repositoriesService match {
-    case repository: AptRepositoriesService => UnversionedPackage("grep")
+    case repository: AptRepositoriesService => NonVersionedPackage("grep")
     case _ => ReportException onNotImplemented "Unknown repository"
   }
 

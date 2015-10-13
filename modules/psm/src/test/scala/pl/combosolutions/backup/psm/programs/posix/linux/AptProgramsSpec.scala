@@ -10,7 +10,7 @@ import pl.combosolutions.backup.test.Tags.UnitTest
 
 class AptProgramsSpec extends Specification with Mockito {
 
-  val repository = AptRepository(false, "test-url", "test-branch", List("test"), List("test"))
+  val repository = AptRepository(isSrc = false, "test-url", "test-branch", List("test"), List("test"))
   val package_ = VersionedPackage("test-program", "test-version")
 
   "AptAddRepository" should {
@@ -153,7 +153,7 @@ class AptProgramsSpec extends Specification with Mockito {
     "be digested to List[AptRepository] with built-in Interpreter" in {
       // given
       import AptPrograms.ListAptRepos2AptRepositories
-      val expected = AptRepository(false, "test-package", "test-version", List(), List())
+      val expected = AptRepository(isSrc = false, "test-package", "test-version", List(), List())
       val program = new Program[ListAptRepos]("", List()) with TestProgramHelper[ListAptRepos]
       program.result = Async some Result[ListAptRepos](0, List(s"/etc/apt/sources.list:$expected"), List())
 

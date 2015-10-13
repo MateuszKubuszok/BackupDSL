@@ -58,13 +58,13 @@ private[elevation] class RmiManager(executorClass: Class[_ <: App]) extends Logg
     stub
   }
 
-  def createRegister() = _createRegister()
+  def createRegister = _createRegister()
 
   def findFreeName(registry: Registry) = _findFreeName(registry)
 
   @tailrec
   private def _createRegister(attemptsLeft: Integer = 10): (Registry, Integer) = {
-    val possiblePorts = (1024 to 65536)
+    val possiblePorts = 1024 to 65536
     val randomPort = possiblePorts(Random nextInt possiblePorts.size)
 
     // format: OFF
@@ -78,7 +78,7 @@ private[elevation] class RmiManager(executorClass: Class[_ <: App]) extends Logg
 
   @tailrec
   private def _findFreeName(registry: Registry): String = {
-    val name = Random.nextLong.toString
+    val name = Random.nextLong().toString
     if (!registry.list.contains(name)) name
     else _findFreeName(registry)
   }

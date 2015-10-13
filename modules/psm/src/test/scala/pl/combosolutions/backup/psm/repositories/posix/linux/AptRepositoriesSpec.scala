@@ -5,7 +5,7 @@ import org.specs2.mutable.Specification
 import pl.combosolutions.backup.psm.elevation.TestElevationFacadeComponent
 import pl.combosolutions.backup.psm.programs.ProgramContextHelper
 import pl.combosolutions.backup.psm.programs.posix.linux._
-import pl.combosolutions.backup.psm.repositories.{ AptRepository, UnversionedPackage, VersionedPackage }
+import pl.combosolutions.backup.psm.repositories.{ AptRepository, NonVersionedPackage, VersionedPackage }
 import pl.combosolutions.backup.test.AsyncSpecificationHelper
 import pl.combosolutions.backup.test.Tags.UnitTest
 
@@ -24,7 +24,7 @@ class AptRepositoriesSpec
       // given
       implicit val e = elevationMode
       implicit val c = cleaner
-      val repository = AptRepository(true, "test", "test", List(), List())
+      val repository = AptRepository(isSrc = true, "test", "test", List(), List())
       val repositories = List(repository)
       makeDigestReturn(repositories)
 
@@ -39,7 +39,7 @@ class AptRepositoriesSpec
       // given
       implicit val e = elevationMode
       implicit val c = cleaner
-      val repository = AptRepository(true, "test", "test", List(), List())
+      val repository = AptRepository(isSrc = true, "test", "test", List(), List())
       val repositories = List(repository)
       makeDigestReturn(true)
 
@@ -54,7 +54,7 @@ class AptRepositoriesSpec
       // given
       implicit val e = elevationMode
       implicit val c = cleaner
-      val repository = AptRepository(true, "test", "test", List(), List())
+      val repository = AptRepository(isSrc = true, "test", "test", List(), List())
       val repositories = List(repository)
       makeDigestReturn(true)
 
@@ -82,7 +82,7 @@ class AptRepositoriesSpec
       // given
       implicit val e = elevationMode
       implicit val c = cleaner
-      val package_ = UnversionedPackage("test")
+      val package_ = NonVersionedPackage("test")
       val packages = List(package_)
       makeDigestReturn(true)
 

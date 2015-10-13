@@ -1,3 +1,3 @@
 name := "backup-tasks"
 
-initialCommands := "import pl.combosoutions.backup.tasks._"
+initialCommands := "import pl.combosolutions.backup.tasks._"

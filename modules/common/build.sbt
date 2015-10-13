@@ -1,3 +1,3 @@
 name := "backup-common"
 
-initialCommands := "import pl.combosoutions.backup._"
+initialCommands := "import pl.combosolutions.backup._"

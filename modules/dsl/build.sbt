@@ -1,3 +1,3 @@
 name := "backup-dsl"
 
-initialCommands := "import pl.combosoutions.backup.dsl._"
+initialCommands := "import pl.combosolutions.backup.dsl._"

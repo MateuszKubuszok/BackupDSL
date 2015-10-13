@@ -24,7 +24,7 @@ object ElevationServer {
 private[elevation] final class ElevationServerImpl extends ElevationServer with Logging {
 
   def runRemote(executable: Executable[_]): Option[Result[_]] = {
-    logger debug s"Run ${executable} remotely"
+    logger debug s"Run $executable remotely"
     Await result (executable.run, Duration.Inf)
   }
 

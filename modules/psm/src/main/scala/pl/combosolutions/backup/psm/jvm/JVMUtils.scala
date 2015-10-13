@@ -40,7 +40,7 @@ object JVMUtils extends Logging {
 
     val jarClassPath = jarClassPathPattern.findFirstMatchIn(pathToClass) map { matcher =>
       val jarDir = Paths get (matcher group 2) getParent ()
-      s"${jarDir}/*"
+      s"$jarDir/*"
     } toSet
 
     val fileClassPath = fileClassPathPattern.findFirstMatchIn(pathToClass) map { matcher =>

@@ -22,7 +22,7 @@ private[programs] trait ProgramExecutor extends Logging {
       var stderr = mutable.MutableList[String]()
       val logger = ProcessLogger(stdout += _, stderr += _)
 
-      val exitValue = processFor(program.name, program.arguments) run logger exitValue
+      val exitValue = processFor(program.name, program.arguments) run logger exitValue ()
 
       Program.logger trace s"finished ${program.asGeneric.toString}"
 
@@ -37,7 +37,7 @@ private[programs] trait ProgramExecutor extends Logging {
 
   def execute2Kill[T <: Program[T]](program: Program[T]): Process = {
     logger trace s"running  ${program.asGeneric.showCMD}"
-    processFor(program.name, program.arguments).run
+    processFor(program.name, program.arguments) run ()
   }
 
   protected def processFor(name: String, arguments: List[String]) = Process(name, arguments)

@@ -33,7 +33,7 @@ class ElevatedExecutorSpec extends Specification with Mockito {
 
     "notify about failed initialization" in new TestContext {
       // given
-      (registry.bind(===(serverName), any[ElevationServer])) throws (new RemoteException)
+      registry.bind(===(serverName), any[ElevationServer]) throws new RemoteException
 
       // when
       new TestElevatedExecutor(registry)(arguments)

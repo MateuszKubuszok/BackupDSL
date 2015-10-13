@@ -6,9 +6,7 @@ package object backup {
 
   type Async[U] = Future[Option[U]]
 
-  implicit def wrapAsyncForMapping[Result](result: Async[Result]) = new AsyncTransformer(result)
-
-  class AsyncTransformer[Result](result: Async[Result]) {
+  implicit class AsyncTransformer[Result](result: Async[Result]) {
 
     def asAsync = this
 
