@@ -2,6 +2,8 @@ package pl.combosolutions.backup
 
 object ReportException {
 
+  def onIllegalArgumentOf(message: String) = throw new IllegalArgumentException(message)
+
   def onIllegalStateOf(message: String) = throw new IllegalStateException(message)
   def onIllegalStateOf(message: String, exception: Throwable) = throw new IllegalStateException(message, exception)
 

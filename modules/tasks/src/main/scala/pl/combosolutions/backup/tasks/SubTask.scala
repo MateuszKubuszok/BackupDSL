@@ -67,7 +67,7 @@ final class SubTaskProxy[Result](proxyDependencyType: DependencyType.Value) exte
     implementation = Some(subTask)
   }
 
-  def execute = synchronized {
+  override def execute = synchronized {
     assert(implementation.isDefined, ProxyNotInitialized)
     implementation.get.result
   }
@@ -87,10 +87,10 @@ final class FakeSubTaskBuilder[Result, ParentResult, ChildResult](subTask: SubTa
   injectableProxy setImplementation subTask
 
   def configureForParent(parentTask: SubTaskBuilder[ParentResult, _, _]): Unit =
-    ReportException onIllegalStateOf FakeBuilderWithConfig
+    ReportException onIllegalArgumentOf FakeBuilderWithConfig
 
   def configureForChildren(childrenTasks: Traversable[SubTaskBuilder[ChildResult, _, _]]): Unit =
-    ReportException onIllegalStateOf FakeBuilderWithConfig
+    ReportException onIllegalArgumentOf FakeBuilderWithConfig
 }
 
 // Independent subtasks

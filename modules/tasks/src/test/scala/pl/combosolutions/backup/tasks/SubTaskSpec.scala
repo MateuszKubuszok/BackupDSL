@@ -76,4 +76,47 @@ class SubTaskSpec extends Specification with Mockito {
       proxy.result must beSome("test").await
     }
   }
+
+  "FakeSubTaskBuilder" should {
+
+    "set passed subTask inside injectable proxy" in {
+      // given
+      val expected = "test-subtask"
+      val subTask = mock[SubTask[String]]
+      subTask.dependencyType returns DependencyType.Independent
+      subTask.result returns (Async some expected)
+
+      // when
+      val builder = new FakeSubTaskBuilder[String, Unit, Unit](subTask, DependencyType.Independent)
+
+      // then
+      builder.injectableProxy.result must beSome(expected).await
+    }
+
+    "prevent configuration for parent" in {
+      // given
+      val subTask = mock[SubTask[String]]
+      subTask.dependencyType returns DependencyType.Independent
+      val parent = mock[SubTaskBuilder[Unit, _, _]]
+
+      // when
+      val builder = new FakeSubTaskBuilder[String, Unit, Unit](subTask, DependencyType.Independent)
+
+      // then
+      builder configureForParent parent must throwA[IllegalArgumentException]
+    }
+
+    "prevent configuration for children" in {
+      // given
+      val subTask = mock[SubTask[String]]
+      subTask.dependencyType returns DependencyType.Independent
+      val child = mock[SubTaskBuilder[Unit, _, _]]
+
+      // when
+      val builder = new FakeSubTaskBuilder[String, Unit, Unit](subTask, DependencyType.Independent)
+
+      // then
+      builder configureForChildren Seq(child) must throwA[IllegalArgumentException]
+    }
+  }
 }
