@@ -6,6 +6,52 @@ import pl.combosolutions.backup.Async
 
 class SubTaskSpec extends Specification with Mockito {
 
+  "SubTask" should {
+
+    "create subtask from function" in {
+      // given
+      val expected = "test-string"
+      val action = () => Async some expected
+
+      // when
+      val subTask = SubTask(action)
+
+      // then
+      subTask.result must beSome(expected).await
+    }
+
+    "flatMap result" in {
+      // given
+      val subTask = new TestSubTask[String] {
+        override val dependencyType = DependencyType.Independent
+        override def execute = Async some "test-result"
+      }
+
+      // when
+      val flatMappedTask = subTask flatMap (_ => SubTask(() => Async.none[String]))
+
+      // then
+      flatMappedTask.result must beNone.await
+    }
+
+    "map result" in {
+      // given
+      val initial = "test-result"
+      val suffix = " test-suffix"
+      val subTask = new TestSubTask[String] {
+        override val dependencyType = DependencyType.Independent
+        override def execute = Async some initial
+      }
+      val expected = initial ++ suffix
+
+      // when
+      val mappedTask = subTask map (_ ++ suffix)
+
+      // then
+      mappedTask.result must beSome(expected).await
+    }
+  }
+
   "SubTaskProxy" should {
 
     "foretell implementation's dependency type" in {

@@ -168,3 +168,7 @@ case class ChildDependentSubTaskBuilder[Result, ParentResult, ChildResult](actio
     injectableProxy.setImplementation(new ChildDependentSubTask[Result, ChildResult](action, childrenTasks.map(_.injectableProxy)))
   }
 }
+
+// TestSubTask
+
+private[tasks] trait TestSubTask[Result] extends SubTask[Result]
