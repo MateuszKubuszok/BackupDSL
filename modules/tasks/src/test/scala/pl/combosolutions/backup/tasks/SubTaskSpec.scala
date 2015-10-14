@@ -165,4 +165,88 @@ class SubTaskSpec extends Specification with Mockito {
       builder configureForChildren Seq(child) must throwA[IllegalArgumentException]
     }
   }
+
+  "IndependentSubTask" should {
+
+    "be independent" in {
+      // given
+      val action = () => Async some "unimportant"
+
+      // when
+      val subTask = new IndependentSubTask(action)
+
+      // then
+      subTask.dependencyType mustEqual DependencyType.Independent
+    }
+
+    "run action" in {
+      // given
+      val expected = "test-result"
+      val action = () => Async some expected
+
+      // when
+      val subTask = new IndependentSubTask(action)
+
+      // then
+      subTask.result must beSome(expected).await
+    }
+  }
+
+  "ParentDependentSubTask" should {
+
+    "be parent dependent" in {
+      // given
+      val parent = mock[SubTask[String]]
+      val action = (string: String) => Async some string
+
+      // when
+      val subTask = new ParentDependentSubTask[String, String](action, parent)
+
+      // then
+      subTask.dependencyType mustEqual DependencyType.ParentDependent
+    }
+
+    "run action" in {
+      // given
+      val expected = "test-result"
+      val parent = mock[SubTask[String]]
+      val action = (string: String) => Async some string
+      parent.result returns (Async some expected)
+
+      // when
+      val subTask = new ParentDependentSubTask[String, String](action, parent)
+
+      // then
+      subTask.result must beSome(expected).await
+    }
+  }
+
+  "ChildDependentSubTask" should {
+
+    "be child dependent" in {
+      // given
+      val child = mock[SubTask[String]]
+      val action = (strings: Traversable[String]) => Async some strings.headOption.getOrElse("")
+
+      // when
+      val subTask = new ChildDependentSubTask[String, String](action, Seq(child))
+
+      // then
+      subTask.dependencyType mustEqual DependencyType.ChildDependent
+    }
+
+    "run action" in {
+      // given
+      val expected = "test-result"
+      val child = mock[SubTask[String]]
+      val action = (strings: Traversable[String]) => Async some strings.headOption.getOrElse("")
+      child.result returns (Async some expected)
+
+      // when
+      val subTask = new ChildDependentSubTask[String, String](action, Seq(child))
+
+      // then
+      subTask.result must beSome(expected).await
+    }
+  }
 }

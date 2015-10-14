@@ -107,10 +107,10 @@ case class IndependentSubTaskBuilder[Result, ParentResult, ChildResult](action: 
   injectableProxy.setImplementation(new IndependentSubTask[Result](action))
 
   final override def configureForParent(parentTask: SubTaskBuilder[ParentResult, _, _]): Unit =
-    ReportException onIllegalStateOf IndependentTaskWithParentConfig
+    ReportException onIllegalArgumentOf IndependentTaskWithParentConfig
 
   final override def configureForChildren(childrenTasks: Traversable[SubTaskBuilder[ChildResult, _, _]]): Unit =
-    ReportException onIllegalStateOf IndependentTaskWithChildrenConfig
+    ReportException onIllegalArgumentOf IndependentTaskWithChildrenConfig
 }
 
 // Parent dependent subtasks
@@ -134,7 +134,7 @@ case class ParentDependentSubTaskBuilder[Result, ParentResult, ChildResult](acti
   }
 
   final override def configureForChildren(childrenTasks: Traversable[SubTaskBuilder[ChildResult, _, _]]): Unit =
-    ReportException onIllegalStateOf ParentDependentWithChildrenConfig
+    ReportException onIllegalArgumentOf ParentDependentWithChildrenConfig
 }
 
 // Child dependent subtasks
@@ -161,7 +161,7 @@ final class ChildDependentSubTask[Result, ChildResult](action: Function[Traversa
 case class ChildDependentSubTaskBuilder[Result, ParentResult, ChildResult](action: Function[Traversable[ChildResult], Async[Result]]) extends SubTaskBuilder[Result, ParentResult, ChildResult](DependencyType.ChildDependent) {
 
   final override def configureForParent(childrenTasks: SubTaskBuilder[ParentResult, _, _]): Unit =
-    ReportException onIllegalStateOf ChildrenDependentWithParentConfig
+    ReportException onIllegalArgumentOf ChildrenDependentWithParentConfig
 
   final override def configureForChildren(childrenTasks: Traversable[SubTaskBuilder[ChildResult, _, _]]): Unit = {
     assert(childrenTasks.forall(_.injectableProxy.dependencyType != DependencyType.ParentDependent), CircularDependency)
