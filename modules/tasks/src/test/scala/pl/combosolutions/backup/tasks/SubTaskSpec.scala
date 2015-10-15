@@ -192,6 +192,34 @@ class SubTaskSpec extends Specification with Mockito {
     }
   }
 
+  "IndependentSubTaskBuilder" should {
+
+    "spawn Independent subtask" in {
+      // given
+      val action = () => Async some "unimportant"
+
+      // when
+      val builder = new IndependentSubTaskBuilder[String, Unit, Unit](action)
+
+      // then
+      builder.injectableProxy.dependencyType mustEqual DependencyType.Independent
+    }
+
+    "be independent" in {
+      // given
+      val action = () => Async some "unimportant"
+      val parent = mock[SubTaskBuilder[Unit, Unit, Unit]]
+      val child = mock[SubTaskBuilder[Unit, Unit, Unit]]
+
+      // when
+      val builder = new IndependentSubTaskBuilder[String, Unit, Unit](action)
+
+      // then
+      builder.configureForParent(parent) must throwA[IllegalArgumentException]
+      builder.configureForChildren(List(child)) must throwA[IllegalArgumentException]
+    }
+  }
+
   "ParentDependentSubTask" should {
 
     "be parent dependent" in {
@@ -221,6 +249,34 @@ class SubTaskSpec extends Specification with Mockito {
     }
   }
 
+  "ParentDependentSubTaskBuilder" should {
+
+    "spawn ParentDependent subtask" in {
+      // given
+      val action = (_: String) => Async some "unimportant"
+
+      // when
+      val builder = new ParentDependentSubTaskBuilder[String, String, Unit](action)
+
+      // then
+      builder.injectableProxy.dependencyType mustEqual DependencyType.ParentDependent
+    }
+
+    "be parent dependent" in {
+      // given
+      val action = (_: String) => Async some "unimportant"
+      val parent = mock[SubTaskBuilder[String, Unit, Unit]]
+      val child = mock[SubTaskBuilder[Unit, Unit, Unit]]
+
+      // when
+      val builder = new ParentDependentSubTaskBuilder[String, String, Unit](action)
+
+      // then
+      builder.configureForParent(parent) must not(throwA[IllegalArgumentException])
+      builder.configureForChildren(List(child)) must throwA[IllegalArgumentException]
+    }
+  }
+
   "ChildDependentSubTask" should {
 
     "be child dependent" in {
@@ -247,6 +303,34 @@ class SubTaskSpec extends Specification with Mockito {
 
       // then
       subTask.result must beSome(expected).await
+    }
+  }
+
+  "ChildDependentSubTaskBuilder" should {
+
+    "spawn ParentDependent subtask" in {
+      // given
+      val action = (_: Traversable[String]) => Async some "unimportant"
+
+      // when
+      val builder = new ChildDependentSubTaskBuilder[String, Unit, String](action)
+
+      // then
+      builder.injectableProxy.dependencyType mustEqual DependencyType.ChildDependent
+    }
+
+    "be child dependent" in {
+      // given
+      val action = (_: Traversable[String]) => Async some "unimportant"
+      val parent = mock[SubTaskBuilder[Unit, Unit, Unit]]
+      val child = mock[SubTaskBuilder[String, Unit, Unit]]
+
+      // when
+      val builder = new ChildDependentSubTaskBuilder[String, Unit, String](action)
+
+      // then
+      builder.configureForParent(parent) must throwA[IllegalArgumentException]
+      builder.configureForChildren(List(child)) must not(throwA[IllegalArgumentException])
     }
   }
 }
