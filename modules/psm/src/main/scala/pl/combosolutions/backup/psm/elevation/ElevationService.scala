@@ -16,6 +16,8 @@ trait ElevationService {
 
   val elevationAvailable: Boolean
 
+  val elevationPriority: ImplementationPriority
+
   val elevationCMD: String
 
   val elevationArgs: List[String] = List()
@@ -51,10 +53,7 @@ object ElevationServiceComponentImpl extends ImplementationResolver[ElevationSer
 
   override def byFilter(service: ElevationService): Boolean = service.elevationAvailable
 
-  // TODO: improve
-  override def byPriority(service: ElevationService): ImplementationPriority =
-    if (service.elevationAvailable) Allowed
-    else NotAllowed
+  override def byPriority(service: ElevationService): ImplementationPriority = service.elevationPriority
 }
 
 trait ElevationServiceComponentImpl extends ElevationServiceComponent {
