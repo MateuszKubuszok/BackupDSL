@@ -17,8 +17,8 @@ object PosixPrograms {
   type FileInfoInterpreter[U] = Result[FileInfo]#Interpreter[U]
   implicit val FileInfo2FileType: FileInfoInterpreter[FileType] = _.stdout.headOption map {
     case fileIsDirectory(fileName) => Directory
-    case fileIsSymlink(fileName) => SymbolicLink
-    case fileIsFile(fileName) => File
+    case fileIsSymlink(fileName)   => SymbolicLink
+    case fileIsFile(fileName)      => File
   } getOrElse (ReportException onIllegalStateOf UnknownFileType)
 
   type LinkFileInterpreter[U] = Result[LinkFile]#Interpreter[U]

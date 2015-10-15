@@ -17,12 +17,12 @@ class PlatformSpecificAdvisedTest
 
   val testRepository: Repository = repositoriesService match {
     case repository: AptRepositoriesService => AptRepository(isSrc = false, "test-url", "test-branch", List("test"), List("x368"))
-    case _ => ReportException onNotImplemented "Unknown repository"
+    case _                                  => ReportException onNotImplemented "Unknown repository"
   }
 
   val testPackage: Package = repositoriesService match {
     case repository: AptRepositoriesService => NonVersionedPackage("grep")
-    case _ => ReportException onNotImplemented "Unknown repository"
+    case _                                  => ReportException onNotImplemented "Unknown repository"
   }
 
   val timeout = DurationInt(60) seconds

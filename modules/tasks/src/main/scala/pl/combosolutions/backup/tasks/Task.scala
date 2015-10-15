@@ -15,9 +15,9 @@ final class Task[BackupResult, ParentBackupResult, ChildBackupResult, RestoreRes
   def restore = restoreSubTask.result
 
   def eitherSubTask(action: Action.Value) = action match {
-    case Action.Backup => Right(() => backupResult)
+    case Action.Backup  => Right(() => backupResult)
     case Action.Restore => Left(() => restoreResult)
-    case _ => ReportException onIllegalStateOf InvalidScriptAction
+    case _              => ReportException onIllegalStateOf InvalidScriptAction
   }
 }
 

@@ -6,6 +6,7 @@ import sbt._
 import sbt.Keys._
 
 import Settings._
+import scalariform.formatter.preferences._
 import scoverage.ScoverageKeys._
 import scoverage.ScoverageSbtPlugin
 
@@ -26,7 +27,7 @@ object Settings extends Dependencies {
     organization := "pl.combosolutions",
     version := "0.1.0-SNAPSHOT",
 
-    scalaVersion := "2.11.6",
+    scalaVersion := "2.11.7",
     scalacOptions ++= Seq(
       "-unchecked",
       "-deprecation",
@@ -40,16 +41,21 @@ object Settings extends Dependencies {
       "-Ywarn-unused-import"
     ),
 
-    resolvers ++= Seq(
-      Resolver sonatypeRepo "public",
-      Resolver typesafeRepo "releases"
-    ),
+    resolvers ++= commonResolvers,
 
     libraryDependencies ++= mainDeps,
     libraryDependencies ++= testDeps map (_ % "test"),
 
     testOptions in Test += excludeTags(platformTestTag, disabledTestTag),
-    coverageEnabled := true
+    coverageEnabled := true,
+
+    ScalariformKeys.preferences := ScalariformKeys.preferences.value
+      .setPreference(AlignParameters, true)
+      .setPreference(AlignSingleLineCaseStatements, true)
+      .setPreference(DoubleIndentClassDeclaration, true)
+      .setPreference(IndentLocalDefs, true)
+      .setPreference(PreserveDanglingCloseParenthesis, true)
+      .setPreference(PreserveSpaceBeforeArguments, true)
   )
 
   private val commonSettings = scalariformSettings ++ customSettings

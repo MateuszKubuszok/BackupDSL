@@ -6,7 +6,7 @@ object Dependencies {
 
   // functional utils
   val scalaz        = "org.scalaz" %% "scalaz-core" % "7.1.3"
-  val scalazContrib = "org.typelevel" % "scalaz-contrib-210_2.11" % "0.2"
+  val scalazContrib = "org.typelevel" %% "scalaz-contrib-210" % "0.2" exclude ("org.scalaz", "scalaz-core_2.11")
 
   // Apache common utils
   val commonsIo   = "commons-io" % "commons-io" % "2.4"
@@ -26,6 +26,11 @@ object Dependencies {
 }
 
 trait Dependencies {
+
+  val commonResolvers = Seq(
+    Resolver sonatypeRepo "public",
+    Resolver typesafeRepo "releases"
+  )
 
   val mainDeps = Seq(scalaz, scalazContrib, commonsIo, commonsLang, scopt, logback)
 

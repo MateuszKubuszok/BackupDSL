@@ -15,7 +15,7 @@ trait ProgramResultTestHelper {
     override def apply[S <: Async[Result[ResultType]]](t: Expectable[S]): MatchResult[S] =
       Await.result(t.value, Duration.Inf) match {
         case Some(programResult) => MatchSuccess[S]("Correct program result", "", t)
-        case _ => MatchFailure[S]("", "Program execution failed", t)
+        case _                   => MatchFailure[S]("", "Program execution failed", t)
       }
   }
 }

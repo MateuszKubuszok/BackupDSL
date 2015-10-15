@@ -16,8 +16,8 @@ class PlatformSpecificAdvisedTest
 
   val testProgram: GenericProgram = operatingSystem match {
     case system: WindowsSystem => GenericProgram("cmd", List())
-    case system: PosixSystem => GenericProgram("ls", List())
-    case _ => ReportException onNotImplemented "Unknown platform"
+    case system: PosixSystem   => GenericProgram("ls", List())
+    case _                     => ReportException onNotImplemented "Unknown platform"
   }
 
   "Current platform's elevator" should {

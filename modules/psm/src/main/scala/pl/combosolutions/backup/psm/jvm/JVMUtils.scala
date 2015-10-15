@@ -74,7 +74,7 @@ object JVMUtils extends Logging {
     val url = clazz getResource s"${clazz.getSimpleName}.class"
     Try(URLDecoder decode (url.toString, "UTF-8")) match {
       case Success(classFilePath) => classFilePath
-      case Failure(ex) => ReportException onIllegalStateOf (BadClassURL, ex)
+      case Failure(ex)            => ReportException onIllegalStateOf (BadClassURL, ex)
     }
   }
 

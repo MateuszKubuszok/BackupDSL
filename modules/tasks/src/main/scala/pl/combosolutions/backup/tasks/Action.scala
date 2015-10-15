@@ -9,9 +9,9 @@ object Action extends Enumeration {
     override def arity: Int = 1
 
     override def reads: (String) => Action = (action) => action.trim.toLowerCase match {
-      case "backup" => Backup
+      case "backup"  => Backup
       case "restore" => Restore
-      case _ => No
+      case _         => No
     }
   }
 
