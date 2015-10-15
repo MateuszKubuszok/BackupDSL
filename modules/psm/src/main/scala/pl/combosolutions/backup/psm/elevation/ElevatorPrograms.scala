@@ -11,14 +11,16 @@ import scalaz.OptionT._
 import scalaz.std.scalaFuture._
 
 final case class DirectElevatorProgram[T <: Program[T]](
-  program: Program[T], elevationService: ElevationService) extends Program[T](
+  program: Program[T], elevationService: ElevationService
+) extends Program[T](
   elevationService.elevationCMD,
   elevationService.elevationArgs ++ (program.name :: program.arguments)
 )
 
 final case class RemoteElevatorProgram[T <: Program[T]](
-  program: Program[T],
-  elevationFacade: ElevationFacade) extends Program[T](
+  program:         Program[T],
+  elevationFacade: ElevationFacade
+) extends Program[T](
   program.name,
   program.arguments
 ) {

@@ -9,8 +9,9 @@ import scalaz.OptionT._
 import scalaz.std.scalaFuture._
 
 final case class RemoteElevatorCommand[T <: Command[T]](
-    command: Command[T],
-    elevationFacade: ElevationFacade) extends Command[T] {
+    command:         Command[T],
+    elevationFacade: ElevationFacade
+) extends Command[T] {
 
   override def run = (for {
     result <- optionT[Future](elevationFacade runRemotely command)

@@ -14,7 +14,8 @@ trait ProgramContextHelper {
 
   class ProgramContext[ProgramType <: Program[ProgramType], ResultType](
       programClass: Class[ProgramType],
-      resultClass: Class[ResultType]) extends Scope {
+      resultClass:  Class[ResultType]
+  ) extends Scope {
 
     type InterpreterType = Result[ProgramType]#Interpreter[ResultType]
 

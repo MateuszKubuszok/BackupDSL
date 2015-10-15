@@ -21,8 +21,9 @@ object JVMProgramArgs {
 }
 
 case class JVMProgram[T <: App](
-  mainClass: Class[T],
-  mainClassArguments: List[String]) extends Program[JVMProgram[T]](
+  mainClass:          Class[T],
+  mainClassArguments: List[String]
+) extends Program[JVMProgram[T]](
   javaExec.toString,
   argumentsFor(mainClass, mainClassArguments)
 )

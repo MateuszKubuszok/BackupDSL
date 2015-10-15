@@ -33,10 +33,10 @@ object AptPrograms {
     areas = Option(lineMatch group 6) map (_ split "\\s+" filterNot (_.isEmpty) toList) getOrElse List()
     architectures = Option(lineMatch group 3) map (_ split " " toList) getOrElse List()
   } yield AptRepository(
-    isSrc = isSrc,
-    url = url,
-    branch = branch,
-    areas = areas,
+    isSrc         = isSrc,
+    url           = url,
+    branch        = branch,
+    areas         = areas,
     architectures = architectures
   )
 }

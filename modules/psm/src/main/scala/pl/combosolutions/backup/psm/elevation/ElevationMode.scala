@@ -47,17 +47,19 @@ private[elevation] trait RemoteElevation extends ObligatoryElevationMode with Co
 object RemoteElevation extends RemoteElevation
 
 private[elevation] class ElevateCommandIfNeeded[T <: Command[T]](
-    command: Command[T],
+    command:       Command[T],
     withElevation: ElevationMode,
-    cleaner: Cleaner) {
+    cleaner:       Cleaner
+) {
 
   def handleElevation = withElevation(command, cleaner)
 }
 
 private[elevation] class ElevateProgramIfNeeded[T <: Program[T]](
-    program: Program[T],
+    program:       Program[T],
     withElevation: ElevationMode,
-    cleaner: Cleaner) {
+    cleaner:       Cleaner
+) {
 
   def handleElevation = withElevation(program, cleaner)
 }

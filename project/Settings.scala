@@ -50,11 +50,11 @@ object Settings extends Dependencies {
     coverageEnabled := true,
 
     ScalariformKeys.preferences := ScalariformKeys.preferences.value
+      .setPreference(AlignArguments, true)
       .setPreference(AlignParameters, true)
       .setPreference(AlignSingleLineCaseStatements, true)
       .setPreference(DoubleIndentClassDeclaration, true)
       .setPreference(IndentLocalDefs, true)
-      .setPreference(PreserveDanglingCloseParenthesis, true)
       .setPreference(PreserveSpaceBeforeArguments, true)
   )
 

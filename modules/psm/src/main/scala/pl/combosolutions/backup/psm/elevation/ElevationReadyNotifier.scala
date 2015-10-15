@@ -25,8 +25,9 @@ object ElevationReadyNotifier {
 }
 
 private[elevation] final class ElevationReadyNotifierImpl(
-  readyListener: ReadyListener,
-  failureListener: FailureListener)
+  readyListener:   ReadyListener,
+  failureListener: FailureListener
+)
     extends ElevationReadyNotifier with Logging {
 
   override def notifyFailure: Unit = {

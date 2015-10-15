@@ -14,7 +14,8 @@ trait CommandContextHelper {
 
   class CommandContext[CommandType <: Command[CommandType], ResultType](
       programClass: Class[CommandType],
-      resultClass: Class[ResultType]) extends Scope {
+      resultClass:  Class[ResultType]
+  ) extends Scope {
 
     type InterpreterType = Result[CommandType]#Interpreter[ResultType]
 

@@ -4,8 +4,9 @@ import pl.combosolutions.backup.ReportException
 import pl.combosolutions.backup.tasks.TasksExceptionMessages._
 
 final class Task[BackupResult, ParentBackupResult, ChildBackupResult, RestoreResult, ParentRestoreResult, ChildRestoreResult](
-    private[tasks] val backupSubTask: SubTask[BackupResult],
-    private[tasks] val restoreSubTask: SubTask[RestoreResult]) {
+    private[tasks] val backupSubTask:  SubTask[BackupResult],
+    private[tasks] val restoreSubTask: SubTask[RestoreResult]
+) {
 
   private lazy val backupResult = backupSubTask.result
   private lazy val restoreResult = restoreSubTask.result
@@ -22,8 +23,9 @@ final class Task[BackupResult, ParentBackupResult, ChildBackupResult, RestoreRes
 }
 
 class TaskBuilder[BackupResult, ParentBackupResult, ChildBackupResult, RestoreResult, ParentRestoreResult, ChildRestoreResult](
-    private[tasks] val backupSubTaskBuilder: SubTaskBuilder[BackupResult, ParentBackupResult, ChildBackupResult],
-    private[tasks] val restoreSubTaskBuilder: SubTaskBuilder[RestoreResult, ParentRestoreResult, ChildRestoreResult]) {
+    private[tasks] val backupSubTaskBuilder:  SubTaskBuilder[BackupResult, ParentBackupResult, ChildBackupResult],
+    private[tasks] val restoreSubTaskBuilder: SubTaskBuilder[RestoreResult, ParentRestoreResult, ChildRestoreResult]
+) {
 
   private val task = new Task[BackupResult, ParentBackupResult, ChildBackupResult, RestoreResult, ParentRestoreResult, ChildRestoreResult](backupSubTaskBuilder.injectableProxy, restoreSubTaskBuilder.injectableProxy)
 

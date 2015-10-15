@@ -61,4 +61,5 @@ import BackupFiles._
 class BackupFiles[ChildBackupResult, ChildRestoreResult](withSettings: Settings)
   extends TaskBuilder[List[Path], List[Path], ChildBackupResult, List[Path], List[Path], ChildRestoreResult](
     new BackupSubTaskBuilder[ChildBackupResult](withSettings),
-    new RestoreSubTaskBuilder[ChildRestoreResult](withSettings))
+    new RestoreSubTaskBuilder[ChildRestoreResult](withSettings)
+  )

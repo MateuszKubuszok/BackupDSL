@@ -22,4 +22,5 @@ import SelectFiles._
 class SelectFiles[ParentBackupResult, ChildBackupResult, ParentRestoreResult, ChildRestoreResult](files: List[String])
   extends TaskBuilder[List[Path], ParentBackupResult, ChildBackupResult, List[Path], ParentRestoreResult, ChildRestoreResult](
     new SelectFilesAction[ParentBackupResult, ChildBackupResult](files),
-    new SelectFilesAction[ParentRestoreResult, ChildRestoreResult](files))
+    new SelectFilesAction[ParentRestoreResult, ChildRestoreResult](files)
+  )
