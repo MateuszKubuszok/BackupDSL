@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.tasks
 
-import java.nio.file.{ CopyOption, Path }
+import java.nio.file.Path
 
 import pl.combosolutions.backup.psm.ComponentRegistry
 import pl.combosolutions.backup.psm.elevation.{ ObligatoryElevationMode, ElevationMode }
@@ -50,18 +50,18 @@ class TaskBuilder[BR, PBR, CBR, RR, PRR, CRR](
     children foreach (_.build)
 
     backupSubTaskBuilder.injectableProxy.dependencyType match {
-      case Independent => backupSubTaskBuilder configurePropagation (children.toSet.map(backupResult))
+      case Independent => backupSubTaskBuilder configurePropagation (children.toSet map backupResult)
       case ParentDependent =>
         backupSubTaskBuilder configureForParent parent.backupSubTaskBuilder
-        backupSubTaskBuilder configurePropagation (children.toSet.map(backupResult))
+        backupSubTaskBuilder configurePropagation (children.toSet map backupResult)
       case ChildDependent => backupSubTaskBuilder configureForChildren (children map (_.backupSubTaskBuilder))
     }
 
     restoreSubTaskBuilder.injectableProxy.dependencyType match {
-      case Independent => restoreSubTaskBuilder configurePropagation (children.toSet.map(restoreResult))
+      case Independent => restoreSubTaskBuilder configurePropagation (children.toSet map restoreResult)
       case ParentDependent =>
         restoreSubTaskBuilder configureForParent parent.restoreSubTaskBuilder
-        restoreSubTaskBuilder configurePropagation (children.toSet.map(backupResult))
+        restoreSubTaskBuilder configurePropagation (children.toSet map backupResult)
       case ChildDependent => restoreSubTaskBuilder configureForChildren (children map (_.restoreSubTaskBuilder))
     }
 
@@ -78,16 +78,14 @@ class TaskBuilder[BR, PBR, CBR, RR, PRR, CRR](
     withElevation:           ElevationMode           = settingsProxy.withElevation,
     withObligatoryElevation: ObligatoryElevationMode = settingsProxy.withObligatoryElevation,
     components:              ComponentRegistry       = settingsProxy.components,
-    backupDir:               Path                    = settingsProxy.backupDir,
-    copyOptions:             Array[CopyOption]       = settingsProxy.copyOptions
+    backupDir:               Path                    = settingsProxy.backupDir
   ): Unit = {
     settingsProxy.innerSettings = Some(ImmutableSettings(
       cleaner                 = cleaner,
       withElevation           = withElevation,
       withObligatoryElevation = withObligatoryElevation,
       components              = components,
-      backupDir               = backupDir,
-      copyOptions             = copyOptions
+      backupDir               = backupDir
     ))
   }
 

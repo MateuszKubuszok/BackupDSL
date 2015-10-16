@@ -4,7 +4,7 @@ import java.nio.file.{ CopyOption, Files, Path }
 
 import pl.combosolutions.backup.Logging
 
-import scala.util.Try
+import scala.util.{ Failure, Try }
 
 trait CommonFilesServiceComponent extends FilesServiceComponent {
 
@@ -24,15 +24,15 @@ trait CommonFilesServiceComponent extends FilesServiceComponent {
       Try(Files copy (from, into, withCopyOptions: _*)) recover logError(s"Failed to copy '$from' -> '$into'") isSuccess
 
     override def delete(file: Path): Boolean =
-      Try(Files delete file) recover logError(s"Failed to delete '$file'") isSuccess
+      Try(Files delete file) recoverWith logError(s"Failed to delete '$file'") isSuccess
 
     override def move(from: Path, into: Path): Boolean =
       Try(Files move (from, into, withMoveOptions: _*)) recover logError(s"Failed to move '$from' -> '$into'") isSuccess
 
-    private def logError(message: String): PartialFunction[Throwable, Throwable] = {
+    private def logError[U](message: String): PartialFunction[Throwable, Try[U]] = {
       case ex: Throwable =>
         logger error (message, ex)
-        ex
+        Failure(ex)
     }
   }
 
