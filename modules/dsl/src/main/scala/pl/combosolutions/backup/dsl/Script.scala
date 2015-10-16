@@ -1,5 +1,7 @@
 package pl.combosolutions.backup.dsl
 
+import java.lang.System.exit
+
 import pl.combosolutions.backup.{ Cleaner, Logging }
 import pl.combosolutions.backup.tasks.Action._
 import pl.combosolutions.backup.tasks.ImmutableSettings
@@ -42,10 +44,18 @@ abstract class Script(name: String) extends Cleaner with Logging {
   }
 
   def main(args: Array[String]): Unit = {
-    Try (parser parse (args, ScriptConfig()) foreach execute) match {
-      case Failure(ex) => logger error ("error during execution", ex)
-      case _           =>
-    }
+    val waitForLastRootTask = Try (parser parse (args, ScriptConfig()) foreach execute)
+
     clean
+
+    // apparently all those uninitialized lazy values would wait indefinitely, we have to help it finish
+    waitForLastRootTask recoverWith {
+      case ex: Throwable =>
+        logger error ("error during execution", ex)
+        Failure(ex)
+    } match {
+      case Success(_) => exit(0)
+      case Failure(_) => exit(1)
+    }
   }
 }
