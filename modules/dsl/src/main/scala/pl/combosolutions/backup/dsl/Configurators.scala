@@ -9,11 +9,10 @@ class Root(
   override val initialSettings: Settings
 ) extends tasks.RootConfigurator(initialSettings)
     with ConfiguratorUtils[Root]
+    with SpawnSelectFiles[Unit, Any, Unit, Any]
     with Reporting {
 
   reporter details "Initializing root task"
-
-  def selectFiles = new SelectFiles[Unit, Unit](this.adjustForChildren[List[Path], List[Path]], initialSettings)
 
   private[dsl] def buildTasks = buildAll
 }
@@ -23,11 +22,10 @@ class SelectFiles[PBR, PRR](
   override val initialSettings: Settings
 ) extends tasks.SelectFilesConfigurator[PBR, List[Path], PRR, List[Path]](parent, initialSettings)
     with ConfiguratorUtils[SelectFiles[PBR, PRR]]
+    with SpawnBackupFiles
     with Reporting {
 
   reporter details "Initializing select-files task"
-
-  def backupFiles[CBR, CRR] = new BackupFiles[CBR, CRR](this, initialSettings)
 }
 
 class BackupFiles[CBR, CRR](
