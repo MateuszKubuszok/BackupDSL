@@ -5,61 +5,59 @@ import java.nio.file.{ Files, Path, Paths }
 import pl.combosolutions.backup.{ Async, Reporting }
 import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
 
+import scala.collection.mutable
 import scala.util.{ Failure, Success, Try }
 
 object BackupFiles extends Reporting {
 
-  private def backupPassedFilesAction(implicit withSettings: Settings): (List[Path]) => Async[List[Path]] =
-    (files: List[Path]) =>
-      combineSubResults(files) { paths =>
-        reporter details s"Backing up ${paths._2} into ${paths._3}... "
-        paths._3.toFile.mkdirs
-        Files.copy(paths._2, paths._3, withSettings.copyOptions: _*) // TODO: compress into TAR archive and allow elevation
-      }
+  val filesBackupDir = "files"
 
-  private def restorePassedFilesAction(implicit withSettings: Settings): (List[Path]) => Async[List[Path]] =
-    (files: List[Path]) =>
-      combineSubResults(files) { paths =>
-        reporter details s"Restoring ${paths._3} into ${paths._2}... "
-        paths._2.toFile.mkdirs
-        Files.copy(paths._3, paths._2, withSettings.copyOptions: _*) // TODO: compress into TAR archive and allow elevation
-      }
-
-  private def combineSubResults(files: List[Path])(copyAction: ((Path, Path, Path)) => Path)(implicit withSettings: Settings): Async[List[Path]] =
-    Async incompleteSequence {
-      hashPaths(files) map { paths =>
-        Async {
-          Try {
-            copyAction(paths)
-          } match {
-            case Success(path) =>
-              reporter inform s"Copied up $path successfully"
-              Some(path)
-            case Failure(ex) =>
-              reporter error (s"Failed to copy file", ex)
-              None
-          }
-        }
-      }
-    }
-
-  private def hashPaths(files: List[Path])(implicit withSettings: Settings) = files map { file =>
-    val backup = file.toAbsolutePath
-    val restore = Paths.get(withSettings.backupDir.toString, "files", backup.hashCode.toString)
-    (file, backup, restore)
+  private def backupAction(implicit withSettings: Settings): (List[Path]) => Async[List[Path]] = { files =>
+    implicit val e = withSettings.withElevation
+    implicit val c = withSettings.cleaner
+    reporter inform s"Backing up files: $files"
+    withSettings.components.fileSystemService copyFiles backupPaths(files)
   }
 
-  class BackupSubTaskBuilder[ChildResult](withSettings: Settings)
-    extends ParentDependentSubTaskBuilder[List[Path], List[Path], ChildResult](backupPassedFilesAction(withSettings))
+  private def restoreAction(implicit withSettings: Settings): (List[Path]) => Async[List[Path]] = { files =>
+    implicit val e = withSettings.withElevation
+    implicit val c = withSettings.cleaner
+    reporter inform s"Restoring files: $files"
+    withSettings.components.fileSystemService copyFiles restorePaths(files)
+  }
 
-  class RestoreSubTaskBuilder[ChildResult](withSettings: Settings)
-    extends ParentDependentSubTaskBuilder[List[Path], List[Path], ChildResult](restorePassedFilesAction(withSettings))
+  private def backupPaths(files: List[Path])(implicit withSettings: Settings) = files map { file =>
+    val backup = file.toAbsolutePath
+    val restore = Paths.get(withSettings.backupDir.toString, filesBackupDir, backup.hashCode.toString)
+    (backup, restore)
+  }
+
+  private def restorePaths(files: List[Path])(implicit withSettings: Settings) = backupPaths(files) map (_.swap)
+
+  class BackupSubTaskBuilder[ChildResult](implicit withSettings: Settings)
+    extends ParentDependentSubTaskBuilder[List[Path], List[Path], ChildResult](backupAction)
+
+  class RestoreSubTaskBuilder[ChildResult](implicit withSettings: Settings)
+    extends ParentDependentSubTaskBuilder[List[Path], List[Path], ChildResult](restoreAction)
 }
 
 import BackupFiles._
 
-class BackupFiles[ChildBackupResult, ChildRestoreResult](withSettings: Settings)
-  extends TaskBuilder[List[Path], List[Path], ChildBackupResult, List[Path], List[Path], ChildRestoreResult](
-    new BackupSubTaskBuilder[ChildBackupResult](withSettings),
-    new RestoreSubTaskBuilder[ChildRestoreResult](withSettings)
+class BackupFiles[CBR, CRR](implicit withSettings: Settings)
+  extends TaskBuilder[List[Path], List[Path], CBR, List[Path], List[Path], CRR](
+    new BackupSubTaskBuilder[CBR],
+    new RestoreSubTaskBuilder[CRR]
   )
+
+class BackupFilesConfigurator[CBR, CRR](
+    parent:                       MutableConfigurator[List[Path], _, List[Path], List[Path], _, List[Path]],
+    override val initialSettings: Settings
+) extends MutableConfigurator[List[Path], List[Path], CBR, List[Path], List[Path], CRR](Some(parent), initialSettings) {
+  self: MutableConfigurator[List[Path], List[Path], CBR, List[Path], List[Path], CRR] =>
+
+  implicit val withSettings: Settings = settingsProxy
+
+  val files: mutable.MutableList[String] = mutable.MutableList()
+
+  override def taskBuilder = new BackupFiles
+}

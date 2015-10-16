@@ -5,10 +5,10 @@ import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
 import pl.combosolutions.backup.tasks.Action.{ Backup, Restore }
 import pl.combosolutions.backup.tasks.TasksExceptionMessages._
 
-final class Task[BR, PBR, CBR, RR, PRR, CRR](
-    private[tasks] val backupSubTask:  SubTask[BR],
-    private[tasks] val restoreSubTask: SubTask[RR]
-) extends TType[BR, PBR, CBR, RR, PRR, CRR] {
+final class Task[BackupResult, RestoreResult](
+    private[tasks] val backupSubTask:  SubTask[BackupResult],
+    private[tasks] val restoreSubTask: SubTask[RestoreResult]
+) {
 
   private lazy val backupResult = backupSubTask.result
   private lazy val restoreResult = restoreSubTask.result

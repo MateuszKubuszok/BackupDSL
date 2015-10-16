@@ -1,20 +1,11 @@
 package pl.combosolutions.backup.dsl
 
 import pl.combosolutions.backup.Logging
-import pl.combosolutions.backup.dsl.oldtasks.{ BackupFiles, RootTask, Task }
-import pl.combosolutions.backup.psm.elevation.ElevationServiceComponent
-import pl.combosolutions.backup.psm.{ ComponentsHelper, ExecutionContexts }
 import pl.combosolutions.backup.psm.operations.Cleaner
-import pl.combosolutions.backup.psm.programs.Program
 import pl.combosolutions.backup.tasks.Action._
-import pl.combosolutions.backup.tasks.{ Action, Settings }
+import pl.combosolutions.backup.tasks.ImmutableSettings
 
-import scala.concurrent.ExecutionContext
-
-abstract class Script(name: String) extends Cleaner with Logging with ComponentsHelper {
-  self: Cleaner with Logging with ElevationServiceComponent =>
-
-  implicit val context: ExecutionContext = ExecutionContexts.Task.context
+abstract class Script(name: String) extends Cleaner with Logging {
 
   private val parser = new scopt.OptionParser[ScriptConfig](name) {
     head("backup/restore script made with BackupDSL")
@@ -25,39 +16,32 @@ abstract class Script(name: String) extends Cleaner with Logging with Components
       required ())
 
     (help("help")
+      action { (action, conf) => conf.copy(showHelp = true) }
       text "displays help")
 
     // pass variables into the Script: var=val
   }
 
-  private val rootTask = new RootTask
+  private val initialSettings = ImmutableSettings(cleaner = this)
 
-  implicit val defaultSettings = Settings
-
-  final def addTask[BR, RR](task: Task[Unit, Unit, BR, RR]): Task[Unit, Unit, BR, RR] = rootTask andThen task
-
-  protected def elevate[T <: Program[T]](program: Program[T]): Program[T] =
-    elevationService elevateRemote (program, this)
+  val configuration = new Root(initialSettings)
 
   private final def execute(config: ScriptConfig): Unit = config.action match {
-    case Action.Backup =>
+    case Backup =>
       logger info s"Running BACKUP: $name"
       logger trace s"with configuration $config"
-      backup
-    case Action.Restore =>
+      configuration.buildTasks.backup
+    case Restore =>
       logger info s"Running RESTORE: $name"
       logger trace s"with configuration $config"
-      restore
+      configuration.buildTasks.restore
+    case _ =>
+      if (config.showHelp) parser.showTryHelp
+      else parser.reportError("backup/restore is required option!! Try --help for more information")
   }
-
-  private final def backup = rootTask performBackup
-
-  private final def restore = rootTask performRestore
 
   def main(args: Array[String]): Unit = {
     parser.parse(args, ScriptConfig()) foreach execute
     clean
   }
-
-  def backupFiles[PBR, PRR](files: String*) = BackupFiles[PBR, PRR](files toList)
 }

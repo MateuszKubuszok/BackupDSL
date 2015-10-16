@@ -6,13 +6,27 @@ import pl.combosolutions.backup.tasks.TasksExceptionMessages._
 
 sealed abstract class SubTaskBuilder[R, PR, CR](
     dependencyType: DependencyType
-) extends SType[R, PR, CR] {
+) {
+
+  type Result = R
+  type ParentResult = PR
+  type ChildResult = CR
+
+  type SubTaskT = SubTask[Result]
+  type SubTaskBuilderT = SubTaskBuilder[Result, ParentResult, ChildResult]
+
+  type ParentSubTaskBuilderT = SubTaskBuilder[ParentResult, _, _]
+
+  type ChildSubTaskBuilderT = SubTaskBuilder[ChildResult, _, _]
+
+  type ParentDependentSubTaskT = ParentDependentSubTask[Result, ParentResult]
+  type ChildDependentSubTaskT = ChildDependentSubTask[Result, ChildResult]
 
   val injectableProxy = new SubTaskProxy[Result](dependencyType)
 
-  def configureForParent(parentTask: SubTaskBuilder[ParentResult, _, _]): Unit
+  def configureForParent(parentTask: ParentSubTaskBuilderT): Unit
 
-  def configureForChildren(childrenTasks: Traversable[SubTaskBuilder[ChildResult, _, _]]): Unit
+  def configureForChildren(childrenTasks: Traversable[ChildSubTaskBuilderT]): Unit
 }
 
 final class FakeSubTaskBuilder[R, PR, CR](
@@ -22,10 +36,10 @@ final class FakeSubTaskBuilder[R, PR, CR](
 
   injectableProxy setImplementation subTask
 
-  def configureForParent(parentTask: SubTaskBuilder[ParentResult, _, _]): Unit =
+  def configureForParent(parentTask: ParentSubTaskBuilderT): Unit =
     ReportException onIllegalArgumentOf FakeBuilderWithConfig
 
-  def configureForChildren(childrenTasks: Traversable[SubTaskBuilder[ChildResult, _, _]]): Unit =
+  def configureForChildren(childrenTasks: Traversable[ChildSubTaskBuilderT]): Unit =
     ReportException onIllegalArgumentOf FakeBuilderWithConfig
 }
 
@@ -35,10 +49,10 @@ case class IndependentSubTaskBuilder[R, PR, CR](
 
   injectableProxy.setImplementation(new IndependentSubTask[Result](action))
 
-  final override def configureForParent(parentTask: SubTaskBuilder[ParentResult, _, _]): Unit =
+  final override def configureForParent(parentTask: ParentSubTaskBuilderT): Unit =
     ReportException onIllegalArgumentOf IndependentTaskWithParentConfig
 
-  final override def configureForChildren(childrenTasks: Traversable[SubTaskBuilder[ChildResult, _, _]]): Unit =
+  final override def configureForChildren(childrenTasks: Traversable[ChildSubTaskBuilderT]): Unit =
     ReportException onIllegalArgumentOf IndependentTaskWithChildrenConfig
 }
 
@@ -46,12 +60,12 @@ case class ParentDependentSubTaskBuilder[R, PR, CR](
     action: Function[PR, Async[R]]
 ) extends SubTaskBuilder[R, PR, CR](ParentDependent) {
 
-  final override def configureForParent(parentTask: SubTaskBuilder[ParentResult, _, _]): Unit = {
+  final override def configureForParent(parentTask: ParentSubTaskBuilderT): Unit = {
     assert(parentTask.injectableProxy.dependencyType != ChildDependent, CircularDependency)
     injectableProxy.setImplementation(new ParentDependentSubTaskT(action, parentTask.injectableProxy))
   }
 
-  final override def configureForChildren(childrenTasks: Traversable[SubTaskBuilder[ChildResult, _, _]]): Unit =
+  final override def configureForChildren(childrenTasks: Traversable[ChildSubTaskBuilderT]): Unit =
     ReportException onIllegalArgumentOf ParentDependentWithChildrenConfig
 }
 
@@ -59,10 +73,10 @@ case class ChildDependentSubTaskBuilder[R, PR, CR](
     action: Function[Traversable[CR], Async[R]]
 ) extends SubTaskBuilder[R, PR, CR](ChildDependent) {
 
-  final override def configureForParent(childrenTasks: SubTaskBuilder[ParentResult, _, _]): Unit =
+  final override def configureForParent(childrenTasks: ParentSubTaskBuilderT): Unit =
     ReportException onIllegalArgumentOf ChildrenDependentWithParentConfig
 
-  final override def configureForChildren(childrenTasks: Traversable[SubTaskBuilder[ChildResult, _, _]]): Unit = {
+  final override def configureForChildren(childrenTasks: Traversable[ChildSubTaskBuilderT]): Unit = {
     assert(childrenTasks.forall(_.injectableProxy.dependencyType != ParentDependent), CircularDependency)
     injectableProxy.setImplementation(new ChildDependentSubTaskT(action, childrenTasks.map(_.injectableProxy)))
   }

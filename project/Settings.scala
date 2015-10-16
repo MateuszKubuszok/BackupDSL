@@ -54,7 +54,7 @@ object Settings extends Dependencies {
       .setPreference(AlignParameters, true)
       .setPreference(AlignSingleLineCaseStatements, true)
       .setPreference(DoubleIndentClassDeclaration, true)
-      .setPreference(IndentLocalDefs, true)
+      .setPreference(IndentLocalDefs, false)
       .setPreference(PreserveSpaceBeforeArguments, true)
   )
 
