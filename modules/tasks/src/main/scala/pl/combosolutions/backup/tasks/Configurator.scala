@@ -37,10 +37,7 @@ abstract class Configurator[BR, PBR, CBR, RR, PRR, CRR](
     }
   }
 
-  private lazy val build: TaskT = {
-    children foreach (_.build)
-    builder.build
-  }
+  private lazy val build: TaskT = builder.build
 
   protected lazy val buildAll: TaskT = {
     configure

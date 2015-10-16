@@ -38,7 +38,7 @@ class TaskBuilder[BR, PBR, CBR, RR, PRR, CRR](
 
   type Propagation = () => Unit
 
-  private val task = new TaskT(backupSubTaskBuilder.injectableProxy, restoreSubTaskBuilder.injectableProxy)
+  private val task = new TaskT(backupSubTaskBuilder.injectableProxy.get, restoreSubTaskBuilder.injectableProxy.get)
 
   lazy val build: TaskT = {
 
@@ -48,21 +48,21 @@ class TaskBuilder[BR, PBR, CBR, RR, PRR, CRR](
 
     def parent = config.parent getOrElse (ReportException onIllegalStateOf ParentDependentWithoutParent)
     val children = config.children.toList
-    def backupResult(child: ChildTaskBuilderT): Propagation = () => child.backupSubTaskBuilder.injectableProxy.result
-    def restoreResult(child: ChildTaskBuilderT): Propagation = () => child.restoreSubTaskBuilder.injectableProxy.result
+    def backupResult(child: ChildTaskBuilderT): Propagation = () => child.backupSubTaskBuilder.injectableProxy.get.result
+    def restoreResult(child: ChildTaskBuilderT): Propagation = () => child.restoreSubTaskBuilder.injectableProxy.get.result
 
     children foreach (_.build)
 
     backupSubTaskBuilder.injectableProxy.dependencyType match {
-      case ParentDependent => backupSubTaskBuilder configureForParent parent.backupSubTaskBuilder
-      case ChildDependent  => backupSubTaskBuilder configureForChildren (children map (_.backupSubTaskBuilder))
-      case Independent     => backupSubTaskBuilder configurePropagation (children.toSet.map(backupResult))
+      case Independent | ParentDependent => backupSubTaskBuilder configurePropagation (children.toSet.map(backupResult))
+      case ParentDependent               => backupSubTaskBuilder configureForParent parent.backupSubTaskBuilder
+      case ChildDependent                => backupSubTaskBuilder configureForChildren (children map (_.backupSubTaskBuilder))
     }
 
     restoreSubTaskBuilder.injectableProxy.dependencyType match {
-      case ParentDependent => restoreSubTaskBuilder configureForParent parent.restoreSubTaskBuilder
-      case ChildDependent  => restoreSubTaskBuilder configureForChildren (children map (_.restoreSubTaskBuilder))
-      case Independent     => restoreSubTaskBuilder configurePropagation (children.toSet.map(restoreResult))
+      case Independent | ParentDependent => restoreSubTaskBuilder configurePropagation (children.toSet.map(restoreResult))
+      case ParentDependent               => restoreSubTaskBuilder configureForParent parent.restoreSubTaskBuilder
+      case ChildDependent                => restoreSubTaskBuilder configureForChildren (children map (_.restoreSubTaskBuilder))
     }
 
     logger trace s"Builder $getClass finished"

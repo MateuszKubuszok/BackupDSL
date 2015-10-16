@@ -4,5 +4,5 @@ object DefaultsAndConstants {
 
   val CommandThreadPoolSize = 10
   val ProgramThreadPoolSize = 10
-  val TaskThreadPoolSize = 10
+  val TaskThreadPoolSize = 30
 }

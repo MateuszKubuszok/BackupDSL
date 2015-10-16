@@ -4,10 +4,6 @@ import pl.combosolutions.backup.{ ExecutionContexts, Result }
 import ExecutionContexts.Program.context
 import Program._
 
-import scala.concurrent.Future
-import scalaz.OptionT._
-import scalaz.std.scalaFuture._
-
 class ProgramAlias[T <: Program[T], U <: Program[U]](
   aliased: Program[U]
 ) extends Program[T](
@@ -15,9 +11,9 @@ class ProgramAlias[T <: Program[T], U <: Program[U]](
   aliased.arguments
 ) {
 
-  override def run = (for {
-    originalResult <- optionT[Future](execute(aliased))
-  } yield Result[T](originalResult.exitValue, originalResult.stdout, originalResult.stderr)).run
+  override def run = execute(aliased).asAsync map { originalResult =>
+    Result[T](originalResult.exitValue, originalResult.stdout, originalResult.stderr)
+  }
 }
 
 case class GenericProgram(

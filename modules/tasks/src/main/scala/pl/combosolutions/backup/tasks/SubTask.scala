@@ -1,13 +1,13 @@
 package pl.combosolutions.backup.tasks
 
-import pl.combosolutions.backup.{ ExecutionContexts, Async, AsyncTransformer }
+import pl.combosolutions.backup.{ Logging, ExecutionContexts, Async, AsyncTransformer }
 import pl.combosolutions.backup.tasks.DependencyType._
 import pl.combosolutions.backup.tasks.TasksExceptionMessages._
 
 import scala.collection.mutable
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ blocking, ExecutionContext, Future }
 
-sealed trait SubTask[Result] {
+sealed trait SubTask[Result] extends Logging {
 
   implicit val context: ExecutionContext = ExecutionContexts.Task.context
 
@@ -17,7 +17,19 @@ sealed trait SubTask[Result] {
   private[tasks] def getPropagation = propagation
 
   lazy val result: Async[Result] = {
-    propagation foreach (_())
+    Future {
+      blocking {
+        if (propagation.nonEmpty) {
+          logger trace s"Poking each dependant future to make sure all are called (size=${propagation.size})"
+          propagation foreach { notified =>
+            logger trace s"Poke start"
+            notified()
+            logger trace s"Poke stop"
+          }
+          logger trace s"Child futures poked"
+        }
+      }
+    }
     execute
   }
 
@@ -39,12 +51,12 @@ sealed trait SubTask[Result] {
 object SubTask {
 
   def apply[Result](action: () => Async[Result]): SubTask[Result] =
-    new IndependentSubTaskBuilder(action).injectableProxy
+    new IndependentSubTaskBuilder(action).injectableProxy.get
 
   def apply[Result, ParentResult](action: ParentResult => Async[Result], parent: SubTask[ParentResult]): SubTask[Result] = {
     val builder = new ParentDependentSubTaskBuilder[Result, ParentResult, Nothing](action)
     builder configureForParent parent.fakeSelfBuilder
-    builder.injectableProxy
+    builder.injectableProxy.get
   }
 
   implicit def proxyToSubTask[Result](proxy: SubTaskProxy[Result]): SubTask[Result] = proxy
@@ -53,6 +65,8 @@ object SubTask {
 final class SubTaskProxy[Result](proxyDependencyType: DependencyType) extends SubTask[Result] {
 
   val dependencyType = proxyDependencyType
+
+  def get: SubTask[Result] = implementation getOrElse this
 
   private var implementation: Option[SubTask[Result]] = None
 
@@ -69,12 +83,9 @@ final class SubTaskProxy[Result](proxyDependencyType: DependencyType) extends Su
     implementation = Some(subTask)
   }
 
-  override lazy val result = {
-    assert(implementation.isDefined, ProxyNotInitialized)
-    implementation.get.result
-  }
+  override lazy val result = execute
 
-  override def execute = {
+  override lazy val execute = {
     assert(implementation.isDefined, ProxyNotInitialized)
     implementation.get.result
   }

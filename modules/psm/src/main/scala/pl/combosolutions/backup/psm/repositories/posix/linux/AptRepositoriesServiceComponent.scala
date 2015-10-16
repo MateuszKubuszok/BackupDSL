@@ -12,9 +12,7 @@ import DpkgPrograms._
 import pl.combosolutions.backup.psm.repositories.{ AptRepository, RepositoriesService, RepositoriesServiceComponent, VersionedPackage }
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{ Await, Future }
-import scalaz.OptionT._
-import scalaz.std.scalaFuture._
+import scala.concurrent.Await
 
 trait AptRepositoriesServiceComponent extends RepositoriesServiceComponent {
 
@@ -45,9 +43,10 @@ trait AptRepositoriesServiceComponent extends RepositoriesServiceComponent {
       AptGetInstall(packages toList).handleElevation.digest[Boolean]
 
     override def areAllInstalled(packages: Packages)
-                                (implicit withElevation: ElevationMode, cleaner: Cleaner) = (for {
-      installedPackages <- optionT[Future](DpkgList.handleElevation.digest[List[VersionedPackage]])
-    } yield packages.forall(package_ => installedPackages.exists(iPackage => iPackage.name == package_.name))).run
+                                (implicit withElevation: ElevationMode, cleaner: Cleaner) =
+      DpkgList.handleElevation.digest[List[VersionedPackage]].asAsync map { installedPackages =>
+        packages forall (package_ => installedPackages.exists(iPackage => iPackage.name == package_.name))
+      }
     // format: ON
 
     private def asApt(list: Repositories) = list collect { case ar: AptRepository => ar }

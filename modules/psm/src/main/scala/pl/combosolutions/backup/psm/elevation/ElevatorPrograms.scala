@@ -5,11 +5,6 @@ import ExecutionContexts.Program.context
 import pl.combosolutions.backup.psm.PsmExceptionMessages.{ RemoteGeneric, RemoteKilling }
 import pl.combosolutions.backup.psm.programs.Program
 
-import scala.concurrent.Future
-
-import scalaz.OptionT._
-import scalaz.std.scalaFuture._
-
 final case class DirectElevatorProgram[T <: Program[T]](
   program: Program[T], elevationService: ElevationService
 ) extends Program[T](
@@ -25,9 +20,7 @@ final case class RemoteElevatorProgram[T <: Program[T]](
   program.arguments
 ) {
 
-  override def run = (for {
-    result <- optionT[Future](elevationFacade runRemotely program.asGeneric)
-  } yield result.asSpecific[T]).run
+  override def run = (elevationFacade runRemotely program.asGeneric).asAsync map (_.asSpecific[T])
 
   override def run2Kill = ReportException onNotImplemented RemoteKilling
 

@@ -1,7 +1,10 @@
 package pl.combosolutions.backup
 
 import scala.collection.generic.CanBuildFrom
+import scala.collection.mutable
 import scala.concurrent.{ ExecutionContext, Future }
+import scalaz.OptionT._
+import scalaz.std.scalaFuture._
 
 object Async {
 
@@ -19,31 +22,36 @@ object Async {
   def completeSequence[Result, M[X] <: TraversableOnce[X]]
       (in: M[Async[Result]])
       (implicit cbf: CanBuildFrom[M[Future[Option[Result]]], Option[Result], M[Option[Result]]],
-       cbf2: CanBuildFrom[M[Option[Result]], Result, M[Result]], executor: ExecutionContext): Async[M[Result]] =
-    Future sequence in map { resultOpts =>
-      if (resultOpts exists (_.isEmpty)) None
-      else
-        resultOpts.foldLeft(Option(cbf2(resultOpts))) {
-          (or, oa) => for (r <- or; a <- oa) yield r += a
-        } map (_.result())
-    }
+       cbf2: CanBuildFrom[M[Option[Result]], Result, M[Result]], executor: ExecutionContext): Async[M[Result]] = for {
+      sequence <- Future sequence in
+      isComplete = sequence forall (_.isDefined)
+      value <- if (isComplete) incompleteSequence(in) else none
+    } yield value
 
   def incompleteSequence[Result, M[X] <: TraversableOnce[X]]
       (in: M[Async[Result]])
       (implicit cbf: CanBuildFrom[M[Future[Option[Result]]], Option[Result], M[Option[Result]]],
-       cbf2: CanBuildFrom[M[Option[Result]], Result, M[Result]], executor: ExecutionContext): Async[M[Result]] =
-    Future sequence in map { resultOpts =>
-      resultOpts.foldLeft(Option(cbf2(resultOpts))) {
-        (or, oa) => for (r <- or; a <- oa) yield r += a
-      } map (_.result())
-    }
+       cbf2: CanBuildFrom[M[Option[Result]], Result, M[Result]], executor: ExecutionContext): Async[M[Result]] = for {
+     resultsOpts <- Future sequence in
+     sequenceBuilderInit = Option(cbf2(resultsOpts))
+     sequenceBuilderOpt = resultsOpts.foldLeft(sequenceBuilderInit)(seqOptFolder[Result, M])
+   } yield sequenceBuilderOpt map (_.result)
 
-  def flatMap[Result, NewResult](result: Async[Result], function: Result => Async[NewResult])
-                                (implicit executor: ExecutionContext): Async[NewResult] =
-    result flatMap (_ map (function(_)) getOrElse none)
+  def flatMap[Result, NewResult](resultA: Async[Result], function: Result => Async[NewResult])
+                                (implicit executor: ExecutionContext): Async[NewResult] = (for {
+    result <- optionT(resultA)
+    mapped <- optionT(function(result))
+  } yield mapped).run
 
-  def map[Result, NewResult](result: Async[Result], function: Result => NewResult)
-                            (implicit executor: ExecutionContext): Async[NewResult] =
-    result map (_ map function)
+  def map[Result, NewResult](resultA: Async[Result], function: Result => NewResult)
+                            (implicit executor: ExecutionContext): Async[NewResult] = (for {
+    result <- optionT(resultA)
+  } yield function(result)).run
+
+  private def seqOptFolder[Result, M[X] <: TraversableOnce[X]]
+      (builderOpt: Option[mutable.Builder[Result, M[Result]]], appendedOpt: Option[Result]) = for {
+    builder <- builderOpt
+    appended <- appendedOpt
+  } yield builder += appended
   // format: ON
 }

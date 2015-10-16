@@ -29,7 +29,7 @@ sealed abstract class SubTaskBuilder[R, PR, CR](
   def configureForChildren(childrenTasks: Traversable[ChildSubTaskBuilderT]): Unit
 
   def configurePropagation(newPropagation: Set[() => Unit]): Unit = {
-    logger trace s"Configuring children $newPropagation for $this"
+    logger trace s"Configuring propagation $newPropagation for $this"
     injectableProxy.getPropagation ++= newPropagation
   }
 }
@@ -59,11 +59,6 @@ case class IndependentSubTaskBuilder[R, PR, CR](
 
   final override def configureForChildren(childrenTasks: Traversable[ChildSubTaskBuilderT]): Unit =
     ReportException onIllegalArgumentOf IndependentTaskWithChildrenConfig
-
-  final override def configurePropagation(newPropagation: Set[() => Unit]): Unit = {
-    logger trace s"Configuring children $newPropagation for $this"
-    injectableProxy.getPropagation ++= newPropagation
-  }
 }
 
 case class ParentDependentSubTaskBuilder[R, PR, CR](

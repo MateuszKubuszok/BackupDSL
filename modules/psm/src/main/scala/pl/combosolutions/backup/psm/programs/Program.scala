@@ -4,11 +4,8 @@ import pl.combosolutions.backup._
 import ExecutionContexts.Program.context
 
 import scala.collection.mutable
-import scala.concurrent.Future
 import scala.sys.process.{ Process, ProcessLogger }
 import scala.util.{ Failure, Success, Try }
-import scalaz.OptionT._
-import scalaz.std.scalaFuture._
 
 private[programs] trait ProgramExecutor extends Logging {
 
@@ -53,9 +50,7 @@ class Program[T <: Program[T]](val name: String, val arguments: List[String]) ex
 
   def run2Kill: Process = execute2Kill(this)
 
-  override def digest[U](implicit interpreter: Result[T]#Interpreter[U]): Async[U] = (for {
-    result <- optionT[Future](run)
-  } yield result.interpret(interpreter)).run
+  override def digest[U](implicit interpreter: Result[T]#Interpreter[U]): Async[U] = run.asAsync map (interpreter(_))
 
   def asGeneric: GenericProgram = GenericProgram(name, arguments)
 
