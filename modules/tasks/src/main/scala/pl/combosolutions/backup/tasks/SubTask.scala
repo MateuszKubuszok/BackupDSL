@@ -13,25 +13,24 @@ sealed trait SubTask[Result] extends Logging {
 
   val dependencyType: DependencyType
 
-  private val propagation: mutable.Set[() => Unit] = mutable.Set()
+  private val propagation: mutable.Set[Propagator] = mutable.Set()
   private[tasks] def getPropagation = propagation
 
   lazy val result: Async[Result] = {
+    val current = execute
     Future {
       blocking {
         if (propagation.nonEmpty) {
           logger trace s"Poking each dependant future to make sure all are called (size=${propagation.size})"
-          propagation foreach { notified =>
-            logger trace s"Poke start"
-            notified()
-            logger trace s"Poke stop"
-          }
+          propagation foreach { _() }
           logger trace s"Child futures poked"
         }
       }
     }
-    execute
+    current
   }
+
+  lazy val propagator: Propagator = new Propagator(this)
 
   protected def execute: Async[Result]
 
@@ -70,7 +69,7 @@ final class SubTaskProxy[Result](proxyDependencyType: DependencyType) extends Su
 
   private var implementation: Option[SubTask[Result]] = None
 
-  private val propagation: mutable.Set[() => Unit] = mutable.Set()
+  private val propagation: mutable.Set[Propagator] = mutable.Set()
   private[tasks] override def getPropagation = {
     if (implementation.isDefined) implementation.get.getPropagation
     else propagation

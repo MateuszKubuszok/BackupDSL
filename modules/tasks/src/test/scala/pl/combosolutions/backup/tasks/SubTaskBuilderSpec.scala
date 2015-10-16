@@ -14,7 +14,7 @@ class SubTaskBuilderSpec extends Specification with Mockito {
       // given
       val expected = "test-subtask"
       val subTask = mock[SubTask[String]]
-      val propagation = mutable.Set[() => Unit]()
+      val propagation = mutable.Set[Propagator]()
       subTask.dependencyType returns DependencyType.Independent
       subTask.getPropagation returns propagation
       subTask.result returns (Async some expected)
@@ -29,7 +29,7 @@ class SubTaskBuilderSpec extends Specification with Mockito {
     "prevent configuration for parent" in {
       // given
       val subTask = mock[SubTask[String]]
-      val propagation = mutable.Set[() => Unit]()
+      val propagation = mutable.Set[Propagator]()
       subTask.dependencyType returns DependencyType.Independent
       subTask.getPropagation returns propagation
       val parent = mock[SubTaskBuilder[Unit, _, _]]
@@ -44,7 +44,7 @@ class SubTaskBuilderSpec extends Specification with Mockito {
     "prevent configuration for children" in {
       // given
       val subTask = mock[SubTask[String]]
-      val propagation = mutable.Set[() => Unit]()
+      val propagation = mutable.Set[Propagator]()
       subTask.dependencyType returns DependencyType.Independent
       subTask.getPropagation returns propagation
       val child = mock[SubTaskBuilder[Unit, _, _]]

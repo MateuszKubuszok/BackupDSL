@@ -13,7 +13,7 @@ class Root(
 
   reporter details "Initializing root task"
 
-  def selectFiles = new SelectFiles[Unit, Unit](this.adjustForChildren[List[Path], List[Path]], builder.withSettings)
+  def selectFiles = new SelectFiles[Unit, Unit](this.adjustForChildren[List[Path], List[Path]], initialSettings)
 
   private[dsl] def buildTasks = buildAll
 }
@@ -27,7 +27,7 @@ class SelectFiles[PBR, PRR](
 
   reporter details "Initializing select-files task"
 
-  def backupFiles[CBR, CRR] = new BackupFiles[CBR, CRR](this, builder.withSettings)
+  def backupFiles[CBR, CRR] = new BackupFiles[CBR, CRR](this, initialSettings)
 }
 
 class BackupFiles[CBR, CRR](

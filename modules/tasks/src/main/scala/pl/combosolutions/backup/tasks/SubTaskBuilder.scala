@@ -28,7 +28,7 @@ sealed abstract class SubTaskBuilder[R, PR, CR](
 
   def configureForChildren(childrenTasks: Traversable[ChildSubTaskBuilderT]): Unit
 
-  def configurePropagation(newPropagation: Set[() => Unit]): Unit = {
+  def configurePropagation(newPropagation: Set[Propagator]): Unit = {
     logger trace s"Configuring propagation $newPropagation for $this"
     injectableProxy.getPropagation ++= newPropagation
   }

@@ -100,7 +100,7 @@ class SubTaskSpec extends Specification with Mockito {
     "prevent double implementation setup" in {
       // given
       val subTask = mock[SubTask[Unit]]
-      val propagation = mutable.Set[() => Unit]()
+      val propagation = mutable.Set[Propagator]()
       val proxy = new SubTaskProxy[Unit](DependencyType.Independent)
       subTask.dependencyType returns DependencyType.Independent
       subTask.getPropagation returns propagation
@@ -115,7 +115,7 @@ class SubTaskSpec extends Specification with Mockito {
     "redirect to implementation once set" in {
       // given
       val subTask = mock[SubTask[String]]
-      val propagation = mutable.Set[() => Unit]()
+      val propagation = mutable.Set[Propagator]()
       val proxy = new SubTaskProxy[String](DependencyType.Independent)
       subTask.dependencyType returns DependencyType.Independent
       subTask.getPropagation returns propagation

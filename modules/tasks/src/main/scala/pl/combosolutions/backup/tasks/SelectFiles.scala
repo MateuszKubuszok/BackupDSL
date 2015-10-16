@@ -9,7 +9,9 @@ import scala.collection.mutable
 
 object SelectFiles extends Reporting {
 
-  private def selectFilesAction(files: () => List[String]): () => Async[List[Path]] = () => Async {
+  type Nothing2Result = () => Async[List[Path]]
+
+  private def selectFilesAction(files: () => List[String]): Nothing2Result = () => Async {
     val paths = files() map (Paths get _)
     reporter inform s"Selected ${paths.length} files: $paths"
     Some(paths)

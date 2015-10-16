@@ -36,33 +36,33 @@ class TaskBuilder[BR, PBR, CBR, RR, PRR, CRR](
 
   type ConfiguratorT = Configurator[BR, PBR, CBR, RR, PRR, CRR]
 
-  type Propagation = () => Unit
-
   private val task = new TaskT(backupSubTaskBuilder.injectableProxy.get, restoreSubTaskBuilder.injectableProxy.get)
 
   lazy val build: TaskT = {
 
     logger debug s"Run builder $getClass"
 
-    type Propagation = () => Unit
-
     def parent = config.parent getOrElse (ReportException onIllegalStateOf ParentDependentWithoutParent)
     val children = config.children.toList
-    def backupResult(child: ChildTaskBuilderT): Propagation = () => child.backupSubTaskBuilder.injectableProxy.get.result
-    def restoreResult(child: ChildTaskBuilderT): Propagation = () => child.restoreSubTaskBuilder.injectableProxy.get.result
+    def backupResult(child: ChildTaskBuilderT): Propagator = child.backupSubTaskBuilder.injectableProxy.get.propagator
+    def restoreResult(child: ChildTaskBuilderT): Propagator = child.restoreSubTaskBuilder.injectableProxy.get.propagator
 
     children foreach (_.build)
 
     backupSubTaskBuilder.injectableProxy.dependencyType match {
-      case Independent | ParentDependent => backupSubTaskBuilder configurePropagation (children.toSet.map(backupResult))
-      case ParentDependent               => backupSubTaskBuilder configureForParent parent.backupSubTaskBuilder
-      case ChildDependent                => backupSubTaskBuilder configureForChildren (children map (_.backupSubTaskBuilder))
+      case Independent => backupSubTaskBuilder configurePropagation (children.toSet.map(backupResult))
+      case ParentDependent =>
+        backupSubTaskBuilder configureForParent parent.backupSubTaskBuilder
+        backupSubTaskBuilder configurePropagation (children.toSet.map(backupResult))
+      case ChildDependent => backupSubTaskBuilder configureForChildren (children map (_.backupSubTaskBuilder))
     }
 
     restoreSubTaskBuilder.injectableProxy.dependencyType match {
-      case Independent | ParentDependent => restoreSubTaskBuilder configurePropagation (children.toSet.map(restoreResult))
-      case ParentDependent               => restoreSubTaskBuilder configureForParent parent.restoreSubTaskBuilder
-      case ChildDependent                => restoreSubTaskBuilder configureForChildren (children map (_.restoreSubTaskBuilder))
+      case Independent => restoreSubTaskBuilder configurePropagation (children.toSet.map(restoreResult))
+      case ParentDependent =>
+        restoreSubTaskBuilder configureForParent parent.restoreSubTaskBuilder
+        restoreSubTaskBuilder configurePropagation (children.toSet.map(backupResult))
+      case ChildDependent => restoreSubTaskBuilder configureForChildren (children map (_.restoreSubTaskBuilder))
     }
 
     logger trace s"Builder $getClass finished"

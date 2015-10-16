@@ -10,16 +10,18 @@ import scala.util.{ Failure, Success, Try }
 
 object BackupFiles extends Reporting {
 
+  type Paths2Result = (List[Path]) => Async[List[Path]]
+
   val filesBackupDir = "files"
 
-  private def backupAction(implicit withSettings: Settings): (List[Path]) => Async[List[Path]] = { files =>
+  private def backupAction(implicit withSettings: Settings): Paths2Result = { files =>
     implicit val e = withSettings.withElevation
     implicit val c = withSettings.cleaner
     reporter inform s"Backing up files: $files"
     withSettings.components.fileSystemService copyFiles backupPaths(files)
   }
 
-  private def restoreAction(implicit withSettings: Settings): (List[Path]) => Async[List[Path]] = { files =>
+  private def restoreAction(implicit withSettings: Settings): Paths2Result = { files =>
     implicit val e = withSettings.withElevation
     implicit val c = withSettings.cleaner
     reporter inform s"Restoring files: $files"

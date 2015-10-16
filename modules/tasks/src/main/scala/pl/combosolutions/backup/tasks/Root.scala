@@ -1,15 +1,20 @@
 package pl.combosolutions.backup.tasks
 
-import pl.combosolutions.backup.{ Async, ExecutionContexts }
+import pl.combosolutions.backup.{ Async, ExecutionContexts, Reporting }
 import ExecutionContexts.Task.context
 
-object Root {
+object Root extends Reporting {
 
-  private val unitResult: Async[Unit] = Async { Some(Unit) }
+  type Any2Result = Traversable[Any] => Async[Unit]
 
-  private def backupAction(implicit withSettings: Settings): Traversable[Any] => Async[Unit] = _ => unitResult
+  private val unitResult: Async[Unit] = Async {
+    reporter inform "All task executed"
+    Some(Unit)
+  }
 
-  private def restoreAction(implicit withSettings: Settings): Traversable[Any] => Async[Unit] = _ => unitResult
+  private def backupAction(implicit withSettings: Settings): Any2Result = _ => unitResult
+
+  private def restoreAction(implicit withSettings: Settings): Any2Result = _ => unitResult
 
   class BackupSubTaskBuilder(implicit withSettings: Settings)
     extends ChildDependentSubTaskBuilder[Unit, Unit, Any](backupAction)
