@@ -1,10 +1,10 @@
 package pl.combosolutions.backup.tasks
 
-import pl.combosolutions.backup.{ Async, AsyncTransformer }
-import pl.combosolutions.backup.psm.ExecutionContexts
+import pl.combosolutions.backup.{ ExecutionContexts, Async, AsyncTransformer }
 import pl.combosolutions.backup.tasks.DependencyType._
 import pl.combosolutions.backup.tasks.TasksExceptionMessages._
 
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 
 sealed trait SubTask[Result] {
@@ -13,7 +13,13 @@ sealed trait SubTask[Result] {
 
   val dependencyType: DependencyType
 
-  lazy val result: Async[Result] = execute
+  private val propagation: mutable.Set[() => Unit] = mutable.Set()
+  private[tasks] def getPropagation = propagation
+
+  lazy val result: Async[Result] = {
+    propagation foreach (_())
+    execute
+  }
 
   protected def execute: Async[Result]
 
@@ -50,14 +56,25 @@ final class SubTaskProxy[Result](proxyDependencyType: DependencyType) extends Su
 
   private var implementation: Option[SubTask[Result]] = None
 
-  private[tasks] def setImplementation[T <: SubTask[Result]](subTask: T): Unit = synchronized {
+  private val propagation: mutable.Set[() => Unit] = mutable.Set()
+  private[tasks] override def getPropagation = {
+    if (implementation.isDefined) implementation.get.getPropagation
+    else propagation
+  }
+
+  private[tasks] def setImplementation[T <: SubTask[Result]](subTask: T): Unit = {
     assert(implementation.isEmpty, ProxyInitialized)
     require(dependencyType == subTask.dependencyType, CircularDependency)
-
+    subTask.getPropagation ++= propagation
     implementation = Some(subTask)
   }
 
-  override def execute = synchronized {
+  override lazy val result = {
+    assert(implementation.isDefined, ProxyNotInitialized)
+    implementation.get.result
+  }
+
+  override def execute = {
     assert(implementation.isDefined, ProxyNotInitialized)
     implementation.get.result
   }
@@ -67,7 +84,9 @@ final class IndependentSubTask[Result](action: () => Async[Result]) extends SubT
 
   val dependencyType = Independent
 
-  override def execute = action()
+  override def execute = {
+    action()
+  }
 }
 
 final class ParentDependentSubTask[Result, ParentResult](
@@ -77,11 +96,7 @@ final class ParentDependentSubTask[Result, ParentResult](
 
   val dependencyType = ParentDependent
 
-  type Behavior = Function[ParentResult, Async[Result]]
-
-  protected def execute = parent.result.asAsync flatMap (executeWithParentResult(_))
-
-  val executeWithParentResult: Behavior = action
+  protected def execute = parent.result.asAsync flatMap action
 }
 
 object ChildDependentSubTask {
@@ -99,11 +114,7 @@ final class ChildDependentSubTask[Result, ChildResult](
 
   val dependencyType = ChildDependent
 
-  type Behavior = Function[Traversable[ChildResult], Async[Result]]
-
-  protected def execute = compose(children).asAsync flatMap (executeWithChildrenResults(_))
-
-  val executeWithChildrenResults: Behavior = action
+  protected def execute = compose(children).asAsync flatMap action
 }
 
 // TestSubTask

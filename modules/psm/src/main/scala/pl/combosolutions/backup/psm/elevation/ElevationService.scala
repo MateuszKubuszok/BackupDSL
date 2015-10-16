@@ -1,5 +1,6 @@
 package pl.combosolutions.backup.psm.elevation
 
+import pl.combosolutions.backup.Cleaner
 import pl.combosolutions.backup.psm.ImplementationPriority._
 import pl.combosolutions.backup.psm.ImplementationResolver
 import pl.combosolutions.backup.psm.PsmExceptionMessages.NoElevationAvailable
@@ -7,7 +8,6 @@ import pl.combosolutions.backup.psm.commands.Command
 import pl.combosolutions.backup.psm.elevation.posix.SudoElevationServiceComponent
 import pl.combosolutions.backup.psm.elevation.posix.linux.{ GKSudoElevationServiceComponent, KDESudoElevationServiceComponent }
 import pl.combosolutions.backup.psm.elevation.windows.{ EmptyElevationServiceComponent, UACElevationServiceComponent }
-import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.Program
 
 import ElevationServiceComponentImpl.resolve

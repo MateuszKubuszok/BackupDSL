@@ -1,7 +1,7 @@
 package pl.combosolutions.backup.psm.commands
 
 import pl.combosolutions.backup._
-import pl.combosolutions.backup.psm.ExecutionContexts.Command.context
+import ExecutionContexts.Command.context
 
 import scala.concurrent.Future
 import scalaz.OptionT._

@@ -1,11 +1,10 @@
-package pl.combosolutions.backup.psm
+package pl.combosolutions.backup
 
 import java.util.concurrent.Executors
 
-import pl.combosolutions.backup.Logging
-import pl.combosolutions.backup.psm.DefaultsAndConstants.{ CommandThreadPoolSize, ProgramThreadPoolSize, TaskThreadPoolSize }
-
 import scala.concurrent.ExecutionContext
+
+import DefaultsAndConstants._
 
 object ExecutionContexts {
 

@@ -1,8 +1,8 @@
 package pl.combosolutions.backup.tasks
 
 case class TaskConfig[BR, PBR, CBR, RR, PRR, CRR](
-    parent:   Option[TaskBuilder[PBR, _, _, PRR, _, _]]      = None,
-    children: Traversable[TaskBuilder[CBR, _, _, CRR, _, _]] = Seq()
+    parent:   Option[TaskBuilder[PBR, _, BR, PRR, _, RR]]      = None,
+    children: Traversable[TaskBuilder[CBR, BR, _, CRR, RR, _]] = Seq()
 ) {
 
   type TaskConfigT = TaskConfig[BR, PBR, CBR, RR, PRR, CRR]

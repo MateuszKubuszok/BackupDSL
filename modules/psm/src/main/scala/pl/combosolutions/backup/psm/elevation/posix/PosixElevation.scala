@@ -1,9 +1,9 @@
 package pl.combosolutions.backup.psm.elevation.posix
 
+import pl.combosolutions.backup.Cleaner
 import pl.combosolutions.backup.psm.ImplementationPriority._
 import pl.combosolutions.backup.psm.commands.Command
 import pl.combosolutions.backup.psm.elevation._
-import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.Program
 import pl.combosolutions.backup.psm.programs.posix.PosixPrograms._
 import pl.combosolutions.backup.psm.programs.posix.WhichProgram

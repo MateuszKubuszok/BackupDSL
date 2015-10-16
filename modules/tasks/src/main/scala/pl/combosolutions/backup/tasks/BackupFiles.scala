@@ -2,8 +2,8 @@ package pl.combosolutions.backup.tasks
 
 import java.nio.file.{ Files, Path, Paths }
 
-import pl.combosolutions.backup.{ Async, Reporting }
-import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
+import pl.combosolutions.backup.{ ExecutionContexts, Async, Reporting }
+import ExecutionContexts.Task.context
 
 import scala.collection.mutable
 import scala.util.{ Failure, Success, Try }
@@ -50,14 +50,13 @@ class BackupFiles[CBR, CRR](implicit withSettings: Settings)
   )
 
 class BackupFilesConfigurator[CBR, CRR](
-    parent:                       MutableConfigurator[List[Path], _, List[Path], List[Path], _, List[Path]],
+    parent:                       Configurator[List[Path], _, List[Path], List[Path], _, List[Path]],
     override val initialSettings: Settings
-) extends MutableConfigurator[List[Path], List[Path], CBR, List[Path], List[Path], CRR](Some(parent), initialSettings) {
-  self: MutableConfigurator[List[Path], List[Path], CBR, List[Path], List[Path], CRR] =>
+) extends Configurator[List[Path], List[Path], CBR, List[Path], List[Path], CRR](Some(parent), initialSettings) {
 
-  implicit val withSettings: Settings = settingsProxy
+  implicit val withSettings = initialSettings
+
+  override val builder = new BackupFiles[CBR, CRR]
 
   val files: mutable.MutableList[String] = mutable.MutableList()
-
-  override def taskBuilder = new BackupFiles
 }

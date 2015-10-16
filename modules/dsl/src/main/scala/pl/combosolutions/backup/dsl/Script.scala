@@ -1,9 +1,10 @@
 package pl.combosolutions.backup.dsl
 
-import pl.combosolutions.backup.Logging
-import pl.combosolutions.backup.psm.operations.Cleaner
+import pl.combosolutions.backup.{ Cleaner, Logging }
 import pl.combosolutions.backup.tasks.Action._
 import pl.combosolutions.backup.tasks.ImmutableSettings
+
+import scala.util.{ Failure, Success, Try }
 
 abstract class Script(name: String) extends Cleaner with Logging {
 
@@ -41,7 +42,10 @@ abstract class Script(name: String) extends Cleaner with Logging {
   }
 
   def main(args: Array[String]): Unit = {
-    parser.parse(args, ScriptConfig()) foreach execute
+    Try (parser parse (args, ScriptConfig()) foreach execute) match {
+      case Failure(ex) => logger error ("error during execution", ex)
+      case _           =>
+    }
     clean
   }
 }

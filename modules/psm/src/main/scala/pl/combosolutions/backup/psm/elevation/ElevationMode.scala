@@ -1,10 +1,9 @@
 package pl.combosolutions.backup.psm.elevation
 
-import pl.combosolutions.backup.ReportException
+import pl.combosolutions.backup.{ Cleaner, ReportException }
 import pl.combosolutions.backup.psm.PsmExceptionMessages.DirectCommand
 import pl.combosolutions.backup.psm.ComponentsHelper
 import pl.combosolutions.backup.psm.commands.Command
-import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.Program
 
 sealed trait ElevationMode {

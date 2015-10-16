@@ -1,10 +1,9 @@
 package pl.combosolutions.backup.psm.repositories.posix.linux
 
-import pl.combosolutions.backup.{ Async, AsyncTransformer }
-import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
+import pl.combosolutions.backup.{ Cleaner, ExecutionContexts, Async, AsyncTransformer }
+import ExecutionContexts.Task.context
 import pl.combosolutions.backup.psm.elevation.{ ElevateIfNeeded, ElevationMode, ObligatoryElevationMode }
 import ElevateIfNeeded._
-import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.posix.{ PosixPrograms, WhichProgram }
 import PosixPrograms._
 import pl.combosolutions.backup.psm.programs.posix.linux._

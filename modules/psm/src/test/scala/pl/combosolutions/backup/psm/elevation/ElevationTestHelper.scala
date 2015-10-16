@@ -1,7 +1,7 @@
 package pl.combosolutions.backup.psm.elevation
 
 import org.specs2.mutable.{ BeforeAfter, Specification }
-import pl.combosolutions.backup.psm.operations.Cleaner
+import pl.combosolutions.backup.Cleaner
 
 trait ElevationTestHelper {
   self: Specification =>

@@ -2,8 +2,8 @@ package pl.combosolutions.backup.tasks
 
 import java.nio.file.{ Path, Paths }
 
-import pl.combosolutions.backup.{ Async, Reporting }
-import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
+import pl.combosolutions.backup.{ Async, ExecutionContexts, Reporting }
+import ExecutionContexts.Task.context
 
 import scala.collection.mutable
 
@@ -11,8 +11,7 @@ object SelectFiles extends Reporting {
 
   private def selectFilesAction(files: () => List[String]): () => Async[List[Path]] = () => Async {
     val paths = files() map (Paths get _)
-    // TODO check if files exists
-    reporter inform s"Selected ${paths.length} files for copying: $paths"
+    reporter inform s"Selected ${paths.length} files: $paths"
     Some(paths)
   }
 
@@ -29,14 +28,13 @@ class SelectFiles[PBR, CBR, PRR, CRR](files: () => List[String])
   )
 
 class SelectFilesConfigurator[PBR, CBR, PRR, CRR](
-    parent:                       MutableConfigurator[PBR, _, List[Path], PRR, _, List[Path]],
+    parent:                       Configurator[PBR, _, List[Path], PRR, _, List[Path]],
     override val initialSettings: Settings
-) extends MutableConfigurator[List[Path], PBR, CBR, List[Path], PRR, CRR](Some(parent), initialSettings) {
-  self: MutableConfigurator[List[Path], PBR, CBR, List[Path], PRR, CRR] =>
+) extends Configurator[List[Path], PBR, CBR, List[Path], PRR, CRR](Some(parent), initialSettings) {
 
-  implicit val withSettings: Settings = settingsProxy
+  implicit val withSettings = initialSettings
+
+  override val builder = new SelectFiles[PBR, CBR, PRR, CRR](() => files.toList)
 
   val files: mutable.MutableList[String] = mutable.MutableList()
-
-  override def taskBuilder = new SelectFiles(() => files.toList)
 }

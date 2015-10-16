@@ -3,13 +3,12 @@ package pl.combosolutions.backup.psm.filesystem
 import java.io.File
 import java.nio.file.Path
 
-import pl.combosolutions.backup.AsyncTransformer
-import pl.combosolutions.backup.psm.ExecutionContexts.Command.context
+import pl.combosolutions.backup.{ Cleaner, ExecutionContexts, AsyncTransformer }
+import ExecutionContexts.Command.context
 import pl.combosolutions.backup.psm.commands.CommonCommands._
 import pl.combosolutions.backup.psm.commands.{ CopyCommand, DeleteCommand, MoveCommand }
 import pl.combosolutions.backup.psm.elevation.ElevationMode
 import pl.combosolutions.backup.psm.elevation.ElevateIfNeeded._
-import pl.combosolutions.backup.psm.operations.Cleaner
 
 trait CommonFileSystemServiceComponent extends FileSystemServiceComponent {
   self: FileSystemServiceComponent =>

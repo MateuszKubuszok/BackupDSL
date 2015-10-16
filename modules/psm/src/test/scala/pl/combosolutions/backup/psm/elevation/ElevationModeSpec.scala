@@ -2,9 +2,8 @@ package pl.combosolutions.backup.psm.elevation
 
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import pl.combosolutions.backup.Result
+import pl.combosolutions.backup.{ Cleaner, Result }
 import pl.combosolutions.backup.psm.commands.TestCommand
-import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.programs.GenericProgram
 import pl.combosolutions.backup.test.Tags.UnitTest
 

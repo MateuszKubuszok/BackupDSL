@@ -1,7 +1,7 @@
 package pl.combosolutions.backup.tasks
 
-import pl.combosolutions.backup.{ Async, AsyncTransformer, ReportException }
-import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
+import pl.combosolutions.backup.{ ExecutionContexts, Async, AsyncTransformer, ReportException }
+import ExecutionContexts.Task.context
 import pl.combosolutions.backup.tasks.Action.{ Backup, Restore }
 import pl.combosolutions.backup.tasks.TasksExceptionMessages._
 

@@ -1,7 +1,6 @@
 package pl.combosolutions.backup.psm.elevation
 
-import pl.combosolutions.backup.{ Async, Executable, Logging, Result }
-import pl.combosolutions.backup.psm.operations.Cleaner
+import pl.combosolutions.backup._
 
 private[elevation] object ElevationFacade {
 

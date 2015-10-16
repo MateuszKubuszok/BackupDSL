@@ -6,7 +6,7 @@ import pl.combosolutions.backup.tasks.TasksExceptionMessages._
 
 sealed abstract class SubTaskBuilder[R, PR, CR](
     dependencyType: DependencyType
-) {
+) extends Logging {
 
   type Result = R
   type ParentResult = PR
@@ -27,6 +27,11 @@ sealed abstract class SubTaskBuilder[R, PR, CR](
   def configureForParent(parentTask: ParentSubTaskBuilderT): Unit
 
   def configureForChildren(childrenTasks: Traversable[ChildSubTaskBuilderT]): Unit
+
+  def configurePropagation(newPropagation: Set[() => Unit]): Unit = {
+    logger trace s"Configuring children $newPropagation for $this"
+    injectableProxy.getPropagation ++= newPropagation
+  }
 }
 
 final class FakeSubTaskBuilder[R, PR, CR](
@@ -54,13 +59,19 @@ case class IndependentSubTaskBuilder[R, PR, CR](
 
   final override def configureForChildren(childrenTasks: Traversable[ChildSubTaskBuilderT]): Unit =
     ReportException onIllegalArgumentOf IndependentTaskWithChildrenConfig
+
+  final override def configurePropagation(newPropagation: Set[() => Unit]): Unit = {
+    logger trace s"Configuring children $newPropagation for $this"
+    injectableProxy.getPropagation ++= newPropagation
+  }
 }
 
 case class ParentDependentSubTaskBuilder[R, PR, CR](
     action: Function[PR, Async[R]]
-) extends SubTaskBuilder[R, PR, CR](ParentDependent) {
+) extends SubTaskBuilder[R, PR, CR](ParentDependent) with Logging {
 
   final override def configureForParent(parentTask: ParentSubTaskBuilderT): Unit = {
+    logger trace s"Configuring parent $parentTask for $this"
     assert(parentTask.injectableProxy.dependencyType != ChildDependent, CircularDependency)
     injectableProxy.setImplementation(new ParentDependentSubTaskT(action, parentTask.injectableProxy))
   }
@@ -71,12 +82,13 @@ case class ParentDependentSubTaskBuilder[R, PR, CR](
 
 case class ChildDependentSubTaskBuilder[R, PR, CR](
     action: Function[Traversable[CR], Async[R]]
-) extends SubTaskBuilder[R, PR, CR](ChildDependent) {
+) extends SubTaskBuilder[R, PR, CR](ChildDependent) with Logging {
 
   final override def configureForParent(childrenTasks: ParentSubTaskBuilderT): Unit =
     ReportException onIllegalArgumentOf ChildrenDependentWithParentConfig
 
   final override def configureForChildren(childrenTasks: Traversable[ChildSubTaskBuilderT]): Unit = {
+    logger trace s"Configuring children $childrenTasks for $this"
     assert(childrenTasks.forall(_.injectableProxy.dependencyType != ParentDependent), CircularDependency)
     injectableProxy.setImplementation(new ChildDependentSubTaskT(action, childrenTasks.map(_.injectableProxy)))
   }

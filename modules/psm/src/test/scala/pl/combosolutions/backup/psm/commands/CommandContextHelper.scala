@@ -3,9 +3,8 @@ package pl.combosolutions.backup.psm.commands
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-import pl.combosolutions.backup.{ Async, Result }
+import pl.combosolutions.backup.{ Cleaner, Async, Result }
 import pl.combosolutions.backup.psm.elevation.ObligatoryElevationMode
-import pl.combosolutions.backup.psm.operations.Cleaner
 
 import scala.reflect.ClassTag
 

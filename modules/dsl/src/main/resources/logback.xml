@@ -8,7 +8,8 @@
         </encoder>
     </appender>
 
-    <logger name="TaskReporter" level="info">
+    <logger name="TaskReporter" level="trace">
+    <!--<logger name="TaskReporter" level="info">-->
         <appender-ref ref="REPORTER" />
     </logger>
 

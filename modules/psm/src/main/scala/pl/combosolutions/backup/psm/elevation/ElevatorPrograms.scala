@@ -1,7 +1,7 @@
 package pl.combosolutions.backup.psm.elevation
 
-import pl.combosolutions.backup.ReportException
-import pl.combosolutions.backup.psm.ExecutionContexts.Program.context
+import pl.combosolutions.backup.{ ExecutionContexts, ReportException }
+import ExecutionContexts.Program.context
 import pl.combosolutions.backup.psm.PsmExceptionMessages.{ RemoteGeneric, RemoteKilling }
 import pl.combosolutions.backup.psm.programs.Program
 

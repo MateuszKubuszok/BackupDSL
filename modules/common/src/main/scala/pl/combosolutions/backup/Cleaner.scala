@@ -1,4 +1,4 @@
-package pl.combosolutions.backup.psm.operations
+package pl.combosolutions.backup
 
 import scala.collection.mutable
 
@@ -8,7 +8,7 @@ trait Cleaner {
 
   private val tasks = mutable.Set[CleanUp]()
 
-  private[psm] def addTask(cleanUp: CleanUp) = tasks += cleanUp
+  def addTask(cleanUp: CleanUp) = tasks += cleanUp
 
   protected def clean = tasks foreach (_())
 }

@@ -1,36 +1,35 @@
 package pl.combosolutions.backup.tasks
 
-import pl.combosolutions.backup.Async
-import pl.combosolutions.backup.psm.ExecutionContexts.Task.context
+import pl.combosolutions.backup.{ Async, ExecutionContexts }
+import ExecutionContexts.Task.context
 
-object RootBuilder {
+object Root {
 
   private val unitResult: Async[Unit] = Async { Some(Unit) }
 
-  private def backupAction(implicit withSettings: Settings): () => Async[Unit] = () => unitResult
+  private def backupAction(implicit withSettings: Settings): Traversable[Any] => Async[Unit] = _ => unitResult
 
-  private def restoreAction(implicit withSettings: Settings): () => Async[Unit] = () => unitResult
+  private def restoreAction(implicit withSettings: Settings): Traversable[Any] => Async[Unit] = _ => unitResult
 
   class BackupSubTaskBuilder(implicit withSettings: Settings)
-    extends IndependentSubTaskBuilder[Unit, Unit, Any](backupAction)
+    extends ChildDependentSubTaskBuilder[Unit, Unit, Any](backupAction)
 
   class RestoreSubTaskBuilder(implicit withSettings: Settings)
-    extends IndependentSubTaskBuilder[Unit, Unit, Any](restoreAction)
+    extends ChildDependentSubTaskBuilder[Unit, Unit, Any](restoreAction)
 }
 
-import RootBuilder._
+import Root._
 
-class RootBuilder(implicit withSettings: Settings) extends TaskBuilder[Unit, Unit, Any, Unit, Unit, Any](
+class Root(implicit withSettings: Settings) extends TaskBuilder[Unit, Unit, Any, Unit, Unit, Any](
   new BackupSubTaskBuilder,
   new RestoreSubTaskBuilder
 )
 
 class RootConfigurator(
     override val initialSettings: Settings
-) extends MutableConfigurator[Unit, Unit, Any, Unit, Unit, Any](None, initialSettings) {
-  self: MutableConfigurator[Unit, Unit, Any, Unit, Unit, Any] =>
+) extends Configurator[Unit, Unit, Any, Unit, Unit, Any](None, initialSettings) {
 
-  implicit val withSettings: Settings = settingsProxy
+  implicit val withSettings = initialSettings
 
-  override def taskBuilder = new RootBuilder
+  override val builder = new Root
 }

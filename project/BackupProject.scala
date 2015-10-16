@@ -22,5 +22,5 @@ object BackupProject extends Build with Settings with Dependencies {
     .configureCommon
     .configureFunctional
     .configureUnit
-    .dependsOnProjects(common, psm, tasks)
+    .dependsOnProjects(common, tasks)
 }

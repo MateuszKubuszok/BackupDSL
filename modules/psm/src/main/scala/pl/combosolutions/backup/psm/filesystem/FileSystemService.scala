@@ -2,14 +2,13 @@ package pl.combosolutions.backup.psm.filesystem
 
 import java.nio.file.Path
 
-import pl.combosolutions.backup.Async
+import pl.combosolutions.backup.{ Cleaner, Async }
 import pl.combosolutions.backup.psm.ImplementationPriority._
 import pl.combosolutions.backup.psm.ImplementationResolver
 import pl.combosolutions.backup.psm.PsmExceptionMessages.NoFileSystemAvailable
 import pl.combosolutions.backup.psm.elevation.ElevationMode
 import pl.combosolutions.backup.psm.filesystem.FileType._
 import pl.combosolutions.backup.psm.filesystem.posix.PosixFileSystemServiceComponent
-import pl.combosolutions.backup.psm.operations.Cleaner
 
 import FileSystemServiceComponentImpl.resolve
 

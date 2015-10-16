@@ -1,8 +1,7 @@
 package pl.combosolutions.backup.tasks
 
 import java.nio.file.{ CopyOption, Path }
-
-import pl.combosolutions.backup.psm.operations.Cleaner
+import pl.combosolutions.backup.Cleaner
 import pl.combosolutions.backup.psm.ComponentRegistry
 import pl.combosolutions.backup.psm.elevation.{ ElevationMode, NotElevated, ObligatoryElevationMode, RemoteElevation }
 import pl.combosolutions.backup.tasks.DefaultsAndConstants.{ BackupDirPath, CopyOptions }
@@ -21,12 +20,12 @@ object Settings {
 
 trait Settings {
 
-  val cleaner: Cleaner
-  val withElevation: ElevationMode
-  val withObligatoryElevation: ObligatoryElevationMode
-  val components: ComponentRegistry
-  val backupDir: Path
-  val copyOptions: Array[CopyOption]
+  def cleaner: Cleaner
+  def withElevation: ElevationMode
+  def withObligatoryElevation: ObligatoryElevationMode
+  def components: ComponentRegistry
+  def backupDir: Path
+  def copyOptions: Array[CopyOption]
 }
 
 case class ImmutableSettings(
@@ -39,13 +38,13 @@ case class ImmutableSettings(
 ) extends Settings
 
 case class MutableSettings(
-    var innerSettings: Settings
+    var innerSettings: Option[Settings]
 ) extends Settings {
 
-  override val cleaner: Cleaner = innerSettings.cleaner
-  override val withElevation: ElevationMode = innerSettings.withElevation
-  override val withObligatoryElevation: ObligatoryElevationMode = innerSettings.withObligatoryElevation
-  override val components: ComponentRegistry = innerSettings.components
-  override val backupDir: Path = innerSettings.backupDir
-  override val copyOptions: Array[CopyOption] = innerSettings.copyOptions
+  override def cleaner: Cleaner = innerSettings.get.cleaner
+  override def withElevation: ElevationMode = innerSettings.get.withElevation
+  override def withObligatoryElevation: ObligatoryElevationMode = innerSettings.get.withObligatoryElevation
+  override def components: ComponentRegistry = innerSettings.get.components
+  override def backupDir: Path = innerSettings.get.backupDir
+  override def copyOptions: Array[CopyOption] = innerSettings.get.copyOptions
 }

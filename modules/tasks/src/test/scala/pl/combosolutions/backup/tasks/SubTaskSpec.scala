@@ -4,6 +4,8 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import pl.combosolutions.backup.Async
 
+import scala.collection.mutable
+
 class SubTaskSpec extends Specification with Mockito {
 
   "SubTask" should {
@@ -98,8 +100,10 @@ class SubTaskSpec extends Specification with Mockito {
     "prevent double implementation setup" in {
       // given
       val subTask = mock[SubTask[Unit]]
+      val propagation = mutable.Set[() => Unit]()
       val proxy = new SubTaskProxy[Unit](DependencyType.Independent)
       subTask.dependencyType returns DependencyType.Independent
+      subTask.getPropagation returns propagation
 
       // when
       proxy setImplementation subTask
@@ -111,8 +115,10 @@ class SubTaskSpec extends Specification with Mockito {
     "redirect to implementation once set" in {
       // given
       val subTask = mock[SubTask[String]]
+      val propagation = mutable.Set[() => Unit]()
       val proxy = new SubTaskProxy[String](DependencyType.Independent)
       subTask.dependencyType returns DependencyType.Independent
+      subTask.getPropagation returns propagation
       subTask.result returns (Async some "test")
 
       // when

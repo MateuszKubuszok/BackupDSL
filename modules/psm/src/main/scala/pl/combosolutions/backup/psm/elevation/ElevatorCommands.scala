@@ -1,6 +1,7 @@
 package pl.combosolutions.backup.psm.elevation
 
-import pl.combosolutions.backup.psm.ExecutionContexts.Command.context
+import pl.combosolutions.backup.ExecutionContexts
+import ExecutionContexts.Command.context
 import pl.combosolutions.backup.psm.commands.Command
 
 import scala.concurrent.Future

@@ -1,11 +1,10 @@
 package pl.combosolutions.backup.psm.repositories
 
-import pl.combosolutions.backup.Async
+import pl.combosolutions.backup.{ Cleaner, Async }
 import pl.combosolutions.backup.psm.ImplementationPriority._
 import pl.combosolutions.backup.psm.ImplementationResolver
 import pl.combosolutions.backup.psm.PsmExceptionMessages.NoRepositoriesAvailable
 import pl.combosolutions.backup.psm.elevation.{ ElevationMode, ObligatoryElevationMode }
-import pl.combosolutions.backup.psm.operations.Cleaner
 import pl.combosolutions.backup.psm.repositories.posix.linux.AptRepositoriesServiceComponent
 
 import RepositoriesServiceComponentImpl.resolve

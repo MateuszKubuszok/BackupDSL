@@ -4,6 +4,8 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import pl.combosolutions.backup.Async
 
+import scala.collection.mutable
+
 class SubTaskBuilderSpec extends Specification with Mockito {
 
   "FakeSubTaskBuilder" should {
@@ -12,7 +14,9 @@ class SubTaskBuilderSpec extends Specification with Mockito {
       // given
       val expected = "test-subtask"
       val subTask = mock[SubTask[String]]
+      val propagation = mutable.Set[() => Unit]()
       subTask.dependencyType returns DependencyType.Independent
+      subTask.getPropagation returns propagation
       subTask.result returns (Async some expected)
 
       // when
@@ -25,7 +29,9 @@ class SubTaskBuilderSpec extends Specification with Mockito {
     "prevent configuration for parent" in {
       // given
       val subTask = mock[SubTask[String]]
+      val propagation = mutable.Set[() => Unit]()
       subTask.dependencyType returns DependencyType.Independent
+      subTask.getPropagation returns propagation
       val parent = mock[SubTaskBuilder[Unit, _, _]]
 
       // when
@@ -38,7 +44,9 @@ class SubTaskBuilderSpec extends Specification with Mockito {
     "prevent configuration for children" in {
       // given
       val subTask = mock[SubTask[String]]
+      val propagation = mutable.Set[() => Unit]()
       subTask.dependencyType returns DependencyType.Independent
+      subTask.getPropagation returns propagation
       val child = mock[SubTaskBuilder[Unit, _, _]]
 
       // when
