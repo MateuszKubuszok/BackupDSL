@@ -4,10 +4,10 @@ import org.slf4j.LoggerFactory
 
 trait Reporting {
 
-  protected val reporter = Reporter
+  protected val reporter: Reporter = Reporter
 }
 
-object Reporter {
+trait Reporter {
 
   val impl = LoggerFactory getLogger "TaskReporter"
 
@@ -19,3 +19,5 @@ object Reporter {
   def error(obj: Object, throwable: Throwable): Unit = impl error (s"        $obj", throwable)
   // format: ON
 }
+
+object Reporter extends Reporter
