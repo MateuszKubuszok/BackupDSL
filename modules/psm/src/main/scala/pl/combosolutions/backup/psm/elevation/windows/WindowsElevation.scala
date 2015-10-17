@@ -1,11 +1,12 @@
 package pl.combosolutions.backup.psm.elevation.windows
 
 import pl.combosolutions.backup.{ Cleaner, ReportException }
-import pl.combosolutions.backup.psm.ImplementationPriority.{ ImplementationPriority, NotAllowed, OnlyAllowed }
-import pl.combosolutions.backup.psm.commands.Command
-import pl.combosolutions.backup.psm.elevation.{ ElevationFacadeComponent, ElevationFacadeComponentImpl, ElevationService, ElevationServiceComponent }
-import pl.combosolutions.backup.psm.systems._
-import pl.combosolutions.backup.psm.programs.Program
+import pl.combosolutions.backup.psm
+import psm.ImplementationPriority.{ ImplementationPriority, NotAllowed, OnlyAllowed }
+import psm.commands.Command
+import psm.elevation._
+import psm.programs.Program
+import psm.systems._
 
 trait EmptyElevationServiceComponent extends ElevationServiceComponent {
   self: ElevationServiceComponent with ElevationFacadeComponent with OperatingSystemComponent =>

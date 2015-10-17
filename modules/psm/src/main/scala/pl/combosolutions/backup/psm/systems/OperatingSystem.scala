@@ -14,27 +14,38 @@ import OperatingSystemComponentImpl.resolve
 object OperatingSystem {
 
   // from http://linuxmafia.com/faq/Admin/release-files.html
-  private[systems] def IS_OS_ARCH = Files.exists(Paths.get("/etc/arch-release"))
-  private[systems] def IS_OS_DEBIAN = Files.exists(Paths.get("/etc/debian_version"))
-  private[systems] def IS_OS_FEDORA = Files.exists(Paths.get("/etc/fedora-release"))
-  private[systems] def IS_OS_GENTOO = Files.exists(Paths.get("/etc/gentoo-release"))
-  private[systems] def IS_OS_REDHAT = Files.exists(Paths.get("/etc/redhat-release"))
+  private[systems] def isOSArch = Files.exists(Paths.get("/etc/arch-release"))
+  private[systems] def isOSDebian = Files.exists(Paths.get("/etc/debian_version"))
+  private[systems] def isOSFedora = Files.exists(Paths.get("/etc/fedora-release"))
+  private[systems] def isOSGentoo = Files.exists(Paths.get("/etc/gentoo-release"))
+  private[systems] def isOSRedHat = Files.exists(Paths.get("/etc/redhat-release"))
 }
 
 // Operating systems families
 
-sealed abstract class OperatingSystem(val name: String, val isCurrent: Boolean, val isPosix: Boolean, val isWindows: Boolean)
-sealed abstract class WindowsSystem(name: String, isCurrent: Boolean) extends OperatingSystem(name, isCurrent, false, true)
-sealed abstract class PosixSystem(name: String, isCurrent: Boolean) extends OperatingSystem(name, isCurrent, true, false)
+sealed abstract class OperatingSystem(
+  val name:      String,
+  val isCurrent: Boolean,
+  val isPosix:   Boolean,
+  val isWindows: Boolean
+)
+sealed abstract class WindowsSystem(
+  name:      String,
+  isCurrent: Boolean
+) extends OperatingSystem(name, isCurrent, false, true)
+sealed abstract class PosixSystem(
+  name:      String,
+  isCurrent: Boolean
+) extends OperatingSystem(name, isCurrent, true, false)
 
 // Linux family
 
 sealed abstract class LinuxSystem(name: String, isCurrent: Boolean) extends PosixSystem(name, isCurrent)
-case object ArchSystem extends LinuxSystem("Arch", IS_OS_LINUX && IS_OS_ARCH)
-case object DebianSystem extends LinuxSystem("Debian", IS_OS_LINUX && IS_OS_DEBIAN)
-case object FedoraSystem extends LinuxSystem("Fedora", IS_OS_LINUX && IS_OS_FEDORA)
-case object GentooSystem extends LinuxSystem("Gentoo", IS_OS_LINUX && IS_OS_GENTOO)
-case object RedHatSystem extends LinuxSystem("Red Hat", IS_OS_LINUX && IS_OS_REDHAT)
+case object ArchSystem extends LinuxSystem("Arch", IS_OS_LINUX && isOSArch)
+case object DebianSystem extends LinuxSystem("Debian", IS_OS_LINUX && isOSDebian)
+case object FedoraSystem extends LinuxSystem("Fedora", IS_OS_LINUX && isOSFedora)
+case object GentooSystem extends LinuxSystem("Gentoo", IS_OS_LINUX && isOSGentoo)
+case object RedHatSystem extends LinuxSystem("Red Hat", IS_OS_LINUX && isOSRedHat)
 case object GenericLinuxSystem extends LinuxSystem("Generic Linux", IS_OS_LINUX)
 
 // MacOS family

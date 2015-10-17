@@ -9,6 +9,7 @@ import Settings._
 import scalariform.formatter.preferences._
 import scoverage.ScoverageKeys._
 import scoverage.ScoverageSbtPlugin
+import org.scalastyle.sbt.ScalastylePlugin._
 
 object Settings extends Dependencies {
 
@@ -55,7 +56,9 @@ object Settings extends Dependencies {
       .setPreference(AlignSingleLineCaseStatements, true)
       .setPreference(DoubleIndentClassDeclaration, true)
       .setPreference(IndentLocalDefs, false)
-      .setPreference(PreserveSpaceBeforeArguments, true)
+      .setPreference(PreserveSpaceBeforeArguments, true),
+
+    scalastyleFailOnError := true
   )
 
   private val commonSettings = scalariformSettings ++ customSettings

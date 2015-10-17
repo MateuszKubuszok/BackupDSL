@@ -14,25 +14,34 @@ import scala.concurrent.{ Await, Promise }
 import scala.sys.process.Process
 import scala.util.{ Failure, Random, Success, Try }
 
+import RmiManager._
+
 private[elevation] class RmiMutex {
 
   private val resultP = Promise[Unit]()
   private val resultF = resultP.future
 
-  def waitForReadiness = synchronized {
+  def waitForReadiness: Unit = synchronized {
     wait()
     Await.result(resultF, Inf)
   }
 
-  def notifyReady = synchronized {
+  def notifyReady: Unit = synchronized {
     resultP success Unit
     notifyAll()
   }
 
-  def notifyFailure = synchronized {
+  def notifyFailure: Unit = synchronized {
     resultP tryComplete Try(ReportException onIllegalStateOf RemoteFailure)
     notifyAll()
   }
+}
+
+private[elevation] object RmiManager {
+
+  val maxRegisterCreationAttempts = 10
+
+  val possiblePorts = 1024 to 65536
 }
 
 private[elevation] class RmiManager(executorClass: Class[_ <: App]) extends Logging with ComponentsHelper {
@@ -40,7 +49,7 @@ private[elevation] class RmiManager(executorClass: Class[_ <: App]) extends Logg
 
   JVMUtils configureRMIFor executorClass
 
-  def createClient(serverName: String, port: Integer) = new ElevationClient(serverName, port)
+  def createClient(serverName: String, port: Integer): ElevationClient = new ElevationClient(serverName, port)
 
   def createServer(notifierName: String, serverName: String, port: Integer): Process = {
     val program = JVMProgram(executorClass, List(notifierName, serverName, port.toString))
@@ -50,7 +59,7 @@ private[elevation] class RmiManager(executorClass: Class[_ <: App]) extends Logg
     elevated run2Kill
   }
 
-  def createReadyNotifier(notifierName: String, registry: Registry, mutex: RmiMutex) = {
+  def createReadyNotifier(notifierName: String, registry: Registry, mutex: RmiMutex): ElevationReadyNotifier = {
     val notifier = ElevationReadyNotifier(() => mutex.notifyReady, () => mutex.notifyFailure)
     val stub = UnicastRemoteObject.exportObject(notifier, 0).asInstanceOf[ElevationReadyNotifier]
     registry bind (notifierName, stub)
@@ -58,38 +67,37 @@ private[elevation] class RmiManager(executorClass: Class[_ <: App]) extends Logg
     stub
   }
 
-  def createRegister = _createRegister()
+  def createRegister: (Registry, Integer) = createRegisterOrFail()
 
-  def findFreeName(registry: Registry) = _findFreeName(registry)
+  def findFreeName(registry: Registry): String = findFreeNameWithoutFailure(registry)
 
   @tailrec
-  private def _createRegister(attemptsLeft: Integer = 10): (Registry, Integer) = {
-    val possiblePorts = 1024 to 65536
+  private def createRegisterOrFail(attemptsLeft: Integer = maxRegisterCreationAttempts): (Registry, Integer) = {
     val randomPort = possiblePorts(Random nextInt possiblePorts.size)
 
     // format: OFF
     Try (LocateRegistry createRegistry randomPort) match {
       case Success(registry) => (registry, randomPort)
       case Failure(ex)       => if (attemptsLeft <= 0) throw ex
-                                else _createRegister(attemptsLeft - 1)
+                                else createRegisterOrFail(attemptsLeft - 1)
     }
     // format: ON
   }
 
   @tailrec
-  private def _findFreeName(registry: Registry): String = {
+  private def findFreeNameWithoutFailure(registry: Registry): String = {
     val name = Random.nextLong().toString
     if (!registry.list.contains(name)) name
-    else _findFreeName(registry)
+    else findFreeNameWithoutFailure(registry)
   }
 }
 
 private[elevation] trait RMIUserHelper {
 
-  protected def configureRMI = JVMUtils configureRMIFor getClass
+  protected def configureRMI: Unit = JVMUtils configureRMIFor getClass
 
-  protected def locateRegistryFor(remotePort: Integer) = LocateRegistry getRegistry remotePort
+  protected def locateRegistryFor(remotePort: Integer): Registry = LocateRegistry getRegistry remotePort
 
-  protected def exportServer(server: ElevationServer) =
+  protected def exportServer(server: ElevationServer): ElevationServer =
     UnicastRemoteObject.exportObject(server, 0).asInstanceOf[ElevationServer]
 }

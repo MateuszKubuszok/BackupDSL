@@ -8,7 +8,7 @@ trait Cleaner {
 
   private val tasks = mutable.Set[CleanUp]()
 
-  def addTask(cleanUp: CleanUp) = tasks += cleanUp
+  def addTask(cleanUp: CleanUp): Unit = tasks += cleanUp
 
-  protected def clean = tasks foreach (_())
+  protected def clean: Unit = tasks foreach (_())
 }

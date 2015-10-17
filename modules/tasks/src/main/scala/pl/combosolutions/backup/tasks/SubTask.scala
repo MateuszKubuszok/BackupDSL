@@ -52,11 +52,14 @@ object SubTask {
   def apply[Result](action: () => Async[Result]): SubTask[Result] =
     new IndependentSubTaskBuilder(action).injectableProxy.get
 
-  def apply[Result, ParentResult](action: ParentResult => Async[Result], parent: SubTask[ParentResult]): SubTask[Result] = {
+  // format: OFF
+  def apply[Result, ParentResult]
+      (action: ParentResult => Async[Result], parent: SubTask[ParentResult]): SubTask[Result] = {
     val builder = new ParentDependentSubTaskBuilder[Result, ParentResult, Nothing](action)
     builder configureForParent parent.fakeSelfBuilder
     builder.injectableProxy.get
   }
+  // format: ON
 
   implicit def proxyToSubTask[Result](proxy: SubTaskProxy[Result]): SubTask[Result] = proxy
 }
@@ -94,9 +97,7 @@ final class IndependentSubTask[Result](action: () => Async[Result]) extends SubT
 
   val dependencyType = Independent
 
-  override def execute = {
-    action()
-  }
+  protected override def execute = action()
 }
 
 final class ParentDependentSubTask[Result, ParentResult](
@@ -111,8 +112,11 @@ final class ParentDependentSubTask[Result, ParentResult](
 
 object ChildDependentSubTask {
 
-  def compose[Result](children: Traversable[SubTask[Result]])(implicit executor: ExecutionContext): Async[Traversable[Result]] =
+  // format: OFF
+  def compose[Result](children: Traversable[SubTask[Result]])
+                     (implicit executor: ExecutionContext): Async[Traversable[Result]] =
     Async completeSequence (children map (_.result))
+  // format: ON
 }
 
 final class ChildDependentSubTask[Result, ChildResult](

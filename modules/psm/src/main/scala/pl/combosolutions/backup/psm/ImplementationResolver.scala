@@ -18,6 +18,6 @@ trait ImplementationResolver[Interface] {
 
   def byPriority(implementation: Interface): ImplementationPriority
 
-  final def resolve = (implementations filter byFilter sortBy byPriority headOption).
+  final def resolve: Interface = (implementations filter byFilter sortBy byPriority headOption).
     getOrElse(ReportException onIllegalStateOf notFoundMessage)
 }

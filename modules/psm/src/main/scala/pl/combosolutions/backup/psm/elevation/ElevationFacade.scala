@@ -4,7 +4,7 @@ import pl.combosolutions.backup._
 
 private[elevation] object ElevationFacade {
 
-  def getFor(cleaner: Cleaner) = synchronized {
+  def getFor(cleaner: Cleaner): ElevationFacade = synchronized {
     cleaner addTask elevationCleanUp
     elevationFacade
   }
@@ -28,7 +28,7 @@ private[elevation] class ElevationFacade(rmiManager: RmiManager) extends Logging
 
   def runRemotely[T <: Executable[T]](executable: Executable[T]): Async[Result[T]] = client executeRemote executable
 
-  def close = {
+  def close: Unit = {
     client.terminate
     server.destroy()
   }
@@ -45,5 +45,5 @@ private[elevation] trait ElevationFacadeComponent {
 
 private[elevation] trait ElevationFacadeComponentImpl extends ElevationFacadeComponent {
 
-  def elevationFacadeFor(cleaner: Cleaner) = ElevationFacade getFor cleaner
+  def elevationFacadeFor(cleaner: Cleaner): ElevationFacade = ElevationFacade getFor cleaner
 }

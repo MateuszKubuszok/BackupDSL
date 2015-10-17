@@ -40,7 +40,7 @@ private[commands] abstract class FilesCommand[T <: Command[T]]
 
 case class CopyCommand(files: List[(String, String)]) extends FilesCommand[CopyCommand] {
 
-  override def filesOperation = for {
+  override def filesOperation: List[(String, Boolean)] = for {
     (fromFileName, intoFileName) <- files
     fromFile = new File(fromFileName).getAbsoluteFile.toPath
     intoFile = new File(intoFileName).getAbsoluteFile.toPath
@@ -49,7 +49,7 @@ case class CopyCommand(files: List[(String, String)]) extends FilesCommand[CopyC
 
 case class DeleteCommand(files: List[String]) extends FilesCommand[DeleteCommand] {
 
-  override def filesOperation = for {
+  override def filesOperation: List[(String, Boolean)] = for {
     fileName <- files
     file = new File(fileName).getAbsoluteFile.toPath
   } yield (fileName, filesService delete file)
@@ -57,7 +57,7 @@ case class DeleteCommand(files: List[String]) extends FilesCommand[DeleteCommand
 
 case class MoveCommand(files: List[(String, String)]) extends FilesCommand[MoveCommand] {
 
-  override def filesOperation = for {
+  override def filesOperation: List[(String, Boolean)] = for {
     (fromFileName, intoFileName) <- files
     fromFile = new File(fromFileName).getAbsoluteFile.toPath
     intoFile = new File(intoFileName).getAbsoluteFile.toPath

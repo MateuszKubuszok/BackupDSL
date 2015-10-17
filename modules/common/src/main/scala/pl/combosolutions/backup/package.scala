@@ -8,10 +8,14 @@ package object backup {
 
   implicit class AsyncTransformer[Result](result: Async[Result]) {
 
-    def asAsync = this
+    def asAsync: AsyncTransformer[Result] = this
 
-    def flatMap[NewResult](function: Result => Async[NewResult])(implicit executor: ExecutionContext) = Async.flatMap(result, function)
+    // format: OFF
+    def flatMap[NewResult](function: Result => Async[NewResult])
+                          (implicit executor: ExecutionContext): Async[NewResult] = Async.flatMap(result, function)
 
-    def map[NewResult](function: Result => NewResult)(implicit executor: ExecutionContext) = Async.map(result, function)
+    def map[NewResult](function: Result => NewResult)
+                      (implicit executor: ExecutionContext): Async[NewResult] = Async.map(result, function)
+    // format: ON
   }
 }

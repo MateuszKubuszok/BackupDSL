@@ -6,8 +6,9 @@ import java.net.{ URLClassLoader, URLDecoder }
 import java.nio.file.{ Files, Paths }
 
 import pl.combosolutions.backup.{ Logging, ReportException }
-import pl.combosolutions.backup.psm.DefaultsAndConstants.{ JavaHomeProperty, ClassPathProperty, RMICodebaseProperty, RMIDisableHttpProperty }
-import pl.combosolutions.backup.psm.PsmExceptionMessages.BadClassURL
+import pl.combosolutions.backup.psm
+import psm.DefaultsAndConstants.{ ClassPathProperty, JavaHomeProperty, RMICodebaseProperty, RMIDisableHttpProperty }
+import psm.PsmExceptionMessages.BadClassURL
 
 import scala.collection.JavaConversions._
 import scala.util.{ Failure, Success, Try }

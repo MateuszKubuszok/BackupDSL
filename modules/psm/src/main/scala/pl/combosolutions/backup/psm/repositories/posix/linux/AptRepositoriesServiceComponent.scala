@@ -2,14 +2,15 @@ package pl.combosolutions.backup.psm.repositories.posix.linux
 
 import pl.combosolutions.backup.{ Cleaner, ExecutionContexts, Async, AsyncTransformer }
 import ExecutionContexts.Task.context
-import pl.combosolutions.backup.psm.elevation.{ ElevateIfNeeded, ElevationMode, ObligatoryElevationMode }
+import pl.combosolutions.backup.psm
+import psm.elevation.{ ElevateIfNeeded, ElevationMode, ObligatoryElevationMode }
 import ElevateIfNeeded._
-import pl.combosolutions.backup.psm.programs.posix.{ PosixPrograms, WhichProgram }
+import psm.programs.posix.{ PosixPrograms, WhichProgram }
 import PosixPrograms._
-import pl.combosolutions.backup.psm.programs.posix.linux._
+import psm.programs.posix.linux._
 import AptPrograms._
 import DpkgPrograms._
-import pl.combosolutions.backup.psm.repositories.{ AptRepository, RepositoriesService, RepositoriesServiceComponent, VersionedPackage }
+import psm.repositories.{ AptRepository, RepositoriesService, RepositoriesServiceComponent, VersionedPackage }
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.Await
@@ -23,27 +24,27 @@ trait AptRepositoriesServiceComponent extends RepositoriesServiceComponent {
     override lazy val repositoriesAvailable: Boolean =
       Await.result(WhichProgram("apt-get").digest[Boolean], Duration.Inf) getOrElse false
 
-    override def obtainRepositories(implicit withElevation: ElevationMode, cleaner: Cleaner) =
+    override def obtainRepositories(implicit withElevation: ElevationMode, cleaner: Cleaner): Async[Repositories] =
       ListAptRepos.handleElevation.digest[List[AptRepository]]
 
     // format: OFF
     override def addRepositories(repositories: Repositories)
-                                (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
+                                (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner): Async[Boolean] =
       areAllTrueWithinAsyncs(asApt(repositories) map (AptAddRepository(_).handleElevation.digest[Boolean]))
 
     override def removeRepositories(repositories: Repositories)
-                                   (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
+                                   (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner): Async[Boolean] =
       areAllTrueWithinAsyncs(asApt(repositories) map (AptRemoveRepository(_).handleElevation.digest[Boolean]))
 
-    override def updateRepositories(implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
+    override def updateRepositories(implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner): Async[Boolean] =
       AptGetUpdate.handleElevation.digest[Boolean]
 
     override def installAll(packages: Packages)
-                           (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner) =
+                           (implicit withElevation: ObligatoryElevationMode, cleaner: Cleaner): Async[Boolean] =
       AptGetInstall(packages toList).handleElevation.digest[Boolean]
 
     override def areAllInstalled(packages: Packages)
-                                (implicit withElevation: ElevationMode, cleaner: Cleaner) =
+                                (implicit withElevation: ElevationMode, cleaner: Cleaner): Async[Boolean] =
       DpkgList.handleElevation.digest[List[VersionedPackage]].asAsync map { installedPackages =>
         packages forall (package_ => installedPackages.exists(iPackage => iPackage.name == package_.name))
       }

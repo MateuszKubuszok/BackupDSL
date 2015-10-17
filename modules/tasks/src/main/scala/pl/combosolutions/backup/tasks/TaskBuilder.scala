@@ -26,9 +26,13 @@ class TaskBuilder[BR, PBR, CBR, RR, PRR, CRR](
   type RestoreSubTaskT = SubTask[RR]
   type RestoreSubTaskBuilderT = SubTaskBuilder[RR, PRR, CRR]
 
+  // format: OFF
   type TaskT = Task[BackupResult, RestoreResult]
-  type TaskBuilderT = TaskBuilder[BackupResult, ParentBackupResult, ChildBackupResult, RestoreResult, ParentRestoreResult, ChildRestoreResult]
-  type TaskConfigT = TaskConfig[BackupResult, ParentBackupResult, ChildBackupResult, RestoreResult, ParentRestoreResult, ChildRestoreResult]
+  type TaskBuilderT = TaskBuilder[BackupResult, ParentBackupResult, ChildBackupResult,
+                                  RestoreResult, ParentRestoreResult, ChildRestoreResult]
+  type TaskConfigT = TaskConfig[BackupResult, ParentBackupResult, ChildBackupResult,
+                                RestoreResult, ParentRestoreResult, ChildRestoreResult]
+  // format: ON
 
   type ParentTaskBuilderT = TaskBuilder[ParentBackupResult, _, BackupResult, ParentRestoreResult, _, RestoreResult]
 

@@ -9,7 +9,7 @@ import scala.util.{ Failure, Success, Try }
 
 private[programs] trait ProgramExecutor extends Logging {
 
-  def apply(name: String, arguments: String*) = GenericProgram(name, arguments.toList)
+  def apply(name: String, arguments: String*): GenericProgram = GenericProgram(name, arguments.toList)
 
   def execute[T <: Program[T]](program: Program[T]): Async[Result[T]] = Async {
     Try {

@@ -1,10 +1,11 @@
 package pl.combosolutions.backup.psm
 
 import pl.combosolutions.backup.Logging
-import pl.combosolutions.backup.psm.elevation.{ ElevationService, ElevationServiceComponent, ElevationServiceComponentImpl }
-import pl.combosolutions.backup.psm.filesystem.{ FileSystemService, FileSystemServiceComponent, FileSystemServiceComponentImpl }
-import pl.combosolutions.backup.psm.repositories.{ RepositoriesService, RepositoriesServiceComponent, RepositoriesServiceComponentImpl }
-import pl.combosolutions.backup.psm.systems.{ OperatingSystem, OperatingSystemComponent, OperatingSystemComponentImpl }
+import pl.combosolutions.backup.psm
+import psm.elevation.{ ElevationService, ElevationServiceComponent, ElevationServiceComponentImpl }
+import psm.filesystem.{ FileSystemService, FileSystemServiceComponent, FileSystemServiceComponentImpl }
+import psm.repositories.{ RepositoriesService, RepositoriesServiceComponent, RepositoriesServiceComponentImpl }
+import psm.systems.{ OperatingSystem, OperatingSystemComponent, OperatingSystemComponentImpl }
 
 trait ComponentRegistry extends AnyRef
   with OperatingSystemComponent

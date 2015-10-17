@@ -3,13 +3,14 @@ package pl.combosolutions.backup.psm.filesystem.posix
 import java.nio.file.Path
 
 import pl.combosolutions.backup._
-import pl.combosolutions.backup.psm.elevation.{ ElevateIfNeeded, ElevationMode }
+import pl.combosolutions.backup.psm
+import psm.elevation.{ ElevateIfNeeded, ElevationMode }
 import ElevateIfNeeded._
-import pl.combosolutions.backup.psm.filesystem.{ CommonFileSystemServiceComponent, FileSystemService, FileSystemServiceComponent }
-import pl.combosolutions.backup.psm.filesystem.FileType.FileType
-import pl.combosolutions.backup.psm.programs.posix.{ FileInfo, LinkFile, PosixPrograms }
+import psm.filesystem.{ CommonFileSystemServiceComponent, FileSystemService, FileSystemServiceComponent }
+import psm.filesystem.FileType.FileType
+import psm.programs.posix.{ FileInfo, LinkFile, PosixPrograms }
 import PosixPrograms._
-import pl.combosolutions.backup.psm.systems.{ OperatingSystemComponent, OperatingSystemComponentImpl }
+import psm.systems.{ OperatingSystemComponent, OperatingSystemComponentImpl }
 
 trait PosixFileSystemServiceComponent
     extends FileSystemServiceComponent
@@ -22,17 +23,23 @@ trait PosixFileSystemServiceComponent
 
     override lazy val fileSystemAvailable = operatingSystem.isPosix
 
-    override def getFileType(forPath: Path)(implicit withElevation: ElevationMode, cleaner: Cleaner) =
+    // format: OFF
+    override def getFileType(forPath: Path)
+                            (implicit withElevation: ElevationMode, cleaner: Cleaner): Async[FileType] =
       FileInfo(forPath.toAbsolutePath.toString).handleElevation.digest[FileType]
 
     override def isSupportingSymbolicLinks: Boolean = true
 
-    override def linkFiles(files: List[(Path, Path)])(implicit withElevation: ElevationMode, cleaner: Cleaner) = {
+    override def linkFiles(files: List[(Path, Path)])
+                          (implicit withElevation: ElevationMode, cleaner: Cleaner): Async[List[Path]] = {
       import ExecutionContexts.Command.context
       Async.completeSequence(paths2Strings(files) map { pair =>
-        LinkFile(pair._1, pair._2).handleElevation.digest[Boolean].asAsync.map(if (_) string2Path(List(pair._1)) else List())
+        LinkFile(pair._1, pair._2).handleElevation.digest[Boolean].asAsync map { success =>
+          if (success) string2Path(List(pair._1)) else List()
+        }
       }).asAsync map (_.flatten)
     }
+    // format: ON
   }
 
   object PosixFileSystemService extends PosixFileSystemService
