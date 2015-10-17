@@ -52,13 +52,15 @@ object Async extends Reporting {
   private def notifyError[Result]: PartialFunction[Throwable, Async[Result]] = {
     case ex: Throwable =>
       reporter error ("Failed to execute Async Result properly", ex)
-      Async.failed[Result](ex)
+      Async failed ex
   }
 
   private def seqOptFolder[Result, M[X] <: TraversableOnce[X]]
-      (builderOpt: Option[mutable.Builder[Result, M[Result]]], appendedOpt: Option[Result]) = for {
-    builder <- builderOpt
-    appended <- appendedOpt
-  } yield builder += appended
+      (builderOpt: Option[mutable.Builder[Result, M[Result]]], appendedOpt: Option[Result]) =
+    if (appendedOpt.isEmpty) builderOpt
+    else for {
+      builder  <- builderOpt
+      appended <- appendedOpt
+    } yield builder += appended
   // format: ON
 }
