@@ -8,7 +8,9 @@ import scala.sys.process.Process
 trait TestProgramHelper[T <: Program[T]] extends Mockito {
   self: Program[T] =>
 
-  var result = Async some Result[T](0, List(), List())
+  val rawResult = Result[T](0, List(), List())
+
+  var result = Async some rawResult
 
   val process = mock[Process]
 

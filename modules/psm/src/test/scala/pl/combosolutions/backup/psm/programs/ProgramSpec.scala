@@ -4,12 +4,11 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import pl.combosolutions.backup.Result
-import pl.combosolutions.backup.test.AsyncSpecificationHelper
 import pl.combosolutions.backup.test.Tags.UnitTest
 
 import scala.sys.process.{ Process, ProcessBuilder, ProcessLogger }
 
-class ProgramSpec extends Specification with Mockito with AsyncSpecificationHelper {
+class ProgramSpec extends Specification with Mockito {
 
   "Program$" should {
 
@@ -62,7 +61,7 @@ class ProgramSpec extends Specification with Mockito with AsyncSpecificationHelp
     "digest result" in new ClassTestContext {
       // given
       implicit val interpreter: Result[GenericProgram]#Interpreter[String] = { _.toString }
-      val expected = await(program.result) map (_.toString) get
+      val expected = program.rawResult.toString
 
       // when
       val result = program.digest[String]

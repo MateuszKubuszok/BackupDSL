@@ -5,14 +5,12 @@ import org.specs2.mutable.Specification
 import pl.combosolutions.backup.psm.elevation.TestElevationFacadeComponent
 import pl.combosolutions.backup.psm.programs.ProgramContextHelper
 import pl.combosolutions.backup.psm.programs.posix.linux._
-import pl.combosolutions.backup.psm.repositories.{ AptRepository, NonVersionedPackage, VersionedPackage }
-import pl.combosolutions.backup.test.AsyncSpecificationHelper
+import pl.combosolutions.backup.psm.repositories._
 import pl.combosolutions.backup.test.Tags.UnitTest
 
 class AptRepositoriesSpec
     extends Specification
     with Mockito
-    with AsyncSpecificationHelper
     with ProgramContextHelper {
 
   val component = new AptRepositoriesServiceComponent with TestElevationFacadeComponent
@@ -20,11 +18,11 @@ class AptRepositoriesSpec
 
   "AptRepositoriesService" should {
 
-    "obtain available repositories" in new ProgramContext(classOf[ListAptRepos], classOf[List[AptRepository]]) {
+    "obtain available repositories" in new ProgramContext(classOf[ListAptRepos], classOf[List[Repository]]) {
       // given
       implicit val e = elevationMode
       implicit val c = cleaner
-      val repository = AptRepository(isSrc = true, "test", "test", List(), List())
+      val repository: Repository = AptRepository(isSrc = true, "test", "test", List(), List())
       val repositories = List(repository)
       makeDigestReturn(repositories)
 
@@ -32,7 +30,7 @@ class AptRepositoriesSpec
       val result = service.obtainRepositories
 
       // then
-      await(result) must beSome(repositories)
+      result must beSome(repositories).await
     } tag UnitTest
 
     "add repositories" in new ProgramContext(classOf[AptAddRepository], classOf[Boolean]) {
@@ -47,7 +45,7 @@ class AptRepositoriesSpec
       val result = service addRepositories repositories
 
       // then
-      await(result) must beSome(true)
+      result must beSome(true).await
     } tag UnitTest
 
     "remove repositories" in new ProgramContext(classOf[AptRemoveRepository], classOf[Boolean]) {
@@ -62,7 +60,7 @@ class AptRepositoriesSpec
       val result = service removeRepositories repositories
 
       // then
-      await(result) must beSome(true)
+      result must beSome(true).await
     } tag UnitTest
 
     "update repositories" in new ProgramContext(classOf[AptGetUpdate], classOf[Boolean]) {
@@ -75,7 +73,7 @@ class AptRepositoriesSpec
       val result = service.updateRepositories
 
       // then
-      await(result) must beSome(true)
+      result must beSome(true).await
     } tag UnitTest
 
     "install packages" in new ProgramContext(classOf[AptGetInstall], classOf[Boolean]) {
@@ -90,7 +88,7 @@ class AptRepositoriesSpec
       val result = service installAll packages
 
       // then
-      await(result) must beSome(true)
+      result must beSome(true).await
     } tag UnitTest
 
     "check if all packages are installed" in new ProgramContext(classOf[DpkgList], classOf[List[VersionedPackage]]) {
@@ -105,7 +103,7 @@ class AptRepositoriesSpec
       val result = service areAllInstalled packages
 
       // then
-      await(result) must beSome(true)
+      result must beSome(true).await
     } tag UnitTest
   }
 }

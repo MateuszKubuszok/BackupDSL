@@ -7,10 +7,9 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import pl.combosolutions.backup.Result
 import pl.combosolutions.backup.psm.programs.GenericProgram
-import pl.combosolutions.backup.test.AsyncSpecificationHelper
 import pl.combosolutions.backup.test.Tags.UnitTest
 
-class ElevationClientSpec extends Specification with Mockito with AsyncSpecificationHelper {
+class ElevationClientSpec extends Specification with Mockito {
 
   private val name = "mock-repository"
   private val remotePort = 6000
@@ -24,10 +23,10 @@ class ElevationClientSpec extends Specification with Mockito with AsyncSpecifica
       (server runRemote program) returns Some(expected)
 
       // when
-      val result = await(client executeRemote program)
+      val result = client executeRemote program
 
       // then
-      result must beSome(expected)
+      result must beSome(expected).await
     } tag UnitTest
 
     "return None successful Async for None successful response" in new TestContext {
@@ -35,10 +34,10 @@ class ElevationClientSpec extends Specification with Mockito with AsyncSpecifica
       (server runRemote program) returns None
 
       // when
-      val result = await(client executeRemote program)
+      val result = client executeRemote program
 
       // then
-      result must beNone
+      result must beNone.await
     } tag UnitTest
 
     "return failed Async for failed request" in new TestContext {

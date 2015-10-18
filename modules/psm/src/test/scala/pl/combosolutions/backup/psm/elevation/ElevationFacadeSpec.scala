@@ -8,12 +8,11 @@ import org.specs2.mutable.Specification
 import pl.combosolutions.backup.psm.commands.TestCommand
 import pl.combosolutions.backup.{ Async, Result }
 import pl.combosolutions.backup.psm.programs.GenericProgram
-import pl.combosolutions.backup.test.AsyncSpecificationHelper
 import pl.combosolutions.backup.test.Tags.UnitTest
 
 import scala.sys.process.Process
 
-class ElevationFacadeSpec extends Specification with Mockito with AsyncSpecificationHelper {
+class ElevationFacadeSpec extends Specification with Mockito {
 
   val remotePort: Integer = 6666
   val remoteName = "test"
@@ -22,7 +21,7 @@ class ElevationFacadeSpec extends Specification with Mockito with AsyncSpecifica
 
     "run command on a remote server" in new TestContext {
       // given
-      val expected = Result[GenericProgram](0, List(), List())
+      val expected = Result[TestCommand](0, List(), List())
       val command = TestCommand(expected)
       (client executeRemote command) returns (Async some expected.asSpecific)
 
@@ -31,7 +30,7 @@ class ElevationFacadeSpec extends Specification with Mockito with AsyncSpecifica
       val result = facade runRemotely command
 
       // then
-      await(result) must beSome(expected)
+      result must beSome(expected).await
     } tag UnitTest
 
     "run program on a remote server" in new TestContext {
@@ -45,7 +44,7 @@ class ElevationFacadeSpec extends Specification with Mockito with AsyncSpecifica
       val result = facade runRemotely program
 
       // then
-      await(result) must beSome(expected)
+      result must beSome(expected).await
     } tag UnitTest
 
     "close elevated executor" in new TestContext {
