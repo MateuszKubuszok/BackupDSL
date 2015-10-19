@@ -13,6 +13,10 @@ import org.scalastyle.sbt.ScalastylePlugin._
 
 object Settings extends Dependencies {
 
+  val usedScalaVersion = "2.11.7"
+  val usedOrganization = "pl.combosolutions"
+  val usedVersion = "0.2.0-SNAPSHOT"
+
   private val platformTestTag = TestTag.PlatformTest
   val PlatformTest = config(platformTestTag) extend Test describedAs "Runs dangerous (!!!) platform-specific tests"
 
@@ -25,10 +29,10 @@ object Settings extends Dependencies {
   private val disabledTestTag = TestTag.DisabledTest
 
   private val customSettings = Seq(
-    organization := "pl.combosolutions",
-    version := "0.2.0-SNAPSHOT",
+    organization := usedOrganization,
+    version := usedVersion,
 
-    scalaVersion := "2.11.7",
+    scalaVersion := usedScalaVersion,
     scalacOptions ++= Seq(
       "-unchecked",
       "-deprecation",
