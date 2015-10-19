@@ -13,10 +13,6 @@ import org.scalastyle.sbt.ScalastylePlugin._
 
 object Settings extends Dependencies {
 
-  private val usedScalaVersion = "2.11.7"
-  private val usedOrganization = "pl.combosolutions"
-  private val usedVersion = "0.2.0-SNAPSHOT"
-
   private val platformTestTag = TestTag.PlatformTest
   val PlatformTest = config(platformTestTag) extend Test describedAs "Runs dangerous (!!!) platform-specific tests"
 
@@ -28,18 +24,16 @@ object Settings extends Dependencies {
 
   private val disabledTestTag = TestTag.DisabledTest
 
-  private val rootSettings = Seq(
-    organization := usedOrganization,
-    version := usedVersion,
+  private val commonSettings = Seq(
+    organization := "pl.combosolutions",
+    version := "0.2.0-SNAPSHOT",
 
-    scalaVersion := usedScalaVersion
+    scalaVersion := scalaVersionUsed
   )
-  
-  private val customSettings = Seq(
-    organization := usedOrganization,
-    version := usedVersion,
 
-    scalaVersion := usedScalaVersion,
+  private val rootSettings = commonSettings
+  
+  private val modulesSettings = scalariformSettings ++ commonSettings ++ Seq(
     scalacOptions ++= Seq(
       "-unchecked",
       "-deprecation",
@@ -73,8 +67,6 @@ object Settings extends Dependencies {
 
     scalastyleFailOnError := true
   )
-
-  private val commonSettings = scalariformSettings ++ customSettings
 
   private def excludeTags(tags: String*) = Argument(Specs2, "exclude", tags.reduce(_ + "," + _))
   private def includeTags(tags: String*) = Argument(Specs2, "include", tags.reduce(_ + "," + _))
@@ -112,26 +104,26 @@ trait Settings {
     def configureRoot = project.settings(rootSettings: _*)
   }
   
-  implicit class CommonConfigurator(project: Project) {
+  implicit class ModuleConfigurator(project: Project) {
 
-    def configureCommon = project.settings(commonSettings: _*)
+    def configureModule = project.settings(modulesSettings: _*)
   }
 
-  implicit class PlatformConfigurator(project: Project)
+  implicit class PlatformTestConfigurator(project: Project)
     extends Configurator(project, PlatformTest, platformTestTag) {
 
-    def configurePlatform = configureSequential
+    def configurePlatformTests = configureSequential
   }
 
-  implicit class FunctionalConfigurator(project: Project)
+  implicit class FunctionalTestConfigurator(project: Project)
     extends Configurator(project, FunctionalTest, functionalTestTag) {
 
-    def configureFunctional = configure
+    def configureFunctionalTests = configure
   }
 
-  implicit class UnitConfigurator(project: Project)
+  implicit class UnitTestConfigurator(project: Project)
     extends Configurator(project, UnitTest, unitTestTag) {
 
-    def configureUnit = configure
+    def configureUnitTests = configure
   }
 }

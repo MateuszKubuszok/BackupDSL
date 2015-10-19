@@ -13,33 +13,33 @@ object BackupProject extends Build with Settings with Dependencies {
     .setName("backup-common")
     .setDescription("Backup DSL: Common")
     .setInitialCommand("_")
-    .configureCommon
+    .configureModule
 
   lazy val psm = project.from("psm")
     .setName("backup-psm")
     .setDescription("Backup DSL: Platform Specific Module")
     .setInitialCommand("psm._")
-    .configureCommon
-    .configurePlatform
-    .configureFunctional
-    .configureUnit
+    .configureModule
+    .configurePlatformTests
+    .configureFunctionalTests
+    .configureUnitTests
     .dependsOnProjects(common)
 
   lazy val tasks = project.from("tasks")
     .setName("backup-tasks")
     .setDescription("Backup DSL: Tasks")
     .setInitialCommand("tasks._")
-    .configureCommon
-    .configureFunctional
-    .configureUnit
+    .configureModule
+    .configureFunctionalTests
+    .configureUnitTests
     .dependsOnProjects(common, psm)
 
   lazy val dsl = project.from("dsl")
     .setName("backup-dsl")
     .setDescription("Backup DSL: DSL")
     .setInitialCommand("dsl._")
-    .configureCommon
-    .configureFunctional
-    .configureUnit
+    .configureModule
+    .configureFunctionalTests
+    .configureUnitTests
     .dependsOnProjects(common, tasks)
 }

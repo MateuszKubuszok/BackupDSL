@@ -4,6 +4,15 @@ import Dependencies._
 
 object Dependencies {
 
+  // scala version
+  val scalaVersion = "2.11.7"
+
+  // resolvers
+  val resolvers = Seq(
+    Resolver sonatypeRepo "public",
+    Resolver typesafeRepo "releases"
+  )
+
   // functional utils
   val scalaz        = "org.scalaz" %% "scalaz-core" % "7.1.3"
   val scalazContrib = "org.typelevel" %% "scalaz-contrib-210" % "0.2" exclude ("org.scalaz", "scalaz-core_2.11")
@@ -27,10 +36,10 @@ object Dependencies {
 
 trait Dependencies {
 
-  val commonResolvers = Seq(
-    Resolver sonatypeRepo "public",
-    Resolver typesafeRepo "releases"
-  )
+  val scalaVersionUsed = "2.11.7"
+
+  // resolvers
+  val commonResolvers = resolvers
 
   val mainDeps = Seq(scalaz, scalazContrib, commonsIo, commonsLang, scopt, logback)
 
