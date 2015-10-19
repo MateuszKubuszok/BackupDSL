@@ -30,8 +30,8 @@ object AptPrograms {
     isSrc = Option(lineMatch group 1) exists (_ equalsIgnoreCase "deb-src")
     url = Option(lineMatch group 4).get
     branch = Option(lineMatch group 5).get
-    areas = Option(lineMatch group 6) map (_ split "\\s+" filterNot (_.isEmpty) toList) getOrElse List()
-    architectures = Option(lineMatch group 3) map (_ split " " toList) getOrElse List()
+    architectures = Option(lineMatch group 3) map (_ split "," toList) getOrElse List()
+    areas = Option(lineMatch group 6) map (_ split "\\s+" filterNot (_.isEmpty) toList) get
   } yield AptRepository(
     isSrc         = isSrc,
     url           = url,

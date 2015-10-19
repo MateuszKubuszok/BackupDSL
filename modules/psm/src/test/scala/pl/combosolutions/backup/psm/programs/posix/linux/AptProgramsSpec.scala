@@ -153,15 +153,20 @@ class AptProgramsSpec extends Specification with Mockito {
     "be digested to List[AptRepository] with built-in Interpreter" in {
       // given
       import AptPrograms.ListAptRepos2AptRepositories
-      val expected = AptRepository(isSrc = false, "test-package", "test-version", List(), List())
-      val program = new Program[ListAptRepos]("", List()) with TestProgramHelper[ListAptRepos]
-      program.result = Async some Result[ListAptRepos](0, List(s"/etc/apt/sources.list:$expected"), List())
+      val expected1 = AptRepository(isSrc = false, "test-package", "test-version", List("test"), List("test"))
+      val expected2 = AptRepository(isSrc = false, "test-package", "test-version", List(), List())
+      val program1 = new Program[ListAptRepos]("", List()) with TestProgramHelper[ListAptRepos]
+      val program2 = new Program[ListAptRepos]("", List()) with TestProgramHelper[ListAptRepos]
+      program1.result = Async some Result[ListAptRepos](0, List(s"/etc/apt/sources.list:$expected1"), List())
+      program2.result = Async some Result[ListAptRepos](0, List(s"/etc/apt/sources.list:$expected2"), List())
 
       // when
-      val result = program.digest[List[AptRepository]]
+      val result1 = program1.digest[List[AptRepository]]
+      val result2 = program2.digest[List[AptRepository]]
 
       // then
-      result must beSome(List(expected)).await
+      result1 must beSome(List(expected1)).await
+      result2 must beSome(List(expected2)).await
     } tag UnitTest
   }
 }
