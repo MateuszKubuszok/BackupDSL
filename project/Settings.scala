@@ -13,9 +13,9 @@ import org.scalastyle.sbt.ScalastylePlugin._
 
 object Settings extends Dependencies {
 
-  val usedScalaVersion = "2.11.7"
-  val usedOrganization = "pl.combosolutions"
-  val usedVersion = "0.2.0-SNAPSHOT"
+  private val usedScalaVersion = "2.11.7"
+  private val usedOrganization = "pl.combosolutions"
+  private val usedVersion = "0.2.0-SNAPSHOT"
 
   private val platformTestTag = TestTag.PlatformTest
   val PlatformTest = config(platformTestTag) extend Test describedAs "Runs dangerous (!!!) platform-specific tests"
@@ -28,6 +28,13 @@ object Settings extends Dependencies {
 
   private val disabledTestTag = TestTag.DisabledTest
 
+  private val rootSettings = Seq(
+    organization := usedOrganization,
+    version := usedVersion,
+
+    scalaVersion := usedScalaVersion
+  )
+  
   private val customSettings = Seq(
     organization := usedOrganization,
     version := usedVersion,
@@ -88,6 +95,21 @@ object Settings extends Dependencies {
 
 trait Settings {
 
+  implicit class DataConfigurator(project: Project) {
+
+    def setName(newName: String) = project.settings(name := newName)
+
+    def setDescription(newDescription: String) = project.settings(description := newDescription)
+    
+    def setInitialCommand(newInitialCommand: String) =
+      project.settings(initialCommands := s"pl.combosolutions.backup.$newInitialCommand")
+  }
+  
+  implicit class RootConfigurator(project: Project) {
+
+    def configureRoot = project.settings(rootSettings: _*)
+  }
+  
   implicit class CommonConfigurator(project: Project) {
 
     def configureCommon = project.settings(commonSettings: _*)

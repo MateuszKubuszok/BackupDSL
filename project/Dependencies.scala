@@ -36,6 +36,11 @@ trait Dependencies {
 
   val testDeps = Seq(mockito, spec2, spec2Core, spec2JUnit)
 
+  implicit class ProjectRoot(project: Project) {
+
+    def root = project in file(".")
+  }
+
   implicit class ProjectFrom(project: Project) {
 
     private val commonDir = "modules"
