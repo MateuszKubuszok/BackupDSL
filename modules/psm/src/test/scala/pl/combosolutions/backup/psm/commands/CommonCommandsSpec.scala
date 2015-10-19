@@ -39,25 +39,31 @@ class CommonCommandsSpec extends Specification with Mockito {
     "be digested to List[String] with built-in Interpreter" in new TestCopyContext {
       // given
       import CommonCommands.CopyCommand2List
-      val expected = List(fromFileName)
+      val expected1 = List(fromFileName)
+      val expected2 = List[String]()
 
       // when
-      val result = command.digest[List[String]]
+      val result1 = command.digest[List[String]]
+      val result2 = command2.digest[List[String]]
 
       // then
-      result must beSome(expected).await
+      result1 must beSome(expected1).await
+      result2 must beSome(expected2).await
     } tag UnitTest
 
     "be digested to (List[String],List[String]) with built-in Interpreter" in new TestCopyContext {
       // given
       import CommonCommands.CopyCommand2Tuple
-      val expected = (List(fromFileName), List[String]())
+      val expected1 = (List(fromFileName), List[String]())
+      val expected2 = (List[String](), List(fromFileName))
 
       // when
-      val result = command.digest[(List[String], List[String])]
+      val result1 = command.digest[(List[String], List[String])]
+      val result2 = command2.digest[(List[String], List[String])]
 
       // then
-      result must beSome(expected).await
+      result1 must beSome(expected1).await
+      result2 must beSome(expected2).await
     } tag UnitTest
   }
 
@@ -88,25 +94,31 @@ class CommonCommandsSpec extends Specification with Mockito {
     "be digested to List[String] with built-in Interpreter" in new TestDeleteContext {
       // given
       import CommonCommands.DeleteCommand2List
-      val expected = List(fileName)
+      val expected1 = List(fileName)
+      val expected2 = List[String]()
 
       // when
-      val result = command.digest[List[String]]
+      val result1 = command.digest[List[String]]
+      val result2 = command2.digest[List[String]]
 
       // then
-      result must beSome(expected).await
+      result1 must beSome(expected1).await
+      result2 must beSome(expected2).await
     } tag UnitTest
 
     "be digested to (List[String],List[String]) with built-in Interpreter" in new TestDeleteContext {
       // given
       import CommonCommands.DeleteCommand2Tuple
-      val expected = (List(fileName), List[String]())
+      val expected1 = (List(fileName), List[String]())
+      val expected2 = (List[String](), List(fileName))
 
       // when
-      val result = command.digest[(List[String], List[String])]
+      val result1 = command.digest[(List[String], List[String])]
+      val result2 = command2.digest[(List[String], List[String])]
 
       // then
-      result must beSome(expected).await
+      result1 must beSome(expected1).await
+      result2 must beSome(expected2).await
     } tag UnitTest
   }
 
@@ -128,34 +140,40 @@ class CommonCommandsSpec extends Specification with Mockito {
       val expected = true
 
       // when
-      val result = command.digest[Boolean]
+      val result1 = command.digest[Boolean]
 
       // then
-      result must beSome(expected).await
+      result1 must beSome(expected).await
     } tag UnitTest
 
     "be digested to List[String] with built-in Interpreter" in new TestMoveContext {
       // given
       import CommonCommands.MoveCommand2List
-      val expected = List(fromFileName)
+      val expected1 = List(fromFileName)
+      val expected2 = List[String]()
 
       // when
-      val result = command.digest[List[String]]
+      val result1 = command.digest[List[String]]
+      val result2 = command2.digest[List[String]]
 
       // then
-      result must beSome(expected).await
+      result1 must beSome(expected1).await
+      result2 must beSome(expected2).await
     } tag UnitTest
 
     "be digested to (List[String],List[String]) with built-in Interpreter" in new TestMoveContext {
       // given
       import CommonCommands.MoveCommand2Tuple
-      val expected = (List(fromFileName), List[String]())
+      val expected1 = (List(fromFileName), List[String]())
+      val expected2 = (List[String](), List(fromFileName))
 
       // when
-      val result = command.digest[(List[String], List[String])]
+      val result1 = command.digest[(List[String], List[String])]
+      val result2 = command2.digest[(List[String], List[String])]
 
       // then
-      result must beSome(expected).await
+      result1 must beSome(expected1).await
+      result2 must beSome(expected2).await
     } tag UnitTest
   }
 
@@ -174,6 +192,8 @@ class CommonCommandsSpec extends Specification with Mockito {
     val input = List((fromFileName, intoFileName))
     val command = new CopyCommand(input) with TestFilesServiceComponent
     command.testFilesService.copy(any[Path], any[Path]) returns true
+    val command2 = new CopyCommand(input) with TestFilesServiceComponent
+    command2.testFilesService.copy(any[Path], any[Path]) returns false
   }
 
   trait TestDeleteContext extends TestContext {
@@ -181,6 +201,8 @@ class CommonCommandsSpec extends Specification with Mockito {
     val input = List(fileName)
     val command = new DeleteCommand(input) with TestFilesServiceComponent
     command.testFilesService.delete(any[Path]) returns true
+    val command2 = new DeleteCommand(input) with TestFilesServiceComponent
+    command2.testFilesService.delete(any[Path]) returns false
   }
 
   trait TestMoveContext extends TestContext {
@@ -188,5 +210,7 @@ class CommonCommandsSpec extends Specification with Mockito {
     val input = List((fromFileName, intoFileName))
     val command = new MoveCommand(input) with TestFilesServiceComponent
     command.testFilesService.move(any[Path], any[Path]) returns true
+    val command2 = new MoveCommand(input) with TestFilesServiceComponent
+    command2.testFilesService.move(any[Path], any[Path]) returns false
   }
 }

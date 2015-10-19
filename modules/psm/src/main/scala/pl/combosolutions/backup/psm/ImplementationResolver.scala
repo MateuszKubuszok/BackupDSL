@@ -1,12 +1,14 @@
 package pl.combosolutions.backup.psm
 
 import pl.combosolutions.backup.ReportException
-import pl.combosolutions.backup.psm.ImplementationPriority.ImplementationPriority
 
 object ImplementationPriority extends Enumeration {
+
   type ImplementationPriority = Value
   val OnlyAllowed, Preferred, Allowed, NotAllowed = Value
 }
+
+import ImplementationPriority._
 
 trait ImplementationResolver[Interface] {
 
@@ -18,6 +20,9 @@ trait ImplementationResolver[Interface] {
 
   def byPriority(implementation: Interface): ImplementationPriority
 
-  final def resolve: Interface = (implementations filter byFilter sortBy byPriority headOption).
+  final def resolve: Interface = (implementations
+    filter byFilter
+    filter (byPriority(_) != NotAllowed)
+    sortBy byPriority headOption).
     getOrElse(ReportException onIllegalStateOf notFoundMessage)
 }
