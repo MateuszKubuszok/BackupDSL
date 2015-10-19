@@ -13,10 +13,10 @@ private[programs] trait ProgramExecutor extends Logging {
 
   def execute[T <: Program[T]](program: Program[T]): Async[Result[T]] = Async {
     Try {
-      Program.logger trace s"running  ${program.asGeneric.showCMD} and awaiting results"
+      Program.logger trace s"running ${program.asGeneric.showCMD} and awaiting results"
 
-      var stdout = mutable.MutableList[String]()
-      var stderr = mutable.MutableList[String]()
+      val stdout = mutable.MutableList[String]()
+      val stderr = mutable.MutableList[String]()
       val logger = ProcessLogger(stdout += _, stderr += _)
 
       val exitValue = processFor(program.name, program.arguments) run logger exitValue ()
@@ -54,11 +54,11 @@ class Program[T <: Program[T]](val name: String, val arguments: List[String]) ex
 
   def asGeneric: GenericProgram = GenericProgram(name, arguments)
 
-  def showCMD: String = s"'$name' ${showArgs(arguments)}"
+  def showCMD: String = s"'$name'${showArgs(arguments)}"
 
   // format: OFF
   private def showArgs(arguments: List[String]) =
     if (arguments.isEmpty) ""
-    else arguments map ("'" + _ + "'") reduce (_ + " " + _)
+    else s" ${arguments map ("'" + _ + "'") reduce (_ + " " + _)}"
   // format: ON
 }

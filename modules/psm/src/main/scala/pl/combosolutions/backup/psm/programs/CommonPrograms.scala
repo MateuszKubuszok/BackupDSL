@@ -2,7 +2,6 @@ package pl.combosolutions.backup.psm.programs
 
 import pl.combosolutions.backup.{ Async, ExecutionContexts, Result }
 import ExecutionContexts.Program.context
-import Program._
 
 class ProgramAlias[T <: Program[T], U <: Program[U]](
   aliased: Program[U]
@@ -11,7 +10,7 @@ class ProgramAlias[T <: Program[T], U <: Program[U]](
   aliased.arguments
 ) {
 
-  override def run: Async[Result[T]] = execute(aliased).asAsync map { originalResult =>
+  override def run: Async[Result[T]] = aliased.run.asAsync map { originalResult =>
     Result[T](originalResult.exitValue, originalResult.stdout, originalResult.stderr)
   }
 }
