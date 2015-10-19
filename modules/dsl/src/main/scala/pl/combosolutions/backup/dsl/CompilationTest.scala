@@ -1,5 +1,6 @@
 package pl.combosolutions.backup.dsl
 
+// $COVERAGE-OFF$Throw away code used for fast tests before proper ones are written
 object CompilationTest extends Script("Test script") {
 
   configuration forThis { config =>
@@ -13,3 +14,4 @@ object CompilationTest extends Script("Test script") {
     }
   }
 }
+// $COVERAGE-ON$
