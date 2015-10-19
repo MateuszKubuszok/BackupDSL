@@ -6,6 +6,8 @@ import pl.combosolutions.backup.psm.ComponentRegistry
 import pl.combosolutions.backup.psm.elevation.{ ElevationMode, NotElevated, ObligatoryElevationMode, RemoteElevation }
 import pl.combosolutions.backup.tasks.DefaultsAndConstants.BackupDirPath
 
+import scala.annotation.implicitNotFound
+
 object Settings {
 
   def apply(settings: Settings): ImmutableSettings = ImmutableSettings(
@@ -17,6 +19,7 @@ object Settings {
   )
 }
 
+@implicitNotFound("Task requires implicit Settings instance for configuration")
 trait Settings {
 
   def cleaner: Cleaner

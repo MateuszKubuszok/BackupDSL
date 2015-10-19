@@ -6,6 +6,9 @@ import pl.combosolutions.backup.psm.ComponentsHelper
 import pl.combosolutions.backup.psm.commands.Command
 import pl.combosolutions.backup.psm.programs.Program
 
+import scala.annotation.implicitNotFound
+
+@implicitNotFound("No elevation mode found - required one of: NotElevated, RemoteElevation, DirectElevation")
 sealed trait ElevationMode {
 
   def apply[T <: Command[T]](command: Command[T], cleaner: Cleaner): Command[T]
@@ -21,6 +24,7 @@ private[elevation] trait NotElevated extends ElevationMode {
 }
 object NotElevated extends NotElevated
 
+@implicitNotFound("No obligatory elevation mode found - required one of: RemoteElevation, DirectElevation")
 sealed trait ObligatoryElevationMode extends ElevationMode
 
 private[elevation] trait DirectElevation extends ObligatoryElevationMode with ComponentsHelper {

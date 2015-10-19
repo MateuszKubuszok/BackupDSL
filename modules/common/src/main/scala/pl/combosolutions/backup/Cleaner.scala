@@ -1,7 +1,9 @@
 package pl.combosolutions.backup
 
+import scala.annotation.implicitNotFound
 import scala.collection.mutable
 
+@implicitNotFound("Required implicit Cleaner implementation - task dependency might need clean up procedure")
 trait Cleaner {
 
   type CleanUp = () => Unit
