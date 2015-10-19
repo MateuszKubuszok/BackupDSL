@@ -64,16 +64,20 @@ class PosixProgramsSpec extends Specification with Mockito {
       val expected3 = File
       val program3 = new FileInfo("test-file") with TestProgramHelper[FileInfo]
       program3.result = Async some Result[FileInfo](0, List("test-file: sth else"), List())
+      val program4 = new FileInfo("test-file") with TestProgramHelper[FileInfo]
+      program4.result = Async some Result[FileInfo](0, List(), List())
 
       // when
       val result1 = program1.digest[FileType]
       val result2 = program2.digest[FileType]
       val result3 = program3.digest[FileType]
+      val result4 = program4.digest[FileType]
 
       // then
       result1 must beSome(expected1).await
       result2 must beSome(expected2).await
       result3 must beSome(expected3).await
+      result4 must throwA[IllegalStateException].await
     } tag UnitTest
   }
 
