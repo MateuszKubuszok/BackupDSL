@@ -8,10 +8,10 @@ import ElevationReadyNotifier.{ FailureListener, ReadyListener }
 sealed trait ElevationReadyNotifier extends Remote {
 
   @throws(classOf[RemoteException])
-  def notifyFailure: Unit
+  def notifyFailure(): Unit
 
   @throws(classOf[RemoteException])
-  def notifyReady: Unit
+  def notifyReady(): Unit
 }
 
 object ElevationReadyNotifier {
@@ -30,12 +30,12 @@ private[elevation] final class ElevationReadyNotifierImpl(
 )
     extends ElevationReadyNotifier with Logging {
 
-  override def notifyFailure: Unit = {
+  override def notifyFailure(): Unit = {
     logger error "Notifies execution failure"
     failureListener()
   }
 
-  override def notifyReady: Unit = {
+  override def notifyReady(): Unit = {
     logger trace "Notifies execution readiness"
     readyListener()
   }

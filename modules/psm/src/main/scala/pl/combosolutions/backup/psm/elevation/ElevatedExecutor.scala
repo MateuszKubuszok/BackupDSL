@@ -34,7 +34,7 @@ class ElevatedExecutor(args: Array[String]) extends RMIUserHelper with Logging {
       terminateOnFailure
   }
 
-  def terminateOnFailure: Unit = System exit -1
+  def terminateOnFailure(): Unit = System exit -1
 }
 
 object ElevatedExecutor extends App {

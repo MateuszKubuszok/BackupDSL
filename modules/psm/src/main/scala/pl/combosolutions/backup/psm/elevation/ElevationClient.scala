@@ -23,7 +23,7 @@ private[elevation] class ElevationClient(var name: String, val remotePort: Integ
     }
   }
 
-  def terminate: Unit = {
+  def terminate(): Unit = {
     logger debug "Terminate remote executor"
     Try(server terminate)
   }

@@ -136,7 +136,7 @@ class PlatformSpecificAdvisedTest
     private val fileNamesToClean =
       List(testDirectoryPath, testFilePath, testLinkPath, testNewDirectoryLocation, testNewFileLocation)
 
-    private def fileCleanUp: Unit =
+    private def fileCleanUp(): Unit =
       fileNamesToClean map tmpFile foreach { file => if (file.exists) file.delete }
   }
 }

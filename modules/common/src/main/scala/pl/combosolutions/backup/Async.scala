@@ -8,55 +8,57 @@ import scalaz.std.scalaFuture._
 
 object Async extends Reporting {
 
-  def apply[Result](action: => Option[Result])(implicit executor: ExecutionContext): Async[Result] =
+  def apply[ResultT](action: => Option[ResultT])(implicit executor: ExecutionContext): Async[ResultT] =
     Future { action } recoverWith notifyError
 
-  def some[Result](value: Result): Async[Result] = Future successful Some(value)
+  def some[ResultT](value: ResultT): Async[ResultT] = Future successful Some(value)
 
-  def none[Result]: Async[Result] = Future successful None
+  def none[ResultT]: Async[ResultT] = Future successful None
 
-  def successful[Result](value: Option[Result]): Async[Result] = Future successful value
+  def successful[ResultT](value: Option[ResultT]): Async[ResultT] = Future successful value
 
-  def failed[Result](exception: Throwable): Async[Result] = Future failed exception
+  def failed[ResultT](exception: Throwable): Async[ResultT] = Future failed exception
 
   // format: OFF
-  def completeSequence[Result, M[X] <: TraversableOnce[X]]
-      (in: M[Async[Result]])
-      (implicit cbf: CanBuildFrom[M[Future[Option[Result]]], Option[Result], M[Option[Result]]],
-       cbf2: CanBuildFrom[M[Option[Result]], Result, M[Result]], executor: ExecutionContext): Async[M[Result]] = for {
+  def completeSequence[ResultT, M[X] <: TraversableOnce[X]]
+      (in: M[Async[ResultT]])
+      (implicit cbf: CanBuildFrom[M[Future[Option[ResultT]]], Option[ResultT], M[Option[ResultT]]],
+       cbf2: CanBuildFrom[M[Option[ResultT]], ResultT, M[ResultT]], executor: ExecutionContext): Async[M[ResultT]] =
+    for {
       sequence <- Future sequence in
       isComplete = sequence forall (_.isDefined)
       value <- if (isComplete) incompleteSequence(in) else none
     } yield value
 
-  def incompleteSequence[Result, M[X] <: TraversableOnce[X]]
-      (in: M[Async[Result]])
-      (implicit cbf: CanBuildFrom[M[Future[Option[Result]]], Option[Result], M[Option[Result]]],
-       cbf2: CanBuildFrom[M[Option[Result]], Result, M[Result]], executor: ExecutionContext): Async[M[Result]] = (for {
-     resultsOpts <- Future sequence in
-     sequenceBuilderInit = Option(cbf2(resultsOpts))
-     sequenceBuilderOpt = resultsOpts.foldLeft(sequenceBuilderInit)(seqOptFolder[Result, M])
-   } yield sequenceBuilderOpt map (_.result)) recoverWith notifyError
+  def incompleteSequence[ResultT, M[X] <: TraversableOnce[X]]
+      (in: M[Async[ResultT]])
+      (implicit cbf: CanBuildFrom[M[Future[Option[ResultT]]], Option[ResultT], M[Option[ResultT]]],
+       cbf2: CanBuildFrom[M[Option[ResultT]], ResultT, M[ResultT]], executor: ExecutionContext): Async[M[ResultT]] =
+    (for {
+      resultsOpts <- Future sequence in
+      sequenceBuilderInit = Option(cbf2(resultsOpts))
+      sequenceBuilderOpt = resultsOpts.foldLeft(sequenceBuilderInit)(seqOptFolder[ResultT, M])
+    } yield sequenceBuilderOpt map (_.result)) recoverWith notifyError
 
-  def flatMap[Result, NewResult](resultA: Async[Result], function: Result => Async[NewResult])
-                                (implicit executor: ExecutionContext): Async[NewResult] = (for {
+  def flatMap[ResultT, NewResult](resultA: Async[ResultT], function: ResultT => Async[NewResult])
+                                 (implicit executor: ExecutionContext): Async[NewResult] = (for {
     result <- optionT(resultA)
     mapped <- optionT(function(result))
   } yield mapped).run recoverWith notifyError
 
-  def map[Result, NewResult](resultA: Async[Result], function: Result => NewResult)
+  def map[ResultT, NewResult](resultA: Async[ResultT], function: ResultT => NewResult)
                             (implicit executor: ExecutionContext): Async[NewResult] = (for {
     result <- optionT(resultA)
   } yield function(result)).run recoverWith notifyError
 
-  private def notifyError[Result]: PartialFunction[Throwable, Async[Result]] = {
+  private def notifyError[ResultT]: PartialFunction[Throwable, Async[ResultT]] = {
     case ex: Throwable =>
       reporter error ("Failed to execute Async Result properly", ex)
       Async failed ex
   }
 
-  private def seqOptFolder[Result, M[X] <: TraversableOnce[X]]
-      (builderOpt: Option[mutable.Builder[Result, M[Result]]], appendedOpt: Option[Result]) =
+  private def seqOptFolder[ResultT, M[X] <: TraversableOnce[X]]
+      (builderOpt: Option[mutable.Builder[ResultT, M[ResultT]]], appendedOpt: Option[ResultT]) =
     if (appendedOpt.isEmpty) builderOpt
     else for {
       builder  <- builderOpt

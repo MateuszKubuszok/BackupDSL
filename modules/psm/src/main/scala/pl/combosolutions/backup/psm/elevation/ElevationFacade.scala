@@ -28,14 +28,14 @@ private[elevation] class ElevationFacade(rmiManager: RmiManager) extends Logging
 
   def runRemotely[T <: Executable[T]](executable: Executable[T]): Async[Result[T]] = client executeRemote executable
 
-  def close: Unit = {
+  def close(): Unit = {
     client.terminate
     server.destroy()
   }
 
-  protected def createMutex = new RmiMutex
+  protected def createMutex() = new RmiMutex
 
-  protected def waitForReadiness = mutex.waitForReadiness
+  protected def waitForReadiness() = mutex.waitForReadiness
 }
 
 private[elevation] trait ElevationFacadeComponent {

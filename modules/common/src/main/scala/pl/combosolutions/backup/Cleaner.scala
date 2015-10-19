@@ -10,5 +10,5 @@ trait Cleaner {
 
   def addTask(cleanUp: CleanUp): Unit = tasks += cleanUp
 
-  protected def clean: Unit = tasks foreach (_())
+  protected def clean(): Unit = tasks foreach (_())
 }

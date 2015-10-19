@@ -13,7 +13,7 @@ sealed trait ElevationServer extends Remote {
   def runRemote(executable: Executable[_]): Option[Result[_]]
 
   @throws(classOf[RemoteException])
-  def terminate: Unit
+  def terminate(): Unit
 }
 
 object ElevationServer {
@@ -28,5 +28,5 @@ private[elevation] final class ElevationServerImpl extends ElevationServer with 
     Await result (executable.run, Duration.Inf)
   }
 
-  def terminate: Unit = System exit 0
+  def terminate(): Unit = System exit 0
 }

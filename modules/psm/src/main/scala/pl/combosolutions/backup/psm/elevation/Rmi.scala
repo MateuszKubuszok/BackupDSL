@@ -21,17 +21,17 @@ private[elevation] class RmiMutex {
   private val resultP = Promise[Unit]()
   private val resultF = resultP.future
 
-  def waitForReadiness: Unit = synchronized {
+  def waitForReadiness(): Unit = synchronized {
     wait()
     Await.result(resultF, Inf)
   }
 
-  def notifyReady: Unit = synchronized {
+  def notifyReady(): Unit = synchronized {
     resultP success Unit
     notifyAll()
   }
 
-  def notifyFailure: Unit = synchronized {
+  def notifyFailure(): Unit = synchronized {
     resultP tryComplete Try(ReportException onIllegalStateOf RemoteFailure)
     notifyAll()
   }
@@ -94,7 +94,7 @@ private[elevation] class RmiManager(executorClass: Class[_ <: App]) extends Logg
 
 private[elevation] trait RMIUserHelper {
 
-  protected def configureRMI: Unit = JVMUtils configureRMIFor getClass
+  protected def configureRMI(): Unit = JVMUtils configureRMIFor getClass
 
   protected def locateRegistryFor(remotePort: Integer): Registry = LocateRegistry getRegistry remotePort
 
