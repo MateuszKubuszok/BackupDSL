@@ -2,6 +2,7 @@ package pl.combosolutions.backup.psm.elevation.posix.linux
 
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
+import pl.combosolutions.backup.psm.systems.{ TestAvailableCommandsComponent, TestOperatingSystemComponent }
 import pl.combosolutions.backup.{ Cleaner, Result }
 import pl.combosolutions.backup.psm.commands.TestCommand
 import pl.combosolutions.backup.psm.elevation.{ RemoteElevatorCommand, RemoteElevatorProgram, TestElevationFacadeComponent }
@@ -10,7 +11,12 @@ import pl.combosolutions.backup.test.Tags.UnitTest
 
 class LinuxElevationSpec extends Specification with Mockito {
 
-  val component = new GKSudoElevationServiceComponent with TestElevationFacadeComponent
+  // format: OFF
+  val component = new GKSudoElevationServiceComponent
+      with TestElevationFacadeComponent
+      with TestOperatingSystemComponent
+      with TestAvailableCommandsComponent
+  // format: ON
   val service = component.elevationService
   val command = TestCommand(Result(0, List(), List()))
   val program = GenericProgram("test-name", List("test-args"))

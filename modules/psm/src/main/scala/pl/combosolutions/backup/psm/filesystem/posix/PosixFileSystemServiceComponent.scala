@@ -4,6 +4,7 @@ import java.nio.file.Path
 
 import pl.combosolutions.backup._
 import pl.combosolutions.backup.psm
+import psm.ImplementationPriority._
 import psm.elevation.{ ElevateIfNeeded, ElevationMode }
 import ElevateIfNeeded._
 import psm.filesystem.{ CommonFileSystemServiceComponent, FileSystemService, FileSystemServiceComponent }
@@ -22,6 +23,8 @@ trait PosixFileSystemServiceComponent
   trait PosixFileSystemService extends FileSystemService with CommonFileSystemService {
 
     override lazy val fileSystemAvailable = operatingSystem.isPosix
+
+    override lazy val fileSystemPriority = if (fileSystemAvailable) OnlyAllowed else NotAllowed
 
     // format: OFF
     override def getFileType(forPath: Path)

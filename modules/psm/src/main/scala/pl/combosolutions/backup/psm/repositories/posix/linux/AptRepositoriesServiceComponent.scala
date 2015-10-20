@@ -3,26 +3,31 @@ package pl.combosolutions.backup.psm.repositories.posix.linux
 import pl.combosolutions.backup.{ Cleaner, ExecutionContexts, Async, AsyncTransformer }
 import ExecutionContexts.Task.context
 import pl.combosolutions.backup.psm
+import psm.ImplementationPriority._
 import psm.elevation.{ ElevateIfNeeded, ElevationMode, ObligatoryElevationMode }
 import ElevateIfNeeded._
-import psm.programs.posix.{ PosixPrograms, WhichProgram }
-import PosixPrograms._
 import psm.programs.posix.linux._
 import AptPrograms._
 import DpkgPrograms._
 import psm.repositories.{ AptRepository, RepositoriesService, RepositoriesServiceComponent, VersionedPackage }
-
-import scala.concurrent.duration.Duration
-import scala.concurrent.Await
+import psm.systems._
 
 trait AptRepositoriesServiceComponent extends RepositoriesServiceComponent {
+  self: RepositoriesServiceComponent with OperatingSystemComponent with AvailableCommandsComponent =>
 
   override def repositoriesService: RepositoriesService = AptRepositoriesService
 
   trait AptRepositoriesService extends RepositoriesService {
 
-    override lazy val repositoriesAvailable: Boolean =
-      Await.result(WhichProgram("apt-get").digest[Boolean], Duration.Inf) getOrElse false
+    override lazy val repositoriesAvailable: Boolean = operatingSystem.isPosix && availableCommands.aptGet
+
+    override lazy val repositoriesPriority: ImplementationPriority =
+      if (repositoriesAvailable) {
+        operatingSystem match {
+          case DebianSystem => Preferred
+          case _            => Allowed
+        }
+      } else NotAllowed
 
     override def obtainRepositories(implicit withElevation: ElevationMode, cleaner: Cleaner): Async[Repositories] =
       ListAptRepos.handleElevation.digest[List[AptRepository]]
@@ -59,7 +64,10 @@ trait AptRepositoriesServiceComponent extends RepositoriesServiceComponent {
   object AptRepositoriesService extends AptRepositoriesService
 }
 
-object AptRepositoriesServiceComponent extends AptRepositoriesServiceComponent {
+object AptRepositoriesServiceComponent
+    extends AptRepositoriesServiceComponent
+    with OperatingSystemComponentImpl
+    with AvailableCommandsComponentImpl {
 
   lazy val aptSourcePattern = "(deb|deb-src)\\s+(\\[arch=(\\S+)\\]\\s+)?(\\S+)\\s+(\\S+)((\\s+\\S+)*)".r
   lazy val etcAptSourcesMain = "/etc/apt/sources.list"

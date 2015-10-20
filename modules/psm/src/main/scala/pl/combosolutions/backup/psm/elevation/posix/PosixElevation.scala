@@ -23,18 +23,20 @@ object CommonElevationServiceComponent {
 trait CommonElevationServiceComponent extends ElevationServiceComponent {
   self: ElevationServiceComponent with ElevationFacadeComponent =>
 
+  val currentDesktopSession = CurrentDesktopSession
+
   trait CommonElevationService extends ElevationService {
 
-    val desktopSession: String
+    val desktopSessions: Set[String]
 
     override lazy val elevationAvailable: Boolean =
       Await.result(WhichProgram(elevationCMD).digest[Boolean], Duration.Inf) getOrElse false
 
     override lazy val elevationPriority: ImplementationPriority = {
       if (elevationAvailable) {
-        CurrentDesktopSession match {
-          case "" => if (CurrentDesktopSession == desktopSession) OnlyAllowed else NotAllowed
-          case _  => if (CurrentDesktopSession == desktopSession) Preferred else Allowed
+        currentDesktopSession match {
+          case "" => if (desktopSessions contains currentDesktopSession) OnlyAllowed else NotAllowed
+          case _  => if (desktopSessions contains currentDesktopSession) Preferred else Allowed
         }
       } else NotAllowed
     }
@@ -62,7 +64,7 @@ trait SudoElevationServiceComponent extends CommonElevationServiceComponent {
 
     override val elevationCMD: String = "sudo"
 
-    override val desktopSession: String = ""
+    override val desktopSessions: Set[String] = Set("")
   }
 
   object SudoElevationService extends SudoElevationService

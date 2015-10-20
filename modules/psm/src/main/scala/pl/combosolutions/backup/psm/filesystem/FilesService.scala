@@ -13,6 +13,8 @@ trait FilesService {
 
   val filesAvailable: Boolean
 
+  val filesPriority: ImplementationPriority
+
   def copy(from: Path, into: Path): Boolean
 
   def delete(file: Path): Boolean
@@ -36,10 +38,7 @@ object FilesServiceComponentImpl extends ImplementationResolver[FilesService] {
 
   override def byFilter(service: FilesService): Boolean = service.filesAvailable
 
-  // TODO: improve
-  override def byPriority(service: FilesService): ImplementationPriority =
-    if (service.filesAvailable) Allowed
-    else NotAllowed
+  override def byPriority(service: FilesService): ImplementationPriority = service.filesPriority
 }
 
 trait FilesServiceComponentImpl extends FilesServiceComponent {

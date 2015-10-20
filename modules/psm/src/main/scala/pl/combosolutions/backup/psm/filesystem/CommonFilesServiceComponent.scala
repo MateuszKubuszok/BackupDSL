@@ -3,6 +3,7 @@ package pl.combosolutions.backup.psm.filesystem
 import java.nio.file.{ CopyOption, Files, Path }
 
 import pl.combosolutions.backup.Logging
+import pl.combosolutions.backup.psm.ImplementationPriority.ImplementationPriority
 
 import scala.util.{ Failure, Try }
 
@@ -12,6 +13,8 @@ trait CommonFilesServiceComponent extends FilesServiceComponent {
 
   protected val available: Boolean
 
+  protected val priority: ImplementationPriority
+
   protected val withCopyOptions: List[CopyOption]
 
   protected val withMoveOptions: List[CopyOption]
@@ -19,6 +22,8 @@ trait CommonFilesServiceComponent extends FilesServiceComponent {
   trait FilesServiceImpl extends FilesService with Logging {
 
     override lazy val filesAvailable = available
+
+    override lazy val filesPriority = priority
 
     override def copy(from: Path, into: Path): Boolean =
       Try(Files copy (from, into, withCopyOptions: _*)) recover logError(s"Failed to copy '$from' -> '$into'") isSuccess

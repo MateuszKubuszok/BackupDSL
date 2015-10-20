@@ -13,6 +13,8 @@ trait RepositoriesService {
 
   val repositoriesAvailable: Boolean
 
+  val repositoriesPriority: ImplementationPriority
+
   // format: OFF
   type Repositories = List[Repository]
   def obtainRepositories(implicit withElevation: ElevationMode, cleaner: Cleaner): Async[Repositories]
@@ -45,10 +47,7 @@ object RepositoriesServiceComponentImpl extends ImplementationResolver[Repositor
 
   override def byFilter(service: RepositoriesService): Boolean = service.repositoriesAvailable
 
-  // TODO: improve
-  override def byPriority(service: RepositoriesService): ImplementationPriority =
-    if (service.repositoriesAvailable) Allowed
-    else NotAllowed
+  override def byPriority(service: RepositoriesService): ImplementationPriority = service.repositoriesPriority
 }
 
 trait RepositoriesServiceComponentImpl extends RepositoriesServiceComponent {

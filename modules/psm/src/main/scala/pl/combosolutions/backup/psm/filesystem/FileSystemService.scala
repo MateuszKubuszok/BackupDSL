@@ -16,6 +16,8 @@ trait FileSystemService {
 
   val fileSystemAvailable: Boolean
 
+  val fileSystemPriority: ImplementationPriority
+
   def getFileType(forPath: Path)(implicit withElevation: ElevationMode, cleaner: Cleaner): Async[FileType]
 
   def isSupportingSymbolicLinks: Boolean
@@ -45,10 +47,7 @@ object FileSystemServiceComponentImpl extends ImplementationResolver[FileSystemS
 
   override def byFilter(service: FileSystemService): Boolean = service.fileSystemAvailable
 
-  // TODO: improve
-  override def byPriority(service: FileSystemService): ImplementationPriority =
-    if (service.fileSystemAvailable) Allowed
-    else NotAllowed
+  override def byPriority(service: FileSystemService): ImplementationPriority = service.fileSystemPriority
 }
 
 trait FileSystemServiceComponentImpl extends FileSystemServiceComponent {
