@@ -69,8 +69,6 @@ case object GenericWindowsSystem extends WindowsSystem("Windows 10", IS_OS_WINDO
 
 case object UnknownSystem extends OperatingSystem("Unknown", true, false, false)
 
-// TODO add the rest of systems
-
 trait OperatingSystemComponent {
 
   def operatingSystem: OperatingSystem
@@ -110,10 +108,8 @@ object OperatingSystemComponentImpl extends ImplementationResolver[OperatingSyst
 
   override def byFilter(system: OperatingSystem): Boolean = system.isCurrent
 
-  // TODO: improve
   override def byPriority(system: OperatingSystem): ImplementationPriority =
-    if (system.isCurrent) Allowed
-    else NotAllowed
+    if (system.isCurrent) OnlyAllowed else NotAllowed
 }
 
 trait OperatingSystemComponentImpl extends OperatingSystemComponent {
