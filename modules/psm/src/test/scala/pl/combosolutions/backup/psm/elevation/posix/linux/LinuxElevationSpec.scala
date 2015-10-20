@@ -1,8 +1,10 @@
 package pl.combosolutions.backup.psm.elevation.posix.linux
 
+import org.specs2.matcher.Scope
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import pl.combosolutions.backup.psm.systems.{ TestAvailableCommandsComponent, TestOperatingSystemComponent }
+import pl.combosolutions.backup.psm.ImplementationPriority._
+import pl.combosolutions.backup.psm.systems._
 import pl.combosolutions.backup.{ Cleaner, Result }
 import pl.combosolutions.backup.psm.commands.TestCommand
 import pl.combosolutions.backup.psm.elevation.{ RemoteElevatorCommand, RemoteElevatorProgram, TestElevationFacadeComponent }
@@ -11,19 +13,35 @@ import pl.combosolutions.backup.test.Tags.UnitTest
 
 class LinuxElevationSpec extends Specification with Mockito {
 
-  // format: OFF
-  val component = new GKSudoElevationServiceComponent
-      with TestElevationFacadeComponent
-      with TestOperatingSystemComponent
-      with TestAvailableCommandsComponent
-  // format: ON
-  val service = component.elevationService
-  val command = TestCommand(Result(0, List(), List()))
-  val program = GenericProgram("test-name", List("test-args"))
-
   "GKSudoElevationService" should {
 
-    "elevate directly using DirectElevationProgram" in {
+    "correctly calculate availability" in new GKSudoResolutionTestContext {
+      // given
+      // when
+      val availabilityForGnome = serviceForGnome.elevationService.elevationAvailable
+      val availabilityForKde = serviceForKde.elevationService.elevationAvailable
+      val availabilityForWindows = serviceForShell.elevationService.elevationAvailable
+
+      // then
+      availabilityForGnome mustEqual true
+      availabilityForKde mustEqual true
+      availabilityForWindows mustEqual false
+    } tag UnitTest
+
+    "correctly calculate priority" in new GKSudoResolutionTestContext {
+      // given
+      // when
+      val priorityForGnome = serviceForGnome.elevationService.elevationPriority
+      val priorityForKde = serviceForKde.elevationService.elevationPriority
+      val priorityForWindows = serviceForShell.elevationService.elevationPriority
+
+      // then
+      priorityForGnome mustEqual Preferred
+      priorityForKde mustEqual Allowed
+      priorityForWindows mustEqual NotAllowed
+    } tag UnitTest
+
+    "elevate directly using DirectElevationProgram" in new GKSudoTestContext {
       // given
       val expectedName = "gksudo"
       val expectedArgs = List("-m", "BackupDSL elevation runner", "--") ++ List(program.name) ++ program.arguments
@@ -37,7 +55,7 @@ class LinuxElevationSpec extends Specification with Mockito {
       resultAsGeneric.arguments mustEqual expectedArgs
     } tag UnitTest
 
-    "elevate remotely using RemoteElevationCommand" in {
+    "elevate remotely using RemoteElevationCommand" in new GKSudoTestContext {
       // given
       val expected = command
       val cleaner = new Cleaner {}
@@ -50,7 +68,7 @@ class LinuxElevationSpec extends Specification with Mockito {
       elevated mustEqual expected
     } tag UnitTest
 
-    "elevate remotely using RemoteElevationProgram" in {
+    "elevate remotely using RemoteElevationProgram" in new GKSudoTestContext {
       // given
       val expected = program
       val cleaner = new Cleaner {}
@@ -63,4 +81,82 @@ class LinuxElevationSpec extends Specification with Mockito {
       elevated mustEqual expected
     } tag UnitTest
   }
+
+  "KDESudoElevationService" should {
+
+    "correctly calculate availability" in new KDESudoResolutionTestContext {
+      // given
+      // when
+      val availabilityForGnome = serviceForGnome.elevationService.elevationAvailable
+      val availabilityForKde = serviceForKde.elevationService.elevationAvailable
+      val availabilityForWindows = serviceForShell.elevationService.elevationAvailable
+
+      // then
+      availabilityForGnome mustEqual true
+      availabilityForKde mustEqual true
+      availabilityForWindows mustEqual false
+    } tag UnitTest
+
+    "correctly calculate priority" in new KDESudoResolutionTestContext {
+      // given
+      // when
+      val priorityForGnome = serviceForGnome.elevationService.elevationPriority
+      val priorityForKde = serviceForKde.elevationService.elevationPriority
+      val priorityForWindows = serviceForShell.elevationService.elevationPriority
+
+      // then
+      priorityForGnome mustEqual Allowed
+      priorityForKde mustEqual Preferred
+      priorityForWindows mustEqual NotAllowed
+    } tag UnitTest
+  }
+
+  trait GKSudoResolutionTestContext extends Scope {
+
+    val serviceForGnome = new TestGKSudoElevationServiceComponent(DebianSystem, "gnome")
+    val serviceForKde = new TestGKSudoElevationServiceComponent(DebianSystem, "kde")
+    val serviceForShell = new TestGKSudoElevationServiceComponent(DebianSystem, "")
+    serviceForGnome.availableCommands.gkSudo returns true
+    serviceForKde.availableCommands.gkSudo returns true
+    serviceForShell.availableCommands.gkSudo returns false
+  }
+
+  trait GKSudoTestContext extends Scope {
+
+    // format: OFF
+    val component = new GKSudoElevationServiceComponent
+      with TestElevationFacadeComponent
+      with TestOperatingSystemComponent
+      with TestAvailableCommandsComponent
+    // format: ON
+    val service = component.elevationService
+    val command = TestCommand(Result(0, List(), List()))
+    val program = GenericProgram("test-name", List("test-args"))
+  }
+
+  class TestGKSudoElevationServiceComponent(
+    override val operatingSystem:       OperatingSystem,
+    override val currentDesktopSession: String
+  ) extends GKSudoElevationServiceComponent
+      with TestElevationFacadeComponent
+      with OperatingSystemComponent
+      with TestAvailableCommandsComponent
+
+  trait KDESudoResolutionTestContext extends Scope {
+
+    val serviceForGnome = new TestKDESudoElevationServiceComponent(DebianSystem, "gnome")
+    val serviceForKde = new TestKDESudoElevationServiceComponent(DebianSystem, "kde")
+    val serviceForShell = new TestKDESudoElevationServiceComponent(DebianSystem, "")
+    serviceForGnome.availableCommands.kdeSudo returns true
+    serviceForKde.availableCommands.kdeSudo returns true
+    serviceForShell.availableCommands.kdeSudo returns false
+  }
+
+  class TestKDESudoElevationServiceComponent(
+    override val operatingSystem:       OperatingSystem,
+    override val currentDesktopSession: String
+  ) extends KDESudoElevationServiceComponent
+      with TestElevationFacadeComponent
+      with OperatingSystemComponent
+      with TestAvailableCommandsComponent
 }

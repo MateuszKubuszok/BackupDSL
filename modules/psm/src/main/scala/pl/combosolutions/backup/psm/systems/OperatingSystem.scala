@@ -24,11 +24,14 @@ object OperatingSystem {
 // Operating systems families
 
 sealed abstract class OperatingSystem(
-  val name:      String,
-  val isCurrent: Boolean,
-  val isPosix:   Boolean,
-  val isWindows: Boolean
-)
+    val name:      String,
+    val isCurrent: Boolean,
+    val isPosix:   Boolean,
+    val isWindows: Boolean
+) {
+
+  val isAvailable = if (isCurrent) OnlyAllowed else NotAllowed
+}
 sealed abstract class WindowsSystem(
   name:      String,
   isCurrent: Boolean
@@ -108,8 +111,7 @@ object OperatingSystemComponentImpl extends ImplementationResolver[OperatingSyst
 
   override def byFilter(system: OperatingSystem): Boolean = system.isCurrent
 
-  override def byPriority(system: OperatingSystem): ImplementationPriority =
-    if (system.isCurrent) OnlyAllowed else NotAllowed
+  override def byPriority(system: OperatingSystem): ImplementationPriority = system.isAvailable
 }
 
 trait OperatingSystemComponentImpl extends OperatingSystemComponent {

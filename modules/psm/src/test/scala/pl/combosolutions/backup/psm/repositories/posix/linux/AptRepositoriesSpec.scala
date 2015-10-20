@@ -1,5 +1,6 @@
 package pl.combosolutions.backup.psm.repositories.posix.linux
 
+import org.specs2.matcher.Scope
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import pl.combosolutions.backup.psm.ImplementationPriority._
@@ -25,15 +26,8 @@ class AptRepositoriesSpec
 
   "AptRepositoriesService" should {
 
-    "correctly calculate availability" in {
+    "correctly calculate availability" in new AptRepositoriesServiceComponentResolutionTestContext {
       // given
-      val serviceForDebian = new TestAptRepositoriesServiceComponent(DebianSystem)
-      val serviceForLinux = new TestAptRepositoriesServiceComponent(GentooSystem)
-      val serviceForWindows = new TestAptRepositoriesServiceComponent(Windows7System)
-      serviceForDebian.testAvailableCommands.aptGet returns true
-      serviceForLinux.testAvailableCommands.aptGet returns false
-      serviceForWindows.testAvailableCommands.aptGet returns false
-
       // when
       val availabilityForDebian = serviceForDebian.repositoriesService.repositoriesAvailable
       val availabilityForLinux = serviceForLinux.repositoriesService.repositoriesAvailable
@@ -41,19 +35,12 @@ class AptRepositoriesSpec
 
       // then
       availabilityForDebian mustEqual true
-      availabilityForLinux mustEqual false
+      availabilityForLinux mustEqual true
       availabilityForWindows mustEqual false
-    }
+    } tag UnitTest
 
-    "correctly calculate priority" in {
+    "correctly calculate priority" in new AptRepositoriesServiceComponentResolutionTestContext {
       // given
-      val serviceForDebian = new TestAptRepositoriesServiceComponent(DebianSystem)
-      val serviceForLinux = new TestAptRepositoriesServiceComponent(GentooSystem)
-      val serviceForWindows = new TestAptRepositoriesServiceComponent(Windows7System)
-      serviceForDebian.testAvailableCommands.aptGet returns true
-      serviceForLinux.testAvailableCommands.aptGet returns true
-      serviceForWindows.testAvailableCommands.aptGet returns false
-
       // when
       val priorityForDebian = serviceForDebian.repositoriesService.repositoriesPriority
       val priorityForLinux = serviceForLinux.repositoriesService.repositoriesPriority
@@ -63,7 +50,7 @@ class AptRepositoriesSpec
       priorityForDebian mustEqual Preferred
       priorityForLinux mustEqual Allowed
       priorityForWindows mustEqual NotAllowed
-    }
+    } tag UnitTest
 
     "obtain available repositories" in new ProgramContext(classOf[ListAptRepos], classOf[List[Repository]]) {
       // given
@@ -152,6 +139,16 @@ class AptRepositoriesSpec
       // then
       result must beSome(true).await
     } tag UnitTest
+  }
+
+  trait AptRepositoriesServiceComponentResolutionTestContext extends Scope {
+
+    val serviceForDebian = new TestAptRepositoriesServiceComponent(DebianSystem)
+    val serviceForLinux = new TestAptRepositoriesServiceComponent(GentooSystem)
+    val serviceForWindows = new TestAptRepositoriesServiceComponent(Windows7System)
+    serviceForDebian.testAvailableCommands.aptGet returns true
+    serviceForLinux.testAvailableCommands.aptGet returns true
+    serviceForWindows.testAvailableCommands.aptGet returns false
   }
 
   class TestAptRepositoriesServiceComponent(override val operatingSystem: OperatingSystem)
