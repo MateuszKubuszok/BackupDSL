@@ -5,12 +5,7 @@ import pl.combosolutions.backup.psm.ImplementationPriority._
 import pl.combosolutions.backup.psm.commands.Command
 import pl.combosolutions.backup.psm.elevation._
 import pl.combosolutions.backup.psm.programs.Program
-import pl.combosolutions.backup.psm.programs.posix.PosixPrograms._
-import pl.combosolutions.backup.psm.programs.posix.WhichProgram
-import pl.combosolutions.backup.psm.systems.{ OperatingSystemComponent, OperatingSystemComponentImpl }
-
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import pl.combosolutions.backup.psm.systems._
 
 import CommonElevationServiceComponent._
 
@@ -27,16 +22,14 @@ trait CommonElevationServiceComponent extends ElevationServiceComponent {
 
   trait CommonElevationService extends ElevationService {
 
-    val desktopSessions: Set[String]
-
-    override lazy val elevationAvailable: Boolean =
-      Await.result(WhichProgram(elevationCMD).digest[Boolean], Duration.Inf) getOrElse false
+    val desktopSessionsPreferringThis: Set[String]
 
     override lazy val elevationPriority: ImplementationPriority = {
       if (elevationAvailable) {
         currentDesktopSession match {
-          case "" => if (desktopSessions contains currentDesktopSession) OnlyAllowed else NotAllowed
-          case _  => if (desktopSessions contains currentDesktopSession) Preferred else Allowed
+          case "" => OnlyAllowed
+          case _ if (desktopSessionsPreferringThis contains currentDesktopSession) => Preferred
+          case _ => Allowed
         }
       } else NotAllowed
     }
@@ -64,7 +57,7 @@ trait SudoElevationServiceComponent extends CommonElevationServiceComponent {
 
     override val elevationCMD: String = "sudo"
 
-    override val desktopSessions: Set[String] = Set("")
+    override val desktopSessionsPreferringThis: Set[String] = Set("")
   }
 
   object SudoElevationService extends SudoElevationService

@@ -28,7 +28,9 @@ private[elevation] class ElevationClient(var name: String, val remotePort: Integ
     Try(server terminate)
   }
 
+  // $COVERAGE-OFF$ Impossible to test without PowerMock
   private lazy val serverInstance = (LocateRegistry getRegistry remotePort lookup name).asInstanceOf[ElevationServer]
   protected def server = serverInstance
+  // $COVERAGE-ON$
 }
 

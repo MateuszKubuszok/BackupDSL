@@ -15,9 +15,10 @@ object JVMProgramArgs {
     jvmArgsExceptDebug ++ List("-cp", classPath, mainName) ++ mainClassArguments
   }
 
-  private def handleCompanionObjectClassCase(className: String) =
-    if (className endsWith "$") className.substring(0, className.length - 1)
-    else className
+  private def handleCompanionObjectClassCase(className: String) = {
+    assert(className endsWith "$")
+    className.substring(0, className.length - 1)
+  }
 }
 
 case class JVMProgram[T <: App](

@@ -31,6 +31,16 @@ class ElevationModeSpec extends Specification with Mockito {
 
   "DirectElevation" should {
 
+    "fail to create directly elevated command" in {
+      // given
+      val cleaner = new Cleaner {}
+      val mode = new DirectElevation with TestElevationServiceComponent
+
+      // when
+      // then
+      mode(command, cleaner) must throwA[IllegalStateException]
+    } tag UnitTest
+
     "create directly elevated program" in {
       // given
       val cleaner = new Cleaner {}

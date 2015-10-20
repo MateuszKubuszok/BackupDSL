@@ -28,5 +28,7 @@ private[elevation] final class ElevationServerImpl extends ElevationServer with 
     Await result (executable.run, Duration.Inf)
   }
 
+  // $COVERAGE-OFF$ Impossible to test without PowerMock
   def terminate(): Unit = System exit 0
+  // $COVERAGE-ON$
 }

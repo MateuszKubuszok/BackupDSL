@@ -36,6 +36,7 @@ trait RepositoriesServiceComponent {
   def repositoriesService: RepositoriesService
 }
 
+// $COVERAGE-OFF$ Implementation resolution should be checked on each implementation level
 object RepositoriesServiceComponentImpl extends ImplementationResolver[RepositoriesService] {
 
   override lazy val implementations = Seq(
@@ -54,3 +55,4 @@ trait RepositoriesServiceComponentImpl extends RepositoriesServiceComponent {
 
   override lazy val repositoriesService = resolve
 }
+// $COVERAGE-ON$

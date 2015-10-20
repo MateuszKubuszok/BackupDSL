@@ -18,7 +18,7 @@ trait GKSudoElevationServiceComponent extends CommonElevationServiceComponent {
 
     override val elevationArgs = List("-m", "BackupDSL elevation runner", "--")
 
-    override val desktopSessions: Set[String] = Set("gnome")
+    override val desktopSessionsPreferringThis: Set[String] = Set("gnome")
   }
 
   object GKSudoElevationService extends GKSudoElevationService
@@ -43,7 +43,7 @@ trait KDESudoElevationServiceComponent extends CommonElevationServiceComponent {
 
     override val elevationArgs = List("-m", "BackupDSL elevation runner", "--")
 
-    override val desktopSessions: Set[String] = Set("kde")
+    override val desktopSessionsPreferringThis: Set[String] = Set("kde")
   }
 
   object KDESudoElevationService extends KDESudoElevationService

@@ -77,6 +77,7 @@ trait OperatingSystemComponent {
   def operatingSystem: OperatingSystem
 }
 
+// $COVERAGE-OFF$ Implementation resolution should be checked on each implementation level
 object OperatingSystemComponentImpl extends ImplementationResolver[OperatingSystem] {
 
   override lazy val implementations = Seq(
@@ -118,3 +119,4 @@ trait OperatingSystemComponentImpl extends OperatingSystemComponent {
 
   override val operatingSystem = resolve
 }
+// $COVERAGE-ON$

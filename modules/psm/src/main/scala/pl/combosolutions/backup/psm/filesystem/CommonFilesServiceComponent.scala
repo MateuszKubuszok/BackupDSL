@@ -25,6 +25,7 @@ trait CommonFilesServiceComponent extends FilesServiceComponent {
 
     override lazy val filesPriority = priority
 
+    // $COVERAGE-OFF$ Impossible to test without PowerMock
     override def copy(from: Path, into: Path): Boolean =
       Try(Files copy (from, into, withCopyOptions: _*)) recover logError(s"Failed to copy '$from' -> '$into'") isSuccess
 
@@ -39,6 +40,7 @@ trait CommonFilesServiceComponent extends FilesServiceComponent {
         logger error (message, ex)
         Failure(ex)
     }
+    // $COVERAGE-ON$
   }
 
   object FilesServiceImpl extends FilesServiceImpl

@@ -8,15 +8,21 @@ import psm.elevation._
 import psm.programs.Program
 import psm.systems._
 
-trait EmptyElevationServiceComponent extends ElevationServiceComponent {
+private[windows] trait UACSupportRecognition {
+
+  val preNTWindows = Set[OperatingSystem](Windows95System, Windows98System, WindowsMESystem)
+
+  def isSupportingUAC(operatingSystem: OperatingSystem): Boolean = !(preNTWindows contains operatingSystem)
+}
+
+trait EmptyElevationServiceComponent extends ElevationServiceComponent with UACSupportRecognition {
   self: ElevationServiceComponent with ElevationFacadeComponent with OperatingSystemComponent =>
 
   override def elevationService: ElevationService = EmptyElevationService
 
   trait EmptyElevationService extends ElevationService {
 
-    override val elevationAvailable: Boolean =
-      Set[OperatingSystem](Windows95System, Windows98System, WindowsMESystem) contains operatingSystem
+    override val elevationAvailable: Boolean = operatingSystem.isWindows && !isSupportingUAC(operatingSystem)
 
     override val elevationPriority: ImplementationPriority = if (elevationAvailable) OnlyAllowed else NotAllowed
 
@@ -37,7 +43,7 @@ object EmptyElevationServiceComponent
   with ElevationFacadeComponentImpl
   with OperatingSystemComponentImpl
 
-trait UACElevationServiceComponent extends ElevationServiceComponent {
+trait UACElevationServiceComponent extends ElevationServiceComponent with UACSupportRecognition {
   self: ElevationServiceComponent with ElevationFacadeComponent with OperatingSystemComponent =>
 
   override def elevationService: ElevationService = UACElevationService
@@ -47,13 +53,13 @@ trait UACElevationServiceComponent extends ElevationServiceComponent {
   // http://stackoverflow.com/questions/27466869/download-a-zip-from-url-and-extract-it-in-resource-using-sbt
   trait UACElevationService extends ElevationService {
 
-    override val elevationAvailable: Boolean =
-      operatingSystem.isWindows && !EmptyElevationServiceComponent.elevationService.elevationAvailable
+    override val elevationAvailable: Boolean = operatingSystem.isWindows && isSupportingUAC(operatingSystem)
 
     override val elevationPriority: ImplementationPriority = if (elevationAvailable) OnlyAllowed else NotAllowed
 
     override val elevationCMD: String = ""
 
+    // $COVERAGE-OFF$ Coverage disabled until actual implementation is done
     override def elevateDirect[T <: Program[T]](program: Program[T]): Program[T] = ReportException onToDoCodeIn getClass
 
     override def elevateRemote[T <: Command[T]](command: Command[T], cleaner: Cleaner): Command[T] =
@@ -61,6 +67,7 @@ trait UACElevationServiceComponent extends ElevationServiceComponent {
 
     override def elevateRemote[T <: Program[T]](program: Program[T], cleaner: Cleaner): Program[T] =
       ReportException onToDoCodeIn getClass
+    // $COVERAGE-ON$
   }
 
   object UACElevationService extends UACElevationService

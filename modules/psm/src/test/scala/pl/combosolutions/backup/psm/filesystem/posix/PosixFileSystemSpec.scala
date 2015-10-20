@@ -1,6 +1,7 @@
 package pl.combosolutions.backup.psm.filesystem.posix
 
 import java.io.File
+import java.nio.file.Path
 
 import org.specs2.matcher.Scope
 import org.specs2.mock.Mockito
@@ -69,6 +70,20 @@ class PosixFileSystemSpec
       implicit val c = cleaner
       val expected = List(path)
       makeDigestReturn(true)
+
+      // when
+      val result = service linkFiles List((path, path))
+
+      // then
+      result must beSome(expected).await
+    } tag UnitTest
+
+    "fail to create symbolic link for file" in new ProgramContext(classOf[LinkFile], classOf[Boolean]) {
+      // given
+      implicit val e = elevationMode
+      implicit val c = cleaner
+      val expected = List[Path]()
+      makeDigestReturn(false)
 
       // when
       val result = service linkFiles List((path, path))

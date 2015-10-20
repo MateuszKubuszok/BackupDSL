@@ -34,7 +34,9 @@ class ElevatedExecutor(args: Array[String]) extends RMIUserHelper with Logging {
       terminateOnFailure
   }
 
+  // $COVERAGE-OFF$ Impossible to test without PowerMock
   def terminateOnFailure(): Unit = System exit -1
+  // $COVERAGE-ON$
 }
 
 object ElevatedExecutor extends App {

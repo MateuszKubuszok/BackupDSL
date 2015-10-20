@@ -36,6 +36,7 @@ trait FileSystemServiceComponent {
   def fileSystemService: FileSystemService
 }
 
+// $COVERAGE-OFF$ Implementation resolution should be checked on each implementation level
 object FileSystemServiceComponentImpl extends ImplementationResolver[FileSystemService] {
 
   override lazy val implementations = Seq(
@@ -54,3 +55,4 @@ trait FileSystemServiceComponentImpl extends FileSystemServiceComponent {
 
   override lazy val fileSystemService = resolve
 }
+// $COVERAGE-ON$

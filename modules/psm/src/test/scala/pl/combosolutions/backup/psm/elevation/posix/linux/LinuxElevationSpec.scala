@@ -20,11 +20,13 @@ class LinuxElevationSpec extends Specification with Mockito {
       // when
       val availabilityForGnome = serviceForGnome.elevationService.elevationAvailable
       val availabilityForKde = serviceForKde.elevationService.elevationAvailable
-      val availabilityForWindows = serviceForShell.elevationService.elevationAvailable
+      val availabilityForShell = serviceForShell.elevationService.elevationAvailable
+      val availabilityForWindows = serviceForWindows.elevationService.elevationAvailable
 
       // then
       availabilityForGnome mustEqual true
       availabilityForKde mustEqual true
+      availabilityForShell mustEqual false
       availabilityForWindows mustEqual false
     } tag UnitTest
 
@@ -33,11 +35,13 @@ class LinuxElevationSpec extends Specification with Mockito {
       // when
       val priorityForGnome = serviceForGnome.elevationService.elevationPriority
       val priorityForKde = serviceForKde.elevationService.elevationPriority
-      val priorityForWindows = serviceForShell.elevationService.elevationPriority
+      val priorityForShell = serviceForShell.elevationService.elevationPriority
+      val priorityForWindows = serviceForWindows.elevationService.elevationPriority
 
       // then
       priorityForGnome mustEqual Preferred
       priorityForKde mustEqual Allowed
+      priorityForShell mustEqual NotAllowed
       priorityForWindows mustEqual NotAllowed
     } tag UnitTest
 
@@ -116,6 +120,7 @@ class LinuxElevationSpec extends Specification with Mockito {
     val serviceForGnome = new TestGKSudoElevationServiceComponent(DebianSystem, "gnome")
     val serviceForKde = new TestGKSudoElevationServiceComponent(DebianSystem, "kde")
     val serviceForShell = new TestGKSudoElevationServiceComponent(DebianSystem, "")
+    val serviceForWindows = new TestGKSudoElevationServiceComponent(WindowsXPSystem, "")
     serviceForGnome.availableCommands.gkSudo returns true
     serviceForKde.availableCommands.gkSudo returns true
     serviceForShell.availableCommands.gkSudo returns false
@@ -147,6 +152,7 @@ class LinuxElevationSpec extends Specification with Mockito {
     val serviceForGnome = new TestKDESudoElevationServiceComponent(DebianSystem, "gnome")
     val serviceForKde = new TestKDESudoElevationServiceComponent(DebianSystem, "kde")
     val serviceForShell = new TestKDESudoElevationServiceComponent(DebianSystem, "")
+    val serviceForWindows = new TestKDESudoElevationServiceComponent(WindowsXPSystem, "")
     serviceForGnome.availableCommands.kdeSudo returns true
     serviceForKde.availableCommands.kdeSudo returns true
     serviceForShell.availableCommands.kdeSudo returns false
