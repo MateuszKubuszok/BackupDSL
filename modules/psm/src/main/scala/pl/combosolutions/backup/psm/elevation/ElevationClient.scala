@@ -7,7 +7,7 @@ import ExecutionContexts.Program.context
 
 import scala.util.{ Failure, Success, Try }
 
-private[elevation] class ElevationClient(var name: String, val remotePort: Integer) extends Logging {
+private[elevation] class ElevationClient(val name: String, val remotePort: Integer) extends Logging {
 
   def executeRemote[T <: Executable[T]](executable: Executable[T]): Async[Result[T]] = Async {
     logger debug s"Sending remote command: $executable"

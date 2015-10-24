@@ -1,7 +1,6 @@
 package pl.combosolutions.backup.psm.commands
 
-import java.io.File
-import java.nio.file.Path
+import java.nio.file.{ Path, Paths }
 
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
@@ -182,9 +181,9 @@ class CommonCommandsSpec extends Specification with Mockito {
     val fileName = "file"
     val fromFileName = "from-file"
     val intoFileName = "into-file"
-    val filePath = new File(fileName).getAbsoluteFile.toPath
-    val fromPath = new File(fromFileName).getAbsoluteFile.toPath
-    val intoPath = new File(intoFileName).getAbsoluteFile.toPath
+    val filePath = Paths.get(fileName).toAbsolutePath
+    val fromPath = Paths.get(fromFileName).toAbsolutePath
+    val intoPath = Paths.get(intoFileName).toAbsolutePath
   }
 
   trait TestCopyContext extends TestContext {

@@ -1,6 +1,7 @@
 package pl.combosolutions.backup.psm.commands
 
-import java.io.File
+import java.net.URI
+import java.nio.file.Paths
 
 import pl.combosolutions.backup.{ ExecutionContexts, Async, Result }
 import ExecutionContexts.Command.context
@@ -42,8 +43,8 @@ case class CopyCommand(files: List[(String, String)]) extends FilesCommand[CopyC
 
   override def filesOperation: List[(String, Boolean)] = for {
     (fromFileName, intoFileName) <- files
-    fromFile = new File(fromFileName).getAbsoluteFile.toPath
-    intoFile = new File(intoFileName).getAbsoluteFile.toPath
+    fromFile = Paths.get(fromFileName).toAbsolutePath
+    intoFile = Paths.get(intoFileName).toAbsolutePath
   } yield (fromFileName, filesService copy (fromFile, intoFile))
 }
 
@@ -51,7 +52,7 @@ case class DeleteCommand(files: List[String]) extends FilesCommand[DeleteCommand
 
   override def filesOperation: List[(String, Boolean)] = for {
     fileName <- files
-    file = new File(fileName).getAbsoluteFile.toPath
+    file = Paths.get(fileName).toAbsolutePath
   } yield (fileName, filesService delete file)
 }
 
@@ -59,7 +60,7 @@ case class MoveCommand(files: List[(String, String)]) extends FilesCommand[MoveC
 
   override def filesOperation: List[(String, Boolean)] = for {
     (fromFileName, intoFileName) <- files
-    fromFile = new File(fromFileName).getAbsoluteFile.toPath
-    intoFile = new File(intoFileName).getAbsoluteFile.toPath
+    fromFile = Paths.get(fromFileName).toAbsolutePath
+    intoFile = Paths.get(intoFileName).toAbsolutePath
   } yield (fromFileName, filesService move (fromFile, intoFile))
 }

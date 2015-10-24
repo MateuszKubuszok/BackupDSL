@@ -1,7 +1,6 @@
 package pl.combosolutions.backup.psm.filesystem
 
-import java.io.File
-import java.io.File.separator
+import java.nio.file.{ Files, Path, Paths }
 
 import org.specs2.mutable.BeforeAfter
 import pl.combosolutions.backup.psm.PlatformSpecificSpecification
@@ -25,8 +24,8 @@ class PlatformSpecificAdvisedTest
       val file = makeFile(testFilePath)
 
       // when
-      val directoryResult = fileSystemService getFileType directory.toPath
-      val fileResult = fileSystemService getFileType file.toPath
+      val directoryResult = fileSystemService getFileType directory
+      val fileResult = fileSystemService getFileType file
 
       // then
       directoryResult must beSome(FileType.Directory).await
@@ -41,9 +40,9 @@ class PlatformSpecificAdvisedTest
       val toFile = tmpFile(testLinkPath)
 
       // when
-      val linkingResult = fileSystemService linkFiles List((fromFile.toPath, toFile.toPath))
+      val linkingResult = fileSystemService linkFiles List((fromFile, toFile))
       Await result (linkingResult, Inf)
-      val typeResult = fileSystemService getFileType toFile.toPath
+      val typeResult = fileSystemService getFileType toFile
 
       // then
     } tag (if (fileSystemService.isSupportingSymbolicLinks) PlatformTest else DisabledTest)
@@ -59,12 +58,12 @@ class PlatformSpecificAdvisedTest
 
       // when
       val result = fileSystemService copyFiles List(
-        (fromDirectory.toPath, toDirectory.toPath),
-        (fromFile.toPath, toFile.toPath)
+        (fromDirectory, toDirectory),
+        (fromFile, toFile)
       )
 
       // then
-      result must beSome(List(fromDirectory.toPath, fromFile.toPath)).await
+      result must beSome(List(fromDirectory, fromFile)).await
     } tag PlatformTest
 
     "delete files from location" in new TestContext {
@@ -75,10 +74,10 @@ class PlatformSpecificAdvisedTest
       val file = makeFile(testFilePath)
 
       // when
-      val result = fileSystemService deleteFiles List(directory.toPath, file.toPath)
+      val result = fileSystemService deleteFiles List(directory, file)
 
       // then
-      result must beSome(List(directory.toPath, file.toPath)).await
+      result must beSome(List(directory, file)).await
     } tag PlatformTest
 
     "move files from one location to another" in new TestContext {
@@ -92,12 +91,12 @@ class PlatformSpecificAdvisedTest
 
       // when
       val result = fileSystemService moveFiles List(
-        (fromDirectory.toPath, toDirectory.toPath),
-        (fromFile.toPath, toFile.toPath)
+        (fromDirectory, toDirectory),
+        (fromFile, toFile)
       )
 
       // then
-      result must beSome(List(fromDirectory.toPath, fromFile.toPath)).await
+      result must beSome(List(fromDirectory, fromFile)).await
     } tag PlatformTest
   }
 
@@ -112,19 +111,11 @@ class PlatformSpecificAdvisedTest
     val testNewDirectoryLocation = "test-new-directory-location"
     val testNewFileLocation = "test-new-file-location"
 
-    def tmpFile(fileName: String): File = new File(s"${System getProperty "java.io.tmpdir"}$separator$fileName")
+    def tmpFile(fileName: String): Path = Paths.get(System getProperty "java.io.tmpdir", fileName)
 
-    def makeDir(fileName: String): File = {
-      val file = tmpFile(fileName)
-      file.mkdirs
-      file
-    }
+    def makeDir(fileName: String): Path = Files createDirectories tmpFile(fileName)
 
-    def makeFile(fileName: String): File = {
-      val file = tmpFile(fileName)
-      file.createNewFile
-      file
-    }
+    def makeFile(fileName: String): Path = Files createFile tmpFile(fileName)
 
     override def before: Any = fileCleanUp
 
@@ -137,6 +128,6 @@ class PlatformSpecificAdvisedTest
       List(testDirectoryPath, testFilePath, testLinkPath, testNewDirectoryLocation, testNewFileLocation)
 
     private def fileCleanUp(): Unit =
-      fileNamesToClean map tmpFile foreach { file => if (file.exists) file.delete }
+      fileNamesToClean map tmpFile foreach { file => if (Files exists file) Files delete file }
   }
 }

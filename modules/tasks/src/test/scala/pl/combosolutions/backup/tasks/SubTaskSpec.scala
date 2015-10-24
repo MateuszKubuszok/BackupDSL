@@ -3,6 +3,7 @@ package pl.combosolutions.backup.tasks
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import pl.combosolutions.backup.Async
+import pl.combosolutions.backup.test.Tags.UnitTest
 
 import scala.collection.mutable
 
@@ -20,7 +21,7 @@ class SubTaskSpec extends Specification with Mockito {
 
       // then
       subTask.result must beSome(expected).await
-    }
+    } tag UnitTest
 
     "flatMap result" in {
       // given
@@ -34,7 +35,7 @@ class SubTaskSpec extends Specification with Mockito {
 
       // then
       flatMappedTask.result must beNone.await
-    }
+    } tag UnitTest
 
     "map result" in {
       // given
@@ -51,27 +52,27 @@ class SubTaskSpec extends Specification with Mockito {
 
       // then
       mappedTask.result must beSome(expected).await
-    }
+    } tag UnitTest
   }
 
   "SubTaskProxy" should {
 
     "foretell implementation's dependency type" in {
       // given
-      val indepedentProxy = new SubTaskProxy[Unit](DependencyType.Independent)
-      val parentDepedentProxy = new SubTaskProxy[Unit](DependencyType.ParentDependent)
-      val childDepedentProxy = new SubTaskProxy[Unit](DependencyType.ChildDependent)
+      val independentProxy = new SubTaskProxy[Unit](DependencyType.Independent)
+      val parentDependentProxy = new SubTaskProxy[Unit](DependencyType.ParentDependent)
+      val childDependentProxy = new SubTaskProxy[Unit](DependencyType.ChildDependent)
 
       // when
-      val independentType = indepedentProxy.dependencyType
-      val parentDependentType = parentDepedentProxy.dependencyType
-      val childDependentType = childDepedentProxy.dependencyType
+      val independentType = independentProxy.dependencyType
+      val parentDependentType = parentDependentProxy.dependencyType
+      val childDependentType = childDependentProxy.dependencyType
 
       // then
       independentType mustEqual DependencyType.Independent
       parentDependentType mustEqual DependencyType.ParentDependent
       childDependentType mustEqual DependencyType.ChildDependent
-    }
+    } tag UnitTest
 
     "prevent execution of uninitialized proxy" in {
       // given
@@ -82,7 +83,7 @@ class SubTaskSpec extends Specification with Mockito {
 
       // then
       proxy.execute must throwA[AssertionError]
-    }
+    } tag UnitTest
 
     "prevent wrong implementation setup" in {
       // given
@@ -95,7 +96,7 @@ class SubTaskSpec extends Specification with Mockito {
 
       // then
       proxy setImplementation subTask must throwA[IllegalArgumentException]
-    }
+    } tag UnitTest
 
     "prevent double implementation setup" in {
       // given
@@ -110,7 +111,7 @@ class SubTaskSpec extends Specification with Mockito {
 
       // then
       proxy setImplementation subTask must throwA[AssertionError]
-    }
+    } tag UnitTest
 
     "redirect to implementation once set" in {
       // given
@@ -126,7 +127,29 @@ class SubTaskSpec extends Specification with Mockito {
 
       // then
       proxy.result must beSome("test").await
-    }
+    } tag UnitTest
+
+    "set propagation for implementation" in {
+      // given
+      val subTask = mock[SubTask[String]]
+      val propagator = new Propagator(subTask)
+      val propagator2 = new Propagator(subTask)
+      val propagation = mutable.Set[Propagator]()
+      val proxy = new SubTaskProxy[String](DependencyType.Independent)
+      subTask.dependencyType returns DependencyType.Independent
+      subTask.getPropagation returns propagation
+      subTask.result returns (Async some "test")
+
+      // when
+      val result1 = proxy.getPropagation += propagator
+      proxy setImplementation subTask
+      val result2 = proxy.getPropagation += propagator2
+
+      // then
+      result1.toSet mustEqual Set(propagator)
+      result2.toSet mustEqual Set(propagator, propagator2)
+      result1 must_!= result2
+    } tag UnitTest
   }
 
   "IndependentSubTask" should {
@@ -140,7 +163,7 @@ class SubTaskSpec extends Specification with Mockito {
 
       // then
       subTask.dependencyType mustEqual DependencyType.Independent
-    }
+    } tag UnitTest
 
     "run action" in {
       // given
@@ -152,7 +175,24 @@ class SubTaskSpec extends Specification with Mockito {
 
       // then
       subTask.result must beSome(expected).await
-    }
+    } tag UnitTest
+
+    "propagate result" in {
+      // given
+      val expected = "expected"
+      val action = () => Async some expected
+      val subTask = new IndependentSubTask(action)
+      val action2 = (str: String) => Async some s"$str$str"
+      val subTask2 = new ParentDependentSubTask(action2, subTask)
+      subTask.getPropagation += subTask2.propagator
+
+      // when
+      subTask.result
+      val result = subTask2.result
+
+      // then
+      result must beSome(expected + expected).await
+    } tag UnitTest
   }
 
   "ParentDependentSubTask" should {
@@ -167,7 +207,7 @@ class SubTaskSpec extends Specification with Mockito {
 
       // then
       subTask.dependencyType mustEqual DependencyType.ParentDependent
-    }
+    } tag UnitTest
 
     "run action" in {
       // given
@@ -181,7 +221,7 @@ class SubTaskSpec extends Specification with Mockito {
 
       // then
       subTask.result must beSome(expected).await
-    }
+    } tag UnitTest
   }
 
   "ChildDependentSubTask" should {
@@ -196,7 +236,7 @@ class SubTaskSpec extends Specification with Mockito {
 
       // then
       subTask.dependencyType mustEqual DependencyType.ChildDependent
-    }
+    } tag UnitTest
 
     "run action" in {
       // given
@@ -210,6 +250,6 @@ class SubTaskSpec extends Specification with Mockito {
 
       // then
       subTask.result must beSome(expected).await
-    }
+    } tag UnitTest
   }
 }
