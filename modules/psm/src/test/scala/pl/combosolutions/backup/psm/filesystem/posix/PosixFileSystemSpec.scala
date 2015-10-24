@@ -1,7 +1,6 @@
 package pl.combosolutions.backup.psm.filesystem.posix
 
-import java.io.File
-import java.nio.file.Path
+import java.nio.file.{ Path, Paths }
 
 import org.specs2.matcher.Scope
 import org.specs2.mock.Mockito
@@ -24,7 +23,7 @@ class PosixFileSystemSpec
 
   val component = new PosixFileSystemServiceComponent with TestElevationFacadeComponent with TestOperatingSystemComponent
   val service = component.fileSystemService
-  val path = new File("test").getAbsoluteFile.toPath
+  val path = Paths.get("test").toAbsolutePath
 
   "PosixFileSystemService" should {
 

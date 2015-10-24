@@ -1,6 +1,6 @@
 package pl.combosolutions.backup.psm.jvm
 
-import java.io.File
+import java.io.File.pathSeparator
 import java.lang.management.ManagementFactory
 import java.net.{ URLClassLoader, URLDecoder }
 import java.nio.file.{ Files, Paths }
@@ -35,7 +35,7 @@ object JVMUtils extends Logging {
   def classPathFor[T](clazz: Class[T]): List[String] = {
     val pathToClass = getPathToClassFor(clazz)
 
-    val propClassPath = classPath split File.pathSeparator toSet
+    val propClassPath = classPath split pathSeparator toSet
 
     val loaderClassPath = clazz.getClassLoader.asInstanceOf[URLClassLoader].getURLs.map(_.getFile).toSet
 
@@ -56,7 +56,7 @@ object JVMUtils extends Logging {
   def configureRMIFor[T](clazz: Class[T]): Unit = {
     val classPath = classPathFor(clazz)
     val codebase = if (classPath isEmpty) ""
-    else classPath map (new File(_).getAbsoluteFile.toURI.toURL.toString) reduce (_ + " " + _)
+    else classPath map (Paths.get(_).toAbsolutePath.toUri.toURL.toString) reduce (_ + " " + _)
 
     logger trace s"Set $RMICodebaseProperty to: $codebase"
     System setProperty (RMICodebaseProperty, codebase)
