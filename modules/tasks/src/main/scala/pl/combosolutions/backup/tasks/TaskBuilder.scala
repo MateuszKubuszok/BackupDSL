@@ -3,8 +3,8 @@ package pl.combosolutions.backup.tasks
 import java.nio.file.Path
 
 import pl.combosolutions.backup.psm.ComponentRegistry
-import pl.combosolutions.backup.psm.elevation.{ ObligatoryElevationMode, ElevationMode }
-import pl.combosolutions.backup.{ Logging, Cleaner, ReportException }
+import pl.combosolutions.backup.psm.elevation.{ ElevationMode, ObligatoryElevationMode }
+import pl.combosolutions.backup.{ Cleaner, Logging, ReportException }
 import pl.combosolutions.backup.tasks.DependencyType._
 import pl.combosolutions.backup.tasks.TasksExceptionMessages._
 
