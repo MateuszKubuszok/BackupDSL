@@ -26,7 +26,7 @@ abstract class Configurator[BR, PBR, CBR, RR, PRR, CRR](
 
   protected def adjustForChildren[CB <: CBR, CR <: CRR] = asInstanceOf[Configurator[BR, PBR, CB, RR, PRR, CR]]
 
-  private lazy val configure: Unit = {
+  private[tasks] lazy val configure: Unit = {
     parentOpt foreach { parent =>
       builder setParent parent.builder
     }
@@ -36,14 +36,12 @@ abstract class Configurator[BR, PBR, CBR, RR, PRR, CRR](
     }
   }
 
-  private lazy val build: TaskT = builder.build
+  private[tasks] lazy val build: TaskT = builder.build
 
   protected lazy val buildAll: TaskT = {
     configure
     build
   }
 
-  private[tasks] def addChild(child: ChildTaskConfiguratorT): Unit = {
-    children += child
-  }
+  private[tasks] def addChild(child: ChildTaskConfiguratorT): Unit = children += child
 }

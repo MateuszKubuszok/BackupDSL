@@ -29,6 +29,7 @@ class SelectFiles[PBR, CBR, PRR, CRR](files: () => List[String])
     new SelectFilesAction[PRR, CRR](files)
   )
 
+// $COVERAGE-OFF$ Hard to test, no real benefit
 class SelectFilesConfigurator[PBR, CBR, PRR, CRR](
     parent: Configurator[PBR, _, List[Path], PRR, _, List[Path]]
 ) extends Configurator[List[Path], PBR, CBR, List[Path], PRR, CRR](Some(parent)) {
@@ -37,3 +38,4 @@ class SelectFilesConfigurator[PBR, CBR, PRR, CRR](
 
   override val builder = new SelectFiles[PBR, CBR, PRR, CRR](() => files.toList)
 }
+// $COVERAGE-ON$

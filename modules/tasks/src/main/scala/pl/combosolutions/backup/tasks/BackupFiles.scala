@@ -51,6 +51,7 @@ class BackupFiles[CBR, CRR](implicit withSettings: Settings)
     new RestoreSubTaskBuilder[CRR]
   )
 
+// $COVERAGE-OFF$ Hard to test, no real benefit
 class BackupFilesConfigurator[CBR, CRR](
     parent:              Configurator[List[Path], _, List[Path], List[Path], _, List[Path]],
     val initialSettings: Settings
@@ -62,3 +63,4 @@ class BackupFilesConfigurator[CBR, CRR](
 
   val files: mutable.MutableList[String] = mutable.MutableList()
 }
+// $COVERAGE-ON$

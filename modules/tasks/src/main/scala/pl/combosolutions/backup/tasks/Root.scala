@@ -28,7 +28,9 @@ class Root extends TaskBuilder[Unit, Unit, Any, Unit, Unit, Any](
   new RestoreSubTaskBuilder
 )
 
+// $COVERAGE-OFF$ Hard to test, no real benefit
 class RootConfigurator extends Configurator[Unit, Unit, Any, Unit, Unit, Any](None) {
 
   override val builder = new Root
 }
+// $COVERAGE-ON$
