@@ -20,7 +20,7 @@ class Root(
 class SelectFiles[PBR, PRR](
   parent:                       Configurator[PBR, _, List[Path], PRR, _, List[Path]],
   override val initialSettings: Settings
-) extends tasks.SelectFilesConfigurator[PBR, List[Path], PRR, List[Path]](parent, initialSettings)
+) extends tasks.SelectFilesConfigurator[PBR, List[Path], PRR, List[Path]](parent)
     with ConfiguratorUtils[SelectFiles[PBR, PRR]]
     with SpawnBackupFiles
     with Reporting {

@@ -65,7 +65,7 @@ class TaskBuilder[BR, PBR, CBR, RR, PRR, CRR](
       case Independent => restoreSubTaskBuilder configurePropagation (children.toSet map restoreResult)
       case ParentDependent =>
         restoreSubTaskBuilder configureForParent parent.restoreSubTaskBuilder
-        restoreSubTaskBuilder configurePropagation (children.toSet map backupResult)
+        restoreSubTaskBuilder configurePropagation (children.toSet map restoreResult)
       case ChildDependent => restoreSubTaskBuilder configureForChildren (children map (_.restoreSubTaskBuilder))
     }
 

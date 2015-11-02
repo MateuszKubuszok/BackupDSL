@@ -3,7 +3,7 @@ package pl.combosolutions.backup.tasks
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-import pl.combosolutions.backup.{ Async, Cleaner }
+import pl.combosolutions.backup.Async
 import pl.combosolutions.backup.test.Tags.UnitTest
 
 class RootSpec extends Specification with Mockito {
@@ -66,10 +66,6 @@ class RootSpec extends Specification with Mockito {
     child.restoreSubTaskBuilder returns childRestore
     childBackup.injectableProxy returns new SubTaskProxy[Any](DependencyType.Independent)
     childRestore.injectableProxy returns new SubTaskProxy[Any](DependencyType.Independent)
-    val cleaner = new Cleaner {}
-    implicit val settings: Settings = ImmutableSettings(
-      cleaner = cleaner
-    )
     val root = new Root
     root.addChild(child)
   }
