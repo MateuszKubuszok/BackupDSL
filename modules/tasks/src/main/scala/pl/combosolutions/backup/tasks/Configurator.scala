@@ -3,8 +3,7 @@ package pl.combosolutions.backup.tasks
 import scala.collection.mutable
 
 abstract class Configurator[BR, PBR, CBR, RR, PRR, CRR](
-    protected val parentOpt:       Option[Configurator[PBR, _, BR, PRR, _, RR]],
-    protected val initialSettings: Settings
+    protected val parentOpt: Option[Configurator[PBR, _, BR, PRR, _, RR]]
 ) {
 
   type TaskBuilderT = TaskBuilder[BR, PBR, CBR, RR, PRR, CRR]

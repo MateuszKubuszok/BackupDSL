@@ -7,7 +7,7 @@ import pl.combosolutions.backup.tasks.{ Configurator, Settings }
 
 class Root(
   override val initialSettings: Settings
-) extends tasks.RootConfigurator(initialSettings)
+) extends tasks.RootConfigurator
     with ConfiguratorUtils[Root]
     with SpawnSelectFiles[Unit, Any, Unit, Any]
     with Reporting {

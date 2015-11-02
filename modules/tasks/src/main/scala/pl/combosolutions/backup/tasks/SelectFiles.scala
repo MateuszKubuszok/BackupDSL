@@ -30,9 +30,9 @@ class SelectFiles[PBR, CBR, PRR, CRR](files: () => List[String])
   )
 
 class SelectFilesConfigurator[PBR, CBR, PRR, CRR](
-    parent:                       Configurator[PBR, _, List[Path], PRR, _, List[Path]],
-    override val initialSettings: Settings
-) extends Configurator[List[Path], PBR, CBR, List[Path], PRR, CRR](Some(parent), initialSettings) {
+    parent:              Configurator[PBR, _, List[Path], PRR, _, List[Path]],
+    val initialSettings: Settings
+) extends Configurator[List[Path], PBR, CBR, List[Path], PRR, CRR](Some(parent)) {
 
   val files: mutable.MutableList[String] = mutable.MutableList()
 

@@ -52,9 +52,9 @@ class BackupFiles[CBR, CRR](implicit withSettings: Settings)
   )
 
 class BackupFilesConfigurator[CBR, CRR](
-    parent:                       Configurator[List[Path], _, List[Path], List[Path], _, List[Path]],
-    override val initialSettings: Settings
-) extends Configurator[List[Path], List[Path], CBR, List[Path], List[Path], CRR](Some(parent), initialSettings) {
+    parent:              Configurator[List[Path], _, List[Path], List[Path], _, List[Path]],
+    val initialSettings: Settings
+) extends Configurator[List[Path], List[Path], CBR, List[Path], List[Path], CRR](Some(parent)) {
 
   implicit val withSettings = initialSettings
 

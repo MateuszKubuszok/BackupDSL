@@ -12,29 +12,23 @@ object Root extends Reporting {
     Some(Unit)
   }
 
-  private def backupAction(implicit withSettings: Settings): Any2Result = _ => unitResult
+  private def backupAction: Any2Result = _ => unitResult
 
-  private def restoreAction(implicit withSettings: Settings): Any2Result = _ => unitResult
+  private def restoreAction: Any2Result = _ => unitResult
 
-  class BackupSubTaskBuilder(implicit withSettings: Settings)
-    extends ChildDependentSubTaskBuilder[Unit, Unit, Any](backupAction)
+  class BackupSubTaskBuilder extends ChildDependentSubTaskBuilder[Unit, Unit, Any](backupAction)
 
-  class RestoreSubTaskBuilder(implicit withSettings: Settings)
-    extends ChildDependentSubTaskBuilder[Unit, Unit, Any](restoreAction)
+  class RestoreSubTaskBuilder extends ChildDependentSubTaskBuilder[Unit, Unit, Any](restoreAction)
 }
 
 import Root._
 
-class Root(implicit withSettings: Settings) extends TaskBuilder[Unit, Unit, Any, Unit, Unit, Any](
+class Root extends TaskBuilder[Unit, Unit, Any, Unit, Unit, Any](
   new BackupSubTaskBuilder,
   new RestoreSubTaskBuilder
 )
 
-class RootConfigurator(
-    override val initialSettings: Settings
-) extends Configurator[Unit, Unit, Any, Unit, Unit, Any](None, initialSettings) {
-
-  implicit val withSettings = initialSettings
+class RootConfigurator extends Configurator[Unit, Unit, Any, Unit, Unit, Any](None) {
 
   override val builder = new Root
 }
