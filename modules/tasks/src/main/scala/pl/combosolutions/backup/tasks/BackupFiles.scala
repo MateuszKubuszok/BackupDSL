@@ -1,12 +1,10 @@
 package pl.combosolutions.backup.tasks
 
-import java.nio.file.{ Files, Path, Paths }
+import java.nio.file.{ Path, Paths }
 
-import pl.combosolutions.backup.{ ExecutionContexts, Async, Reporting }
-import ExecutionContexts.Task.context
+import pl.combosolutions.backup.{ Async, Reporting }
 
 import scala.collection.mutable
-import scala.util.{ Failure, Success, Try }
 
 object BackupFiles extends Reporting {
 
