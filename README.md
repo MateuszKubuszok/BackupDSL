@@ -40,7 +40,7 @@ configuration like this one:
     /***
     scalaVersion := "2.11.7"
     
-    libraryDependencies += "pl.combosolutions" %% "backup-dsl" % "0.2"
+    libraryDependencies += "pl.combosolutions" %% "backup-dsl" % "0.2.0-SNAPSHOT"
     */
     
     import pl.combosolutions.backup.dsl.Script
