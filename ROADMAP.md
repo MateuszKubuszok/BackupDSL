@@ -7,7 +7,7 @@
  *  *fully* supports POSIX filesystem.
 
 
-## 0.2 - functional DSL with example tasks
+## 0.2 - functional DSL with example tasks [✓]
 
  *  has functional at least file backup-restore tasks,
  *  has functional DSL for at least file backup-restore.
